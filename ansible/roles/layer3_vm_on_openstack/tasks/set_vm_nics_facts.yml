@@ -32,7 +32,7 @@
   - name: save VMs IPs as facts in vm_nics
     # TODO: this is a little bit ugly as we assume a 24 bit netmask for the gw calculation... we should look at the subnets and figure this out and set it accordingly
     set_fact:
-      vm_nics: "{{ vm_nics|default([]) + [ {'ip': (instance_data.stdout|from_json)[0]['Networks']|regex_replace('.*'+item.0+'=','')|regex_replace('[,;].*',''), 'prefix': '24', 'dev': item.1, 'mac': item.2, 'netname': item.0, 'default_gw': (gwip if item.1 == 'eth0' else (instance_data.stdout|from_json)[0]['Networks']|regex_replace('.*'+item.0+'=','')|regex_replace('[,;].*','')|regex_replace('(\\d+\\.\\d+\\.\\d+)\\.\\d+','\\1.1')) } ] }}"
+      vm_nics: "{{ vm_nics|default([]) + [ {'ip': (instance_data.stdout|from_json)[0]['Networks']|regex_replace('.*'+item.0+'=','')|regex_replace('[,;].*',''), 'prefix': '24', 'dev': item.1, 'mac': item.2, 'netname': item.0, 'default_gw': (gwip.stdout if item.1 == 'eth0' else (instance_data.stdout|from_json)[0]['Networks']|regex_replace('.*'+item.0+'=','')|regex_replace('[,;].*','')|regex_replace('(\\d+\\.\\d+\\.\\d+)\\.\\d+','\\1.1')) } ] }}"
     with_together: 
       - "{{ vm_networks }}"
       - "{{ nics.stdout_lines }}"
