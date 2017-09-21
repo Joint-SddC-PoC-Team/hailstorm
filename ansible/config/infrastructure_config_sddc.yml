@@ -52,16 +52,17 @@ infrastructure_network_guests:
 
 # this is meant as a way to connect to the machines in a way like an out-of-band management network, so RACs should be here or in RHSOP-Provisioning; in OpenStack this is the Management Network
 infrastructure_network_admin:
+  # in SDDC we have here only 10.116.127.140-179 free
   netname: 'admin'
   bridge: 'admin'
-  default_gw_host_prefix: 10.116.122.1/24
+  default_gw_host_prefix: 10.116.127.254
   vlan:       1
-  osp_overcloud_start: 10.116.122.81
-  osp_overcloud_end:   10.116.122.100
-  dhcp_start: 10.116.122.172
-  dhcp_end:   10.116.122.254
-  floating_start:         10.116.122.101
-  floating_end:           10.116.122.120
+  dhcp_start: 10.116.127.140
+  dhcp_end:   10.116.127.159
+  osp_overcloud_start: 10.116.127.160
+  osp_overcloud_end:   10.116.127.169
+  floating_start:         10.116.127.170
+  floating_end:           10.116.127.179
   mac_prefix: "02:00:00:00:03:"
 
 # here all internal api calls should happen of products communicating with each other
@@ -111,10 +112,10 @@ infrastructure_network_rhosp_provisioning:
   netname: 'rhosp_provisioning'
   bridge: 'provisioning'
   forward_mode: 'nat'
-  default_gw_host_prefix: 10.116.127.1/24
+  default_gw_host_prefix: 10.116.122.1/24
   vlan: 1
-  floating_start:         10.116.127.101
-  floating_end:           10.116.127.120
+  floating_start:         10.116.122.101
+  floating_end:           10.116.122.120
   mac_prefix: "02:00:00:00:08:"
 
 # deprecated as those networks melt into the others (like they always should)
@@ -146,7 +147,7 @@ infrastructure_network_provider2:
   mac_prefix: "02:00:00:00:10:"
 
 # OSPF1
-#nfrastructure_network_provider3:
+#infrastructure_network_provider3:
 # netname: 'provider3'
 # bridge: 'provider3'
 # default_gw_host_prefix: 10.116.111.1/28
@@ -154,7 +155,7 @@ infrastructure_network_provider2:
 # mac_prefix: "02:00:00:00:11:"
 
 # OSPF2
-#nfrastructure_network_provider4:
+#infrastructure_network_provider4:
 # netname: 'provider4'
 # bridge: 'provider4'
 # default_gw_host_prefix: 10.116.111.33/28
