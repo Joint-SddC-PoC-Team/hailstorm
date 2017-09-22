@@ -1,12 +1,14 @@
 - block:
     - include: prepare_host.yml
       tags: ['layer1','layer1-host']
+    # - include: configure_bond_devices.yml
+    #   tags: ['layer1', 'layer1-bond']
     - include: configure_bridge.yml
       tags: ['layer1','layer1-bridge']
-    - include: define_libvirt_storage_pools.yml
-      tags: ['layer1','layer1-libvirt-storage']
     - include: define_libvirt_networks.yml
       tags: ['layer1','layer1-libvirt-networks']
+    - include: define_libvirt_storage_pools.yml
+      tags: ['layer1','layer1-libvirt-storage']
     - include: copy_installation_sources.yml
       tags: ['layer1','layer1-sources']
     - include: prepare_kickstart_folder.yml
@@ -27,9 +29,11 @@
       tags: ['layer1','layer1-nfs-binary']
   when: mode=='create'
 
-- block:
+#- block:
     #- include: remove_user_with_kvm_access.yml
     #- include: remove_iptables.yml
-    - include: destroy_libvirt_networks.yml
-    - include: remove_bridge.yml
-  when: mode=='destroy'
+    #- include: destroy_libvirt_networks.yml
+    #- include: remove_bridge.yml
+    #- include: remove_bond_devices.yml
+    #  tags: ['layer1', 'layer1-bond']
+#  when: mode=='destroy'

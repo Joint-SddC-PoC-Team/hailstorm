@@ -20,7 +20,7 @@
 - name: system-upgrade
   yum: name=* state=latest
 - name: ensure prerequisite packages are present
-  yum: name=libvirt,libvirt-client,qemu-kvm,qemu-img,libvirt-python,virt-install,nfs-utils,iptables-services state=latest
+  yum: name=libvirt,libvirt-client,qemu-kvm,qemu-img,libvirt-python,virt-install,nfs-utils,iptables-services,rsync state=latest
   #reboot machine if necessary https://bugzilla.redhat.com/show_bug.cgi?id=950436
   register: prereqs
 

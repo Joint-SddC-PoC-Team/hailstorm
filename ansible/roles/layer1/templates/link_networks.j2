@@ -1,0 +1,12 @@
+#!/bin/bash
+{% for network in infrastructure_networks %}
+
+{% if network.forward_mode != 'bridge'%}
+ip link add dev l{{ network.bridge }} type veth peer name lx{{ network.bridge }}
+brctl addif {{ network.bridge }} lx{{ network.bridge }}
+brctl addif x{{ network.bridge }} l{{ network.bridge }}
+ip link set l{{ network.bridge }} up
+ip link set lx{{ network.bridge }} up
+{% endif %}
+
+{% endfor %}

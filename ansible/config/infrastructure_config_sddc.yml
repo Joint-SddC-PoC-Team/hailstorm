@@ -18,7 +18,7 @@ infrastructure_network_services:
   bridge: 'services'
   forward_mode: 'nat'
   default_gw_host_prefix: 10.116.120.1/24
-  vlan:                   2801
+  vlan:                   2813
   osp_undercloud_start:   10.116.120.30
   osp_undercloud_end:     10.116.120.80
   osp_overcloud_start:    10.116.120.81
@@ -28,35 +28,62 @@ infrastructure_network_services:
   floating_start:         10.116.120.173
   floating_end:           10.116.120.254
   mac_prefix: "02:00:00:00:01:"
+  nic:
+    "storm2.coe.muc.redhat.com": p5p1
+    "storm3.coe.muc.redhat.com": p5p1
+    "storm4.coe.muc.redhat.com": p2p1
+    "storm5.coe.muc.redhat.com": p2p1
+    "storm6.coe.muc.redhat.com": p2p1
 
 # guests is an external network for virtual machine guests, not to be confused with the OpenStack tentant network; it is as a matter of fact OpenStacks br-ex without the public API endpoints
 # SDDC: BGP2 breakout?
 infrastructure_network_guests:
   netname: 'guests'
-  bridge:                 '{% if external_network_config.guest_network_bridging is not defined %}virbr2{%           else %}br0{% endif %}'
-  # should be:
-  #bridge:                 "guests"
-  forward_mode:           "{% if external_network_config.guest_network_bridging is not defined %}nat{%              else %}bridge{% endif %}"
-  default_gw_host_prefix: "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.1/24{% else %}{{ external_network_config.guest_network_bridging.default_gw_host_prefix }}{% endif %}"
-  vlan:                   2802
-  infra_start:            "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.129{%  else %}{{ external_network_config.guest_network_bridging.osp_infra_start }}{% endif %}"
-  infra_end:              "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.149{%  else %}{{ external_network_config.guest_network_bridging.osp_infra_end }}{% endif %}"
-  floating_start:         "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.150{%  else %}{{ external_network_config.guest_network_bridging.osp_floating_start }}{% endif %}"
-  floating_end:           "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.254{%  else %}{{ external_network_config.guest_network_bridging.osp_floating_end }}{% endif %}"
-  dns_server:             "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.1{%  else %}{{ external_network_config.guest_network_bridging.dns_server }}{% endif %}"
+  bridge:                 "guests"
+  mac_prefix:             "52:54:00:48:04:"
+  forward_mode:           "bridge"
+
+  #COE MUC
+  default_gw_host_prefix: "10.32.111.254/20"
+  #vlan                   -1
+  floating_start:         "10.32.105.163"
+  floating_end:           "10.32.105.177"
+  dns_server:             10.32.96.1"
+  #infra_start:            "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.129{%  else %}{{ external_network_config.guest_network_bridging.osp_infra_start }}{% endif %}"
+  #infra_end:              "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.149{%  else %}{{ external_network_config.guest_network_bridging.osp_infra_end }}{% endif %}"
+  nic:
+    #storm1: em2
+    "storm2.coe.muc.redhat.com": em2
+    "storm3.coe.muc.redhat.com": em2
+    "storm4.coe.muc.redhat.com": em2
+    "storm5.coe.muc.redhat.com": em2
+    "storm6.coe.muc.redhat.com": em2
+
+  #BOSCH
+  #default_gw_host_prefix: "10.116.121.1/24"
+  #vlan:                   2802
+  #floating_start:         "10.116.121.150"
+  #floating_end:           "10.116.121.254"
+  #dns_server:             "10.116.121.1"
+  # nic:
+  #   storm2: p5p1
+  #   "storm3.coe.muc.redhat.com": p5p1
+  #   "storm4.coe.muc.redhat.com": p2p1
+  #   "storm5.coe.muc.redhat.com": p2p1
+  #   "storm6.coe.muc.redhat.com": p2p1
 
   # the following are only relevant when forward_mode == 'nat'
-  dhcp_start: 10.116.121.2
-  dhcp_end:   10.116.121.128
-  mac_prefix: "02:00:00:00:02:"
+  #dhcp_start: 10.116.121.2
+  #dhcp_end:   10.116.121.128
 
 # this is meant as a way to connect to the machines in a way like an out-of-band management network, so RACs should be here or in RHSOP-Provisioning; in OpenStack this is the Management Network
 infrastructure_network_admin:
   # in SDDC we have here only 10.116.127.140-179 free
   netname: 'admin'
   bridge: 'admin'
-  default_gw_host_prefix: 10.116.127.254
-  vlan:       1
+  forward_mode: 'nat'
+  default_gw_host_prefix: 10.116.127.254/24
+#  vlan:       1
   dhcp_start: 10.116.127.140
   dhcp_end:   10.116.127.159
   osp_overcloud_start: 10.116.127.160
@@ -64,31 +91,53 @@ infrastructure_network_admin:
   floating_start:         10.116.127.170
   floating_end:           10.116.127.179
   mac_prefix: "02:00:00:00:03:"
+  nic:
+    "storm2.coe.muc.redhat.com": p5p1
+    "storm3.coe.muc.redhat.com": p5p1
+    "storm4.coe.muc.redhat.com": p2p1
+    "storm5.coe.muc.redhat.com": p2p1
+    "storm6.coe.muc.redhat.com": p2p1
+
 
 # here all internal api calls should happen of products communicating with each other
 infrastructure_network_internal_api:
   netname: 'internal_api'
   bridge: 'internal_api'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.123.1/24
   vlan:       2814
   osp_overcloud_start: 10.116.123.81
   osp_overcloud_end:   10.116.123.100
   mac_prefix: "02:00:00:00:04:"
+  nic:
+    "storm2.coe.muc.redhat.com": p5p1
+    "storm3.coe.muc.redhat.com": p5p1
+    "storm4.coe.muc.redhat.com": p2p1
+    "storm5.coe.muc.redhat.com": p2p1
+    "storm6.coe.muc.redhat.com": p2p1
 
 # this is the real tenant network where all tenant traffic is encapsulated by the sdn solution
 infrastructure_network_tenant:
   netname: 'tenant'
   bridge: 'tenant'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.124.1/24
   vlan:       2815
   osp_overcloud_start: 10.116.124.81
   osp_overcloud_end:   10.116.124.100
   mac_prefix: "02:00:00:00:05:"
+  nic:
+    "storm2.coe.muc.redhat.com": p5p1
+    "storm3.coe.muc.redhat.com": p5p1
+    "storm4.coe.muc.redhat.com": p2p1
+    "storm5.coe.muc.redhat.com": p2p1
+    "storm6.coe.muc.redhat.com": p2p1
 
 # this is a network for accessing the storage systems (aka public APIs); if applicable the storage systems on their own should not utilize this network, e.g. for syncing; for that the Storage Management network should be used like it is done in OpenStack
 infrastructure_network_storage:
   netname: 'storage'
   bridge: 'storage'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.125.1/24
   vlan:       2816
   osp_overcloud_start: 10.116.125.81
@@ -96,16 +145,29 @@ infrastructure_network_storage:
   dhcp_start: 10.116.125.172
   dhcp_end:   10.116.125.254
   mac_prefix: "02:00:00:00:06:"
+  nic:
+    "storm2.coe.muc.redhat.com": p5p1
+    "storm3.coe.muc.redhat.com": p5p1
+    "storm4.coe.muc.redhat.com": p2p1
+    "storm5.coe.muc.redhat.com": p2p1
+    "storm6.coe.muc.redhat.com": p2p1
 
 # the Storage Management network should be used for all storage systems for their internal processes like syning and communication; for public endpoints use the Storage Network
 infrastructure_network_storage_mgmt:
   netname: 'storage_mgmt'
   bridge: 'storage_mgmt'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.126.1/24
   vlan:       2817
   osp_overcloud_start: 10.116.126.81
   osp_overcloud_end:   10.116.126.100
   mac_prefix: "02:00:00:00:07:"
+  nic:
+    "storm2.coe.muc.redhat.com": p5p1
+    "storm3.coe.muc.redhat.com": p5p1
+    "storm4.coe.muc.redhat.com": p2p1
+    "storm5.coe.muc.redhat.com": p2p1
+    "storm6.coe.muc.redhat.com": p2p1
 
 # this is the provisioning network of OpenStack, although it could be used for all provisioning (like Satellite) as none of the systems should listen to requests of unknown machines; by that they should not interfere
 infrastructure_network_rhosp_provisioning:
@@ -113,10 +175,16 @@ infrastructure_network_rhosp_provisioning:
   bridge: 'provisioning'
   forward_mode: 'nat'
   default_gw_host_prefix: 10.116.122.1/24
-  vlan: 1
+#  vlan: 1
   floating_start:         10.116.122.101
   floating_end:           10.116.122.120
   mac_prefix: "02:00:00:00:08:"
+  nic:
+    "storm2.coe.muc.redhat.com": p5p3
+    "storm3.coe.muc.redhat.com": p5p3
+    "storm4.coe.muc.redhat.com": em3
+    "storm5.coe.muc.redhat.com": em3
+    "storm6.coe.muc.redhat.com": em3
 
 # deprecated as those networks melt into the others (like they always should)
 #infrastructure_network_rhosp_internal:
@@ -130,21 +198,35 @@ infrastructure_network_rhosp_provisioning:
 infrastructure_network_provider1:
   netname: 'provider1'
   bridge: 'provider1'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.111.17/28
   vlan:       2803
   floating_start:         10.116.111.18
   floating_end:           10.116.111.30
   mac_prefix: "02:00:00:00:09:"
+  nic:
+    "storm2.coe.muc.redhat.com": p5p1
+    "storm3.coe.muc.redhat.com": p5p1
+    "storm4.coe.muc.redhat.com": p2p1
+    "storm5.coe.muc.redhat.com": p2p1
+    "storm6.coe.muc.redhat.com": p2p1
 
 # BGP2
 infrastructure_network_provider2:
   netname: 'provider2'
   bridge: 'provider2'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.111.49/28
   vlan:       2804
   floating_start:         10.116.111.50
   floating_end:           10.116.111.62
   mac_prefix: "02:00:00:00:10:"
+  nic:
+    "storm2.coe.muc.redhat.com": p5p1
+    "storm3.coe.muc.redhat.com": p5p1
+    "storm4.coe.muc.redhat.com": p2p1
+    "storm5.coe.muc.redhat.com": p2p1
+    "storm6.coe.muc.redhat.com": p2p1
 
 # OSPF1
 #infrastructure_network_provider3:
@@ -153,6 +235,12 @@ infrastructure_network_provider2:
 # default_gw_host_prefix: 10.116.111.1/28
 # vlan:       2801
 # mac_prefix: "02:00:00:00:11:"
+# nic:
+#   "storm2.coe.muc.redhat.com": p5p1
+#   "storm3.coe.muc.redhat.com": p5p1
+#   "storm4.coe.muc.redhat.com": p2p1
+#   "storm5.coe.muc.redhat.com": p2p1
+#   "storm6.coe.muc.redhat.com": p2p1
 
 # OSPF2
 #infrastructure_network_provider4:
@@ -161,6 +249,12 @@ infrastructure_network_provider2:
 # default_gw_host_prefix: 10.116.111.33/28
 # vlan:       2802
 # mac_prefix: "02:00:00:00:12:"
+# nic:
+#   "storm2.coe.muc.redhat.com": p5p1
+#   "storm3.coe.muc.redhat.com": p5p1
+#   "storm4.coe.muc.redhat.com": p2p1
+#   "storm5.coe.muc.redhat.com": p2p1
+#   "storm6.coe.muc.redhat.com": p2p1
 
 infrastructure_networks:
   - "{{ infrastructure_network_services }}"
@@ -176,3 +270,6 @@ infrastructure_networks:
   - "{% if infrastructure_network_provider2 is defined %}{{ infrastructure_network_provider2 }}{% endif %}"
 # - "{{ infrastructure_network_provider3 }}"
 # - "{{ infrastructure_network_provider4 }}"
+
+
+infrastructure_network_master: storm4.coe.muc.redhat.com

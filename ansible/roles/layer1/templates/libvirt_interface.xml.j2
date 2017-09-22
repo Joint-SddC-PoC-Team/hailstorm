@@ -1,7 +1,14 @@
-<interface type='bridge' name='{{ infrastructure_network_guests.bridge }}'>
+<interface type='bridge' name='{{ item.bridge }}'>
   <start mode='onboot'/>
   <bridge stp='off' delay='2'>
-    <interface type='ethernet' name='{{ external_network_config.guest_network_bridging.layer1_dev }}'>
+    {% if item.vlan is defined %}
+    <interface type='vlan' name='{{ item.nic[layer1_ansible_host] }}.{{ item.vlan }}'>
+      <vlan tag='{{ item.vlan }}'>
+        <interface name='{{ item.nic[layer1_ansible_host] }}'/>
+      </vlan>
     </interface>
+    {% else %}
+    <interface type='ethernet' name='{{ item.nic[layer1_ansible_host] }}' />
+    {% endif %}
   </bridge>
 </interface>

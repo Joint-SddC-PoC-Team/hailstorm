@@ -40,7 +40,7 @@
         - include: roles/layer3_vm_on_openstack/tasks/set_floating_ip_as_fact.yml
         - include: roles/layer3_vm_on_openstack/tasks/set_vm_nics_facts.yml
         - debug: var=vm_nics
-    when: openstack_available.stdout|length > 0
+      when: openstack_available.stdout|length > 0
 
 - hosts: layer1
   remote_user: root
