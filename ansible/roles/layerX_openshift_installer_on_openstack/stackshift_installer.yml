@@ -1,0 +1,13 @@
+---
+# IMPORTANT!! Please run this playbook from a client with access to your OpenStack keystone endpoint. Required software: Ansible v2.3.2, OpenStack client v3.2.1, Neutron client v6.0.0
+# One more thing: In order to achieve a fully automated experience, set host_key_checking = False in your /etc/ansible/ansible.cfg before start
+- hosts: localhost
+- gather_facts: no
+- name: Deploy the infrastructure on OpenStack
+  include: 01_deploy_infrastructure.yml
+- name: Finish the infrastructure configuration
+  include: 02_post_deploy_infrastructure.yml
+- name: Prepare and deploy OpenShift Container platform
+  include: 03_prepare_OCP_deployment.yml
+- name: Finish OpenShift configuration
+  include: 04_after_OCP_deployment.yml

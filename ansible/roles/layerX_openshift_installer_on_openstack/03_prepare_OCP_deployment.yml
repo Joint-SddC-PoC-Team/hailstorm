@@ -1,0 +1,171 @@
+---
+- hosts: localhost
+
+  vars_files:
+  - vars.yml
+
+  tasks:
+
+  # Add bastion as new ansible host
+  - name: Add bastion to ansible inventory in memory
+    add_host:
+      name: "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}"
+      groups: OCP
+
+- hosts: OCP
+
+  environment:
+    ANSIBLE_HOST_KEY_CHECKING: False
+    DOCKER_DEV: "{{ VOLUME_DEV }}"
+
+  vars:
+    ansible_ssh_private_key_file: ./ocpkp
+    ansible_ssh_user: cloud-user
+    ansible_become: true
+
+  vars_files:
+  - vars.yml
+
+  tasks:
+
+  # Create nodes variables
+  - set_fact:
+      ALL_NODES: "{{ OCP_BASTION }} + {{ OCP_LB }} + {{ OCP_MASTERS }} + {{ OCP_INFRANODES }} + {{ OCP_APPNODES }}"
+      OCP_NODES: "{{ OCP_MASTERS }} + {{ OCP_INFRANODES }} + {{ OCP_APPNODES }}"
+      HA: "{{ True if (OCP_LB.0 is defined) else False}}"
+      MASTERNUMBER: "{{ OCP_MASTERS | length }}"
+      INFRANUMBER: "{{ OCP_INFRANODES | length }}"
+      APPNUMBER: "{{ OCP_APPNODES | length }}"
+
+  # Subscribe bastion, enable the right repos, update and install the packages
+  - name: Check subscription status for bastion
+    shell: subscription-manager status
+    register: subs
+    ignore_errors: yes    
+ 
+  - set_fact:
+      subs_status={{ true if (subs.stdout | search("Current")) else false }}
+
+  - name: Subscribe bastion
+    shell: subscription-manager register --username="{{ RHN_USERNAME }}" --password="{{ RHN_PASSWORD }}"
+    when: subs_status|bool == false
+  
+  - name: Attach pool ID in bastion
+    shell: subscription-manager attach --pool="{{ RHN_POOLID }}"
+    when: subs_status|bool == false
+  
+  - name: Disable all repos in bastion
+    shell: subscription-manager repos --disable=*
+    when: subs_status|bool == false
+  
+  - name: Enable correct repos
+    shell: subscription-manager repos --enable='{{item}}'
+    with_items:
+    - "{{OCP_REPOS}}"
+    when: subs_status|bool == false
+
+  - name: Update all in bastion
+    yum:
+      name: '*'
+      state: latest
+    when: subs_status|bool == false
+
+  - name: Install packages on bastion
+    yum:  
+      name: "{{item}}"
+      state: latest
+    with_items:    
+    - "{{OCP_PACKAGES_BASTION}}"
+    when: subs_status|bool == false
+
+  - name: Copy the private key to the bastion
+    copy:
+      src: ./ocpkp
+      dest: /home/cloud-user/.ssh/id_rsa
+      owner: cloud-user
+      group: cloud-user
+      mode: 0400
+    when: subs_status|bool == false
+
+  - name: Copy the inventory to the bastion
+    template:
+      src: hosts.j2
+      dest: /etc/ansible/hosts
+    when: subs_status|bool == false
+
+  - name: Copy the docker file to the bastion
+    template:
+      src: docker.j2
+      dest: /home/cloud-user/docker
+    when: subs_status|bool == false
+  
+  # Prepare OpenShift hosts
+  - name: Check if OpenShift hosts are already registered
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa all -a 'subscription-manager status'
+    register: status_subs
+    ignore_errors: yes    
+  
+  - set_fact:
+      OCP_subs_status={{ true if (status_subs.stdout | search("Current")) else false}}
+
+  - name: Register OpenShift hosts
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa all -a 'subscription-manager register --username="{{ RHN_USERNAME }}" --password="{{ RHN_PASSWORD }}"'
+    when: OCP_subs_status|bool == false
+  - name: Attach pool ID to every OpenShift host
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa all -a 'subscription-manager attach --pool="{{ RHN_POOLID }}"'
+    when: OCP_subs_status|bool == false
+  - name: Disable all repos on every OpenShift host
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa all -a 'subscription-manager repos --disable=*'
+    when: OCP_subs_status|bool == false
+  - name: Enable the required repos on every OpenShift host
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa all -a 'subscription-manager repos --enable="{{item}}"'
+    with_items:
+    - "{{OCP_REPOS}}"    
+    when: OCP_subs_status|bool == false
+
+  - name: Check if OpenShift is already running
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa masters -a 'systemctl status atomic-openshift-master'
+    register: status_master
+    ignore_errors: yes
+    when: HA != true
+
+  - name: Check if OpenShift is already running (HA)
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa masters -a 'systemctl status atomic-openshift-master-controllers'
+    register: status_master_HA
+    ignore_errors: yes
+    when: HA == true
+
+  - set_fact:
+      OCP_master_status={{ false if (status_master.stdout | search('FAILED')) else true}}
+    when: HA != true
+      
+  - set_fact:
+      OCP_master_status={{ false if (status_master_HA.stdout | search('FAILED')) else true}}
+    when: HA == true
+
+  - name: Install the required software packages on every OpenShift host
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa all -m yum -a 'name="{{item}}" state=present'
+    with_items:    
+    - "{{OCP_PACKAGES}}"
+    when: OCP_master_status|bool == false
+  - name: Update Openshift hosts' software to the latest versions
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa all -m yum -a 'name="*" state=latest'
+    when: OCP_master_status|bool == false
+  - name: Install atomic-openshift-utils software on every OpenShift host
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa all -m yum -a 'name=atomic-openshift-utils state=present'
+    when: OCP_master_status|bool == false
+  - name: Install docker on every OpenShift host
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa nodes -m yum -a 'name=docker state=present'
+    when: OCP_master_status|bool == false
+  - name: Copy the docker storage setup file to every OpenShift host
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa nodes -m copy -a 'src=/home/cloud-user/docker dest=/etc/sysconfig/docker-storage-setup'
+    when: OCP_master_status|bool == false
+  - name: Enable and start docker on every OpenShift host
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa nodes -m service -a 'name=docker state=started enabled=yes'
+    when: OCP_master_status|bool == false
+
+  # Deploy OpenShift Container Platform
+  - name: Deploy OpenShift Container Platform - This step will take some time, please be patient
+    shell: ansible-playbook --private-key=/home/cloud-user/.ssh/id_rsa /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+    when: OCP_master_status|bool == false
+ 

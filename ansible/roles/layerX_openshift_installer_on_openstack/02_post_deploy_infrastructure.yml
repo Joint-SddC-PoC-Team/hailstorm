@@ -1,0 +1,125 @@
+---
+- hosts: localhost
+
+  vars_files:
+  - vars.yml
+
+  # Set environment variables
+  vars:
+    admin_tenant:
+      OS_REGION_NAME: "{{REGION_NAME}}"  
+      OS_AUTH_URL: "{{AUTH_URL}}"
+      OS_TENANT_NAME: "{{ADMIN_PROJECT_NAME}}"
+      OS_USERNAME: "{{AUTH_USERNAME}}"
+      OS_PASSWORD: "{{AUTH_PASSWORD}}"
+    openshift_tenant:
+      OS_REGION_NAME: "{{REGION_NAME}}"  
+      OS_AUTH_URL: "{{AUTH_URL}}"
+      OS_TENANT_NAME: "{{TENANT_NAME}}"
+      OS_USERNAME: "{{TENANT_USER}}"
+      OS_PASSWORD: "{{TENANT_PWD}}"
+
+  tasks:
+
+  # Create nodes variables
+  - set_fact:
+      ALL_NODES: "{{ OCP_BASTION }} + {{ OCP_LB }} + {{ OCP_MASTERS }} + {{ OCP_INFRANODES }} + {{ OCP_APPNODES }}"
+      OCP_NODES: "{{ OCP_MASTERS }} + {{ OCP_INFRANODES }} + {{ OCP_APPNODES }}"
+      HA: "{{ True if (OCP_LB.0 is defined) else False}}"
+
+  # Load private IPs
+  - name: Load private IPs into array
+    shell: openstack server list --project openshift | grep "{{item}}" | awk '{print $8}' | awk -F[=,] '{print $2}'
+    with_items: "{{ALL_NODES}}"
+    environment: "{{openshift_tenant}}"
+    register: private_IPs
+  
+  # DNS entries configuration
+  - name: Update private entries on the DNS server
+    nsupdate:
+      key_name: "{{KEY_NAME}}"
+      key_secret: "{{KEY_SECRET}}"
+      server: "{{NAMESERVER}}"
+      zone: "{{OCP_DOMAIN}}"
+      record: "{{item.item}}"
+      value: "{{item.stdout | ipaddr}}"
+    with_items: "{{private_IPs.results}}"    
+
+  # Load bastion public IP
+  - name: Load bastion public IP
+    shell: openstack server list --project openshift | grep "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
+    register: bastion_public_IP
+    environment: "{{openshift_tenant}}"
+
+  # Load LB public IP
+  - name: Load LB public IP
+    shell: openstack server list --project openshift | grep "{{OCP_LB.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
+    register: LB_public_IP
+    environment: "{{openshift_tenant}}"
+    when: HA == true
+
+  # Load master public IP
+  - name: Load master public IP
+    shell: openstack server list --project openshift | grep "{{OCP_MASTERS.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
+    register: master_public_IP
+    environment: "{{openshift_tenant}}"
+    when: HA == false
+
+  # Load infranode public IP
+  - name: Load infranode public IP
+    shell: openstack server list --project openshift | grep "{{OCP_INFRANODES.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
+    register: infra_public_IP
+    environment: "{{openshift_tenant}}"
+    when: HA == false    
+    
+  # DNS update for bastion
+  - name: Update bastion public IP in the DNS server
+    nsupdate:
+      key_name: "{{KEY_NAME}}"
+      key_secret: "{{KEY_SECRET}}"
+      server: "{{NAMESERVER}}"
+      zone: "{{OCP_DOMAIN}}"
+      record: "{{OCP_BASTION.0}}"
+      value: "{{bastion_public_IP.stdout}}"
+
+  # DNS update for LB if HA
+  - name: Update webconsole LB public IP in the DNS server
+    nsupdate:
+      key_name: "{{KEY_NAME}}"
+      key_secret: "{{KEY_SECRET}}"
+      server: "{{NAMESERVER}}"
+      zone: "{{OCP_DOMAIN}}"
+      record: "{{OCP_WEBCONSOLE}}"
+      value: "{{LB_public_IP.stdout}}"
+    when: HA == true
+  - name: Update apps subdomain LB public IP in the DNS server
+    nsupdate:
+      key_name: "{{KEY_NAME}}"
+      key_secret: "{{KEY_SECRET}}"
+      server: "{{NAMESERVER}}"
+      zone: "{{OCP_DOMAIN}}"
+      record: "{{OCP_APPSSUBDOMAIN}}"
+      value: "{{LB_public_IP.stdout}}"
+    when: HA == true    
+
+  # DNS update for master1 if not HA
+  - name: Update masternode public IP in the DNS server
+    nsupdate:
+      key_name: "{{KEY_NAME}}"
+      key_secret: "{{KEY_SECRET}}"
+      server: "{{NAMESERVER}}"
+      zone: "{{OCP_DOMAIN}}"
+      record: "{{OCP_WEBCONSOLE}}"
+      value: "{{master_public_IP.stdout}}"
+    when: HA == false
+
+  # DNS update for infranode1 if not HA
+  - name: Update infranode public IP in the DNS server
+    nsupdate:
+      key_name: "{{KEY_NAME}}"
+      key_secret: "{{KEY_SECRET}}"
+      server: "{{NAMESERVER}}"
+      zone: "{{OCP_DOMAIN}}"
+      record: "{{OCP_APPSSUBDOMAIN}}"
+      value: "{{infra_public_IP.stdout}}"
+    when: HA == false
