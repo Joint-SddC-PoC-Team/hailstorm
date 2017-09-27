@@ -86,6 +86,11 @@ Run all commands on your laptop from the ansible directory. Since the server mig
 
 1. If you encounter any issues please report it and edit this page if you think it can improve the process.
 
+### Tower License
+in case you roll out a new tower installation, you need a tower license file in
+ansible/binary/tower_license.json
+You can get it from: https://store.ansible.com/redhat/tower_license/
+
 ## Network Connectivity
 
 In order to access the virtual machines created on layer2, a tunneling mechanism is used. Ansible connects to the layer1 host and from there tunnels to the virtual machines via a dedicated admin network. See group_vars/layer2.yml to see what this tunneling mechanism actually looks like.
