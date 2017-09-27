@@ -1,0 +1,133 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+lb
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+ansible_ssh_user=cloud-user
+ansible_become=true
+
+deployment_type=openshift-enterprise
+
+# htpasswd authentication
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+# apply updated node defaults
+openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80']}
+
+#openstack cloudprovider
+openshift_cloudprovider_kind=openstack
+openshift_cloudprovider_openstack_auth_url="{{AUTH_URL}}"
+openshift_cloudprovider_openstack_username="{{TENANT_USER}}"
+openshift_cloudprovider_openstack_password="{{TENANT_PWD}}"
+openshift_cloudprovider_openstack_tenant_name="{{TENANT_NAME}}"
+openshift_cloudprovider_openstack_region="{{REGION_NAME}}"
+
+# enable ntp on masters to ensure proper failover
+openshift_clock_enabled=true
+
+# disable checks
+openshift_disable_check=memory_availability,disk_availability
+
+# Configure master API and console ports.
+openshift_master_api_port=8443
+openshift_master_console_port=8443
+
+# Configure OVS plugin
+os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
+{% if proxy_http %}
+
+# Proxy configuration
+openshift_http_proxy=http://{% if proxy_username %}{{proxy_username}}{% if proxy_password %}:{{proxy_password}}{% endif %}@{% endif %}{{proxy_http}}
+{% endif %}
+{% if proxy_https %}
+openshift_https_proxy=https://{% if proxy_username %}{{proxy_username}}{% if proxy_password %}:{{proxy_password}}{% endif %}@{% endif %}{{proxy_https}}
+{% endif %}
+{% if proxy_no %}
+openshift_no_proxy='{{proxy_no}}'
+openshift_generate_no_proxy_hosts=true
+{% endif %}
+
+# Configure default node selector for deployments
+osm_default_node_selector='purpose=work'
+
+# Default subdomain
+openshift_master_default_subdomain="{{OCP_APPSSUBDOMAIN | replace("*.","")}}.{{OCP_DOMAIN}}"
+
+# Routers
+openshift_hosted_router_selector='purpose=infra'
+openshift_hosted_router_replicas="{{INFRANUMBER}}"
+
+# Registry
+openshift_hosted_registry_selector='purpose=infra'
+openshift_registry_selector='purpose=infra'
+openshift_hosted_registry_replicas="{{INFRANUMBER}}"
+
+# Metrics deployment
+openshift_hosted_metrics_deploy=false
+openshift_hosted_metrics_public_url=https://metrics.{{ OCP_APPSSUBDOMAIN | replace("*.","")}}.{{OCP_DOMAIN}}/hawkular/metrics
+openshift_metrics_hawkular_hostname=metrics.{{ OCP_APPSSUBDOMAIN | replace("*.","")}}.{{OCP_DOMAIN}}
+openshift_metrics_cassandra_replicas=1
+openshift_metrics_cassandra_limits_memory=2Gi
+openshift_metrics_hawkular_replicas=1
+openshift_metrics_duration=5
+openshift_metrics_cassandra_storage_type=dynamic
+openshift_metrics_cassandra_nodeselector={"purpose":"infra"}
+openshift_metrics_hawkular_nodeselector={"purpose":"infra"}
+openshift_metrics_heapster_nodeselector={"purpose":"infra"}
+
+# Logging deployment
+openshift_hosted_logging_deploy=false
+openshift_logging_install_logging=false
+openshift_logging_kibana_hostname=logging.{{ OCP_APPSSUBDOMAIN | replace("*.","")  }}.{{OCP_DOMAIN}}
+openshift_logging_use_ops=false
+openshift_logging_public_master_url=https://"{{OCP_WEBCONSOLE}}.{{OCP_DOMAIN}}":8443
+openshift_logging_curator_default_days=7
+openshift_logging_kibana_hostname=logging.{{ OCP_APPSSUBDOMAIN | replace("*.","")  }}.{{OCP_DOMAIN}}
+openshift_logging_curator_nodeselector={"purpose":"infra"}
+openshift_logging_es_nodeselector={"purpose":"infra"}
+openshift_logging_kibana_nodeselector={"purpose":"infra"}
+openshift_logging_es_pvc_dynamic=true
+
+{% if (HA | bool) == True %}
+# HA cluster parameters
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname="{{OCP_WEBCONSOLE}}.{{OCP_DOMAIN}}"
+openshift_master_cluster_public_hostname="{{OCP_WEBCONSOLE}}.{{OCP_DOMAIN}}"
+{% endif %}
+
+# host group for LB
+[lb]
+{% if (HA | bool) == True %}
+"{{OCP_LB.0}}.{{OCP_DOMAIN}}"
+{% endif %}
+
+# host group for masters
+[masters]
+{% for host in OCP_MASTERS %}
+"{{host}}.{{OCP_DOMAIN}}"
+{% endfor %}
+
+# host group for etcd
+[etcd]
+{% for host in OCP_MASTERS %}
+"{{host}}.{{OCP_DOMAIN}}"
+{% endfor %}
+
+# host group for nodes, includes region info
+[nodes]
+{% if (HA | bool) == True %}
+{% for host in OCP_MASTERS %}
+"{{host}}.{{OCP_DOMAIN}}" openshift_hostname="{{host}}.{{OCP_DOMAIN}}" openshift_schedulable=false openshift_node_labels="{'region':'primary','logging-infra-fluentd':'true'}"
+{% endfor %}
+{% else %}
+"{{OCP_MASTERS.0}}.{{OCP_DOMAIN}}" openshift_hostname="{{OCP_MASTERS.0}}.{{OCP_DOMAIN}}" openshift_public_hostname="{{OCP_WEBCONSOLE}}.{{OCP_DOMAIN}}" openshift_schedulable=false openshift_node_labels="{'region':'primary','logging-infra-fluentd':'true'}" openshift_public_hostname="{{OCP_WEBCONSOLE}}.{{OCP_DOMAIN}}"
+{% endif %}
+{% for host in OCP_INFRANODES %}
+"{{host}}.{{OCP_DOMAIN}}" openshift_hostname="{{host}}.{{OCP_DOMAIN}}" openshift_node_labels="{'region':'primary','purpose':'infra','logging-infra-fluentd':'true'}"
+{% endfor %}
+{% for host in OCP_APPNODES %}
+"{{host}}.{{OCP_DOMAIN}}" openshift_hostname="{{host}}.{{OCP_DOMAIN}}" openshift_node_labels="{'region':'primary','purpose':'work','logging-infra-fluentd':'true'}"
+{% endfor %}

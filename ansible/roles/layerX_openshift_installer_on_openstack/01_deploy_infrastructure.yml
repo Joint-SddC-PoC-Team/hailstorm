@@ -1,0 +1,330 @@
+---
+- hosts: localhost
+
+  vars_files:
+  - vars.yml
+
+  # Set environment variables
+  vars:
+    admin_tenant:
+      OS_REGION_NAME: "{{REGION_NAME}}"  
+      OS_AUTH_URL: "{{AUTH_URL}}"
+      OS_TENANT_NAME: "{{ADMIN_PROJECT_NAME}}"
+      OS_USERNAME: "{{AUTH_USERNAME}}"
+      OS_PASSWORD: "{{AUTH_PASSWORD}}"
+    openshift_tenant:
+      OS_REGION_NAME: "{{REGION_NAME}}"  
+      OS_AUTH_URL: "{{AUTH_URL}}"
+      OS_TENANT_NAME: "{{TENANT_NAME}}"
+      OS_USERNAME: "{{TENANT_USER}}"
+      OS_PASSWORD: "{{TENANT_PWD}}"
+
+  tasks:
+
+  # Create nodes variables
+  - set_fact:
+      ALL_NODES: "{{ OCP_BASTION }} + {{ OCP_LB }} + {{ OCP_MASTERS }} + {{ OCP_INFRANODES }} + {{ OCP_APPNODES }}"
+      OCP_NODES: "{{ OCP_MASTERS }} + {{ OCP_INFRANODES }} + {{ OCP_APPNODES }}"
+      HA: "{{ True if (OCP_LB.0 is defined) else False}}"
+  
+  # Create OpenShift project
+  - name: Check if there is already an OpenShift project
+    shell: openstack project list | grep "{{TENANT_NAME}}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: project_check
+  - name: Create OpenShift project
+    shell: openstack project create "{{TENANT_NAME}}" --description "Project for OpenShift Container Platform components"
+    environment: "{{admin_tenant}}"
+    when: project_check.stdout == ""
+
+  # Configure project quota
+  - name: Check if there is already a quota set on the OpenShift project
+    shell: openstack quota show openshift | grep 100000 | awk '{print $4}'
+    environment: "{{admin_tenant}}"
+    register: quota_check
+  - name: Configure project quota
+    shell: openstack quota set "{{TENANT_NAME}}" --cores 16 --fixed-ips 10 --floating-ips 10 --gigabytes 1000 --injected-file-size 100 --injected-files 20 --instances 20 --key-pairs 1 --ram 100000 --secgroups 10 --secgroup-rules 100 --snapshots 100 --volumes 100
+    environment: "{{admin_tenant}}"
+    when: quota_check.stdout == ""
+
+  # Create user
+  - name: Check if there is already a created user for the tenant OpenShift
+    shell: openstack user list | grep "{{TENANT_USER}}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: user_check
+  - name: Create user
+    shell: openstack user create "{{TENANT_USER}}" --password "{{TENANT_PWD}}" --project "{{TENANT_NAME}}" --enable
+    environment: "{{admin_tenant}}"
+    when: user_check.stdout == ""
+
+  # Award admin permission for the project
+  - name: Award admin permission for the project
+    shell: openstack role add admin --project "{{TENANT_NAME}}" --user "{{TENANT_USER}}"
+    environment: "{{admin_tenant}}"
+    when: user_check.stdout == ""
+
+    # Create image
+  - name: Check if there is already a "{{ RHEL_IMAGE_NAME }}" image
+    shell: openstack image list | grep "{{ RHEL_IMAGE_NAME }}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: image_check
+  - name: Create image
+    shell: openstack image create "{{ RHEL_IMAGE_NAME }}" --container-format bare  --disk-format qcow2  --file "{{ RHEL_FILE_NAME }}"
+    environment: "{{admin_tenant}}"
+    when: image_check.stdout == ""
+
+  # Create public network
+  - name: Check if there is a public network
+    shell: openstack network list | grep "{{ PUBLIC_NETWORK_NAME }}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: public_network_check    
+  - name: Create public network
+    shell: openstack network create "{{ PUBLIC_NETWORK_NAME }}" --external --share
+    environment: "{{admin_tenant}}"
+    when: public_network_check.stdout == ""
+
+  # Create subnet for public network
+  - name: Check if there is a public subnet
+    shell: openstack subnet list | grep "{{ PUBLIC_SUBNET_NAME }}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: public_subnet_check      
+  - name: Create subnet for public network
+    shell: openstack subnet create "{{ PUBLIC_SUBNET_NAME }}" --network "{{ PUBLIC_NETWORK_NAME }}" --subnet-range "{{ PUBLIC_SUBNET_RANGE }}" --allocation-pool start="{{ PUBLIC_NETWORK_POOL_START }}",end="{{ PUBLIC_NETWORK_POOL_END }}" --gateway "{{ PUBLIC_NETWORK_GATEWAY }}" --no-dhcp
+    environment: "{{admin_tenant}}"
+    when: public_subnet_check.stdout == ""
+
+  # Create flavors
+  - name: Check if there is a "{{ BASTION_FLAVOR_NAME }}" flavor
+    shell: openstack flavor list | grep "{{ BASTION_FLAVOR_NAME }}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: bastion_flavor_check   
+  - name: Create flavor "{{ BASTION_FLAVOR_NAME }}"
+    shell: openstack flavor create "{{ BASTION_FLAVOR_NAME }}" --ram "{{ BASTION_MEMORY }}" --vcpus "{{ BASTION_CORES }}" --disk "{{ BASTION_DISK }}"
+    environment: "{{admin_tenant}}"
+    when: bastion_flavor_check.stdout == ""
+  - name: Check if there is a "{{ LB_FLAVOR_NAME }}" flavor
+    shell: openstack flavor list | grep "{{ LB_FLAVOR_NAME }}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: lb_flavor_check   
+  - name: Create flavor "{{ LB_FLAVOR_NAME }}"
+    shell: openstack flavor create "{{ LB_FLAVOR_NAME }}" --ram "{{ LB_MEMORY }}" --vcpus "{{ LB_CORES }}" --disk "{{ LB_DISK }}"  
+    environment: "{{admin_tenant}}"
+    when: lb_flavor_check.stdout == ""
+  - name: Check if there is a "{{ MASTER_FLAVOR_NAME }}" flavor
+    shell: openstack flavor list | grep "{{ MASTER_FLAVOR_NAME }}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: master_flavor_check   
+  - name: Create flavor "{{ MASTER_FLAVOR_NAME }}"
+    shell: openstack flavor create "{{ MASTER_FLAVOR_NAME }}" --ram "{{ MASTER_MEMORY }}" --vcpus "{{ MASTER_CORES }}" --disk "{{ MASTER_DISK }}"
+    environment: "{{admin_tenant}}"
+    when: master_flavor_check.stdout == ""
+  - name: Check if there is a "{{ INFRANODE_FLAVOR_NAME }}" flavor
+    shell: openstack flavor list | grep "{{ INFRANODE_FLAVOR_NAME }}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: infra_flavor_check     
+  - name: Create flavor "{{ INFRANODE_FLAVOR_NAME }}"
+    shell: openstack flavor create "{{ INFRANODE_FLAVOR_NAME }}" --ram "{{ INFRANODE_MEMORY }}" --vcpus "{{ INFRANODE_CORES }}" --disk "{{ INFRANODE_DISK }}"
+    environment: "{{admin_tenant}}"
+    when: infra_flavor_check.stdout == ""
+  - name: Check if there is a "{{ APPNODE_FLAVOR_NAME }}" flavor
+    shell: openstack flavor list | grep "{{ APPNODE_FLAVOR_NAME }}" | awk '{print $2}'
+    environment: "{{admin_tenant}}"
+    register: appflavor_check   
+  - name: Create flavor "{{ APPNODE_FLAVOR_NAME }}"
+    shell: openstack flavor create "{{ APPNODE_FLAVOR_NAME }}" --ram "{{ APPNODE_MEMORY }}" --vcpus "{{ APPNODE_CORES }}" --disk "{{ APPNODE_DISK }}"     
+    environment: "{{admin_tenant}}"
+    when: appflavor_check.stdout == ""
+
+  # Create OpenShift network
+  - name: Check if there is an OpenShift network
+    shell: openstack network list | grep "{{ OCP_NETWORK_NAME }}" | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    register: openshift_network_check     
+  - name: Create OpenShift network
+    shell: openstack network create "{{ OCP_NETWORK_NAME }}"
+    environment: "{{openshift_tenant}}"
+    register: openshift_network_check  
+    when: openshift_network_check.stdout == ""
+  - name: Store OpenShift network uuid
+    shell: openstack network show "{{ OCP_NETWORK_NAME }}" | grep ' id ' | awk '{print $4}'
+    register: OCP_NETWORK_UUID
+    environment: "{{openshift_tenant}}"
+
+  # Create subnet for OpenShift network
+  - name: Check if there is a OpenShift subnet
+    shell: openstack subnet list | grep "{{ OCP_SUBNET_NAME }}" | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    register: openshift_subnet_check    
+  - name: Create subnet for OpenShift network
+    shell: openstack subnet create "{{ OCP_SUBNET_NAME }}" --network "{{ OCP_NETWORK_NAME }}" --subnet-range "{{ OCP_NETWORK_RANGE }}" --dns-nameserver "{{ NAMESERVER }}"
+    environment: "{{openshift_tenant}}"
+    when: openshift_subnet_check.stdout == ""
+
+  # Create router for OpenShift network access to public network
+  - name: Check if there is an OpenShift router
+    shell: openstack router list | grep "{{ OCP_ROUTER_NAME }}" | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    register: openshift_router_check       
+  - name: Create router for OpenShift network access to public network
+    shell: openstack router create "{{ OCP_ROUTER_NAME }}" 
+    environment: "{{openshift_tenant}}"
+    when: openshift_router_check.stdout == ""
+  - name: Add subnet to router
+    shell: openstack router add subnet "{{ OCP_ROUTER_NAME }}" "{{ OCP_SUBNET_NAME }}"
+    environment: "{{openshift_tenant}}"
+    when: openshift_router_check.stdout == ""
+  - name: Add external gateway to router
+    shell: neutron router-gateway-set "{{ OCP_ROUTER_NAME }}" "{{ PUBLIC_NETWORK_NAME }}"
+    environment: "{{openshift_tenant}}"
+    when: openshift_router_check.stdout == ""
+    #shell: openstack router set "{{ OCP_ROUTER_NAME }}" --route destination="{{ PUBLIC_SUBNET_RANGE }}",gateway="{{ PUBLIC_NETWORK_GATEWAY }}" - This doesn't work in supported
+    #shell: openstack router set --external-gateway "{{ PUBLIC_NETWORK_NAME }}" "{{ OCP_ROUTER_NAME }}" - Another option, but it is not supported by client v3.2.1
+
+  # Create ssh keys and touch its permissions
+  - stat: path="{{ OCP_KEYPAIR }}"
+    register: sshkey
+  - name: Create ssh keys and touch its permissions
+    shell: ssh-keygen -b 2048 -t rsa -f ./"{{ OCP_KEYPAIR }}" -q -N ""
+    args:
+      creates: ./"{{ OCP_KEYPAIR }}"
+    when: sshkey.stat.exists == False
+  - file:
+      path: "{{ OCP_KEYPAIR }}"
+      state: touch
+      mode: "400"
+    when: sshkey.stat.exists == False
+  - file:
+      path: "{{ OCP_KEYPAIR }}.pub"
+      state: touch
+      mode: "400"
+    when: sshkey.stat.exists == False
+
+  # Create keypair
+  - name: Check if there is an OpenShift keypair
+    shell: openstack keypair list | grep "{{ OCP_KEYPAIR }}" | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    register: openshift_keypair_check   
+  - name: Create keypair
+    shell: openstack keypair create "{{ OCP_KEYPAIR }}" --public-key "{{ OCP_KEYPAIR }}.pub"
+    environment: "{{openshift_tenant}}"
+    when: openshift_keypair_check.stdout == ""
+
+  # Create cinder docker volumes
+  - name: Check if there is a cinder volume
+    shell: openstack volume list | grep "{{OCP_NODES.0}}"-docker | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    register: openshift_volume_check     
+  - name: Create cinder docker volumes
+    shell: openstack volume create "{{item}}"-docker --type "{{VOLUME_TYPE}}" --size "{{VOLUME_SIZE}}" --project "{{TENANT_NAME}}"
+    with_items: "{{OCP_NODES}}"
+    environment: "{{openshift_tenant}}"
+    when: openshift_volume_check.stdout == ""
+    
+  # Create a security group and rules
+  - name: Check if there is a security group called all_open
+    shell: openstack security group list | grep all_open | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    register: securitygroup_check   
+  - name: Create security group and rules
+    shell: openstack security group create all_open --description "Security group for OpenShift instances" --project "{{TENANT_NAME}}"
+    environment: "{{openshift_tenant}}"
+    when: securitygroup_check.stdout == ""
+  - shell: openstack security group rule create all_open --protocol tcp --src-ip 0.0.0.0/0 --project "{{TENANT_NAME}}"
+    environment: "{{openshift_tenant}}"
+    when: securitygroup_check.stdout == ""
+  - shell: openstack security group rule create all_open --protocol udp --src-ip 0.0.0.0/0 --project "{{TENANT_NAME}}"
+    environment: "{{openshift_tenant}}"
+    when: securitygroup_check.stdout == ""
+  - shell: openstack security group rule create all_open --protocol icmp --src-ip 0.0.0.0/0 --project "{{TENANT_NAME}}"
+    environment: "{{openshift_tenant}}"
+    when: securitygroup_check.stdout == ""
+
+  # Generate cloudinit files
+  - file: path=./cloudinit state=absent
+  - file: path=./cloudinit state=directory
+  - name: Create cloudinit files
+    template:
+      src: templates/cloudinit.j2
+      dest: cloudinit/{{item}}.yaml
+    with_items: "{{ALL_NODES}}"
+  
+  # Create LB instance
+  - name: Check if there is already a Load Balancer
+    shell: openstack server list | grep "{{OCP_LB.0}}.{{OCP_DOMAIN}}" | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    register: LB_check     
+    when: (OCP_LB.0 is defined)    
+  - name: Create load balancer instance
+    shell: openstack server create "{{OCP_LB.0}}.{{OCP_DOMAIN}}" --image "{{ RHEL_IMAGE_NAME }}" --key-name "{{ OCP_KEYPAIR }}" --flavor "{{ LB_FLAVOR_NAME }}" --user-data cloudinit/"{{OCP_LB.0}}".yaml --security-group all_open --nic net-id="{{ OCP_NETWORK_UUID.stdout }}"
+    when: (OCP_LB.0 is defined) and (LB_check.stdout == "")
+    environment: "{{openshift_tenant}}"
+  
+  # Create bastion instance
+  - name: Check if there is already a Bastion
+    shell: openstack server list | grep "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}" | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    when: OCP_BASTION.0 is defined
+    register: bastion_check     
+  - name: Create bastion instance
+    shell: openstack server create "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}" --image "{{ RHEL_IMAGE_NAME }}" --key-name "{{ OCP_KEYPAIR }}" --flavor "{{ BASTION_FLAVOR_NAME }}" --user-data cloudinit/"{{OCP_BASTION.0}}".yaml --security-group all_open --nic net-id="{{ OCP_NETWORK_UUID.stdout }}"
+    when: (OCP_BASTION.0 is defined) and (bastion_check.stdout == "")
+    environment: "{{openshift_tenant}}"
+
+  # Create openshift instances and attach docker volumes
+  - name: Check if there is already at least one master instance created
+    shell: openstack server list | grep "{{OCP_MASTERS.0}}.{{OCP_DOMAIN}}" | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    when: OCP_MASTERS.0 is defined
+    register: master_check       
+  - name: Create OpenShift master instances
+    shell: openstack server create "{{item}}.{{OCP_DOMAIN}}" --image "{{ RHEL_IMAGE_NAME }}" --key-name "{{ OCP_KEYPAIR }}" --flavor "{{ MASTER_FLAVOR_NAME }}" --user-data cloudinit/"{{item}}".yaml --security-group all_open --nic net-id="{{ OCP_NETWORK_UUID.stdout }}"
+    with_items: "{{OCP_MASTERS}}"
+    when: (OCP_MASTERS.0 is defined) and (master_check.stdout == "")
+    environment: "{{openshift_tenant}}"
+  - name: Check if there is already at least one infranode instance created
+    shell: openstack server list | grep "{{OCP_INFRANODES.0}}.{{OCP_DOMAIN}}" | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    when: OCP_INFRANODES.0 is defined
+    register: infra_check        
+  - name: Create OpenShift infranode instances
+    shell: openstack server create "{{item}}.{{OCP_DOMAIN}}" --image "{{ RHEL_IMAGE_NAME }}" --key-name "{{ OCP_KEYPAIR }}" --flavor "{{ INFRANODE_FLAVOR_NAME }}" --user-data cloudinit/"{{item}}".yaml --security-group all_open --nic net-id="{{ OCP_NETWORK_UUID.stdout }}"
+    with_items: "{{OCP_INFRANODES}}"
+    when: (OCP_INFRANODES.0 is defined) and (infra_check.stdout == "")
+    environment: "{{openshift_tenant}}"
+  - name: Check if there is already at least one appnode instance created
+    shell: openstack server list | grep "{{OCP_APPNODES.0}}.{{OCP_DOMAIN}}" | awk '{print $2}'
+    environment: "{{openshift_tenant}}"
+    when: OCP_APPNODES.0 is defined
+    register: app_check     
+  - name: Create OpenShift appnode instances
+    shell: openstack server create "{{item}}.{{OCP_DOMAIN}}" --image "{{ RHEL_IMAGE_NAME }}" --key-name "{{ OCP_KEYPAIR }}" --flavor "{{ APPNODE_FLAVOR_NAME }}" --user-data cloudinit/"{{item}}".yaml --security-group all_open --nic net-id="{{ OCP_NETWORK_UUID.stdout }}"
+    with_items: "{{OCP_APPNODES}}"
+    when: (OCP_APPNODES.0 is defined) and (app_check.stdout == "")
+    environment: "{{openshift_tenant}}"
+  - name: Wait 30s for instances to be built
+    wait_for:
+      timeout: 30
+    when: (master_check.stdout == "") or (infra_check.stdout == "") or (app_check.stdout == "") or (bastion_check.stdout == "")
+  - name: Attach docker disk volumes to every instance
+    shell: openstack server add volume --device "{{ VOLUME_DEV }}" "{{item}}.{{OCP_DOMAIN}}" "{{item}}"-docker 
+    with_items: "{{OCP_NODES}}"
+    when: OCP_NODES.0 is defined and ((master_check.stdout == "") or (infra_check.stdout == "") or (app_check.stdout == "") or (bastion_check.stdout == ""))
+    environment: "{{openshift_tenant}}"
+
+  # Attach floating IPs
+  - name: Attach floating IPs to LBs, if they are defined
+    shell: openstack server add floating ip "{{OCP_LB.0}}.{{OCP_DOMAIN}}" $(openstack floating ip create {{PUBLIC_NETWORK_NAME}} | grep " floating_ip_address " | awk '{print $4}')
+    when: (OCP_LB.0 is defined) and (LB_check.stdout == "")
+    environment: "{{openshift_tenant}}"
+  - name: Attach floating IP to Bastion, if it's defined
+    shell: openstack server add floating ip "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}" $(openstack floating ip create {{PUBLIC_NETWORK_NAME}} | grep " floating_ip_address " | awk '{print $4}')
+    when: (OCP_BASTION.0 is defined) and (bastion_check.stdout == "")
+    environment: "{{openshift_tenant}}"    
+  - name: Attach floating IPs to 1st master, if there are not defined LBs
+    shell: openstack server add floating ip "{{OCP_MASTERS.0}}.{{OCP_DOMAIN}}" $(openstack floating ip create {{PUBLIC_NETWORK_NAME}} | grep " floating_ip_address " | awk '{print $4}')
+    when: (OCP_LB.0 is undefined) and (master_check.stdout == "")
+    environment: "{{openshift_tenant}}"        
+  - name: Attach floating IPs to 1st infranode, if there are not defined LBs
+    shell: openstack server add floating ip "{{OCP_INFRANODES.0}}.{{OCP_DOMAIN}}" $(openstack floating ip create {{PUBLIC_NETWORK_NAME}} | grep " floating_ip_address " | awk '{print $4}')
+    when: (OCP_LB.0 is undefined) and (infra_check.stdout == "")
+    environment: "{{openshift_tenant}}"

@@ -1,0 +1,93 @@
+# Global settings
+#---------------------------------------------------------------------
+global
+chroot /var/lib/haproxy
+pidfile /var/run/haproxy.pid
+maxconn 20000
+user haproxy
+group haproxy
+daemon
+log /dev/log local0 info
+# turn on stats unix socket
+stats socket /var/lib/haproxy/stats
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+mode http
+log global
+option httplog
+option dontlognull
+# option http-server-close
+option forwardfor except 127.0.0.0/8
+option redispatch
+retries 3
+timeout http-request 10s
+timeout queue 1m
+timeout connect 10s
+timeout client 300s
+timeout server 300s
+timeout http-keep-alive 10s
+timeout check 10s
+maxconn 20000
+
+listen stats 0.0.0.0:9000       #Listen on all IP's on port 9000
+    mode http
+    balance
+    timeout client 5000
+    timeout connect 4000
+    timeout server 30000
+
+    #This is the virtual URL to access the stats page
+    stats uri /haproxy_stats
+
+    #Authentication realm. This can be set to anything. Escape space characters with a backslash.
+    stats realm HAProxy\ Statistics
+
+    #The user/pass you want to use. Change this password!
+    stats auth admin:{{TENANT_PWD}}
+
+    #This allows you to take down and bring up back end servers.
+    #This will produce an error on older versions of HAProxy.
+    stats admin if TRUE
+
+frontend atomic-openshift-api
+bind *:8443
+default_backend atomic-openshift-api
+mode tcp
+option tcplog
+
+backend atomic-openshift-api
+balance source
+mode tcp
+
+{% for host in OCP_MASTERS %}
+server {{host}} {{host}}.{{OCP_DOMAIN}}:8443 check
+{% endfor %}
+
+frontend router-forward-https
+bind *:443
+default_backend router-forward-https
+mode tcp
+option tcplog
+
+backend router-forward-https
+balance source
+mode tcp
+{% for host in OCP_INFRANODES %}
+server {{host}} {{host}}.{{OCP_DOMAIN}}:443 check
+{% endfor %}
+
+frontend router-forward-http
+bind *:80
+default_backend router-forward-http
+mode tcp
+option tcplog
+
+backend router-forward-http
+balance source
+mode tcp
+{% for host in OCP_INFRANODES %}
+server {{host}} {{host}}.{{OCP_DOMAIN}}:80 check
+{% endfor %}
