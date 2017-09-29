@@ -1,0 +1,111 @@
+---
+### OpenStack related data
+# Auth details
+AUTH_URL: http://192.168.1.40:5000/v2.0
+AUTH_USERNAME: admin
+AUTH_PASSWORD: YOURPASSWORD
+ADMIN_PROJECT_NAME: admin
+REGION_NAME: RegionOne
+
+# OpenShift tenant details
+TENANT_NAME: openshift
+TENANT_USER: openshift
+TENANT_PWD: YOURPASSWORD # it's also the same password for the OCP admin user
+
+# DNS server details
+NAMESERVER: 192.168.1.14
+KEY_NAME: remote
+KEY_SECRET: "KRXMTEv6Q+3ztY1TMQvSu5ZZtyzkkKYvr+OcWwtOX/amI3HEVnzfNcy4ZjAKN9lyoOIrbO2yrj1+MHBKuYGQYQ=="
+
+# Public network details
+PUBLIC_NETWORK_NAME: public_network
+PUBLIC_SUBNET_NAME: public_subnet
+PUBLIC_NETWORK_POOL_START: 192.168.1.200
+PUBLIC_NETWORK_POOL_END: 192.168.1.240
+PUBLIC_NETWORK_GATEWAY: 192.168.1.1
+PUBLIC_SUBNET_RANGE: 192.168.1.0/24
+
+#OpenShift private network details
+OCP_NETWORK_NAME: openshift_network
+OCP_SUBNET_NAME: openshift_subnet
+OCP_ROUTER_NAME: openshift_router
+OCP_NETWORK_RANGE: 172.18.10.0/24
+
+#RHEL image details
+RHEL_IMAGE_NAME: rhel74
+RHEL_FILE_NAME: rhel-server-7.4-x86_64-kvm.qcow2
+
+#Flavors details
+BASTION_FLAVOR_NAME: ocpbastion
+BASTION_MEMORY: 2048
+BASTION_CORES: 1
+BASTION_DISK: 20
+LB_FLAVOR_NAME: ocplb
+LB_MEMORY: 4096
+LB_CORES: 1
+LB_DISK: 20
+MASTER_FLAVOR_NAME: ocpmaster
+MASTER_MEMORY: 8192
+MASTER_CORES: 1
+MASTER_DISK: 30
+INFRANODE_FLAVOR_NAME: ocpinfranode
+INFRANODE_MEMORY: 8192
+INFRANODE_CORES: 2
+INFRANODE_DISK: 30
+APPNODE_FLAVOR_NAME: ocpappnode
+APPNODE_MEMORY: 8192
+APPNODE_CORES: 2
+APPNODE_DISK: 30
+
+#Keypair details
+OCP_KEYPAIR: ocpkp
+
+#Volumes details
+VOLUME_SIZE: 50 #specify the volume size for docker disk in the instances
+VOLUME_TYPE: nfs #specify the volume type to user in the docker disks creation
+VOLUME_DEV: /dev/vdb #device name for docker disk
+
+### OpenShift related data
+#OpenShift instances details
+OCP_DOMAIN: ageslab.com
+OCP_BASTION: ['bastion'] # only 1 bastion will be taken into account
+OCP_LB: []# only 1 LB will be take into account
+OCP_MASTERS: ['master1'] # insert min 1 or recommended max 3 master nodes
+OCP_INFRANODES: ['infranode1'] # max 2000
+OCP_APPNODES: ['appnode1','appnode2'] # max 2000 - OCP_INFRANODES
+OCP_WEBCONSOLE: "openshift" # just the name, without the OCP_DOMAIN
+OCP_APPSSUBDOMAIN: "*.apps" # just the wildcard and the name, without the OCP_DOMAIN
+VOLUME_REGISTRY_SIZE: 50 #specify the volume size for the registry volume, to be provisioned in the post deployment stage
+VOLUME_LOGGING_SIZE: 30 #specify the volume size for the elastic search cluster, to be provisioned in the post deployment stage
+VOLUME_METRICS_SIZE: 30 #specify the volume size for the cassandra database, to be provisioned in the post deployment stage
+
+# Red Hat network, repos and packages
+RHN_USERNAME: YOURRHNUSER
+RHN_PASSWORD: YOURRHNPWD
+RHN_POOLID: YOURPOOLID
+OCP_REPOS:
+- rhel-7-server-rpms
+- rhel-7-server-extras-rpms
+- rhel-7-server-ose-3.6-rpms
+- rhel-7-fast-datapath-rpms
+OCP_PACKAGES_BASTION:
+- atomic-openshift-utils
+- atomic-openshift-clients
+OCP_PACKAGES:
+- wget
+- git
+- net-tools
+- bind-utils
+- iptables-services
+- bridge-utils
+- bash-completion
+- kexec-tools
+- sos
+- psacct
+
+# Proxy configuration
+proxy_http: 
+proxy_https:
+proxy_username:
+proxy_password:
+proxy_no:

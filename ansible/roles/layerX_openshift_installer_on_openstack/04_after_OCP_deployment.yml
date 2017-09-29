@@ -1,0 +1,139 @@
+---
+- hosts: localhost
+
+  vars_files:
+  - vars.yml
+
+  tasks:
+
+  # Add bastion as new ansible host
+  - name: Add bastion to ansible inventory in memory
+    add_host:
+      name: "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}"
+      groups: OCP
+
+- hosts: OCP
+
+  environment:
+    ANSIBLE_HOST_KEY_CHECKING: False
+
+  vars:
+    ansible_ssh_private_key_file: ./ocpkp
+    ansible_ssh_user: cloud-user
+    ansible_become: true
+
+  vars_files:
+  - vars.yml
+
+  tasks:
+
+  # Create nodes variables
+  - set_fact:
+      ALL_NODES: "{{ OCP_BASTION }} + {{ OCP_LB }} + {{ OCP_MASTERS }} + {{ OCP_INFRANODES }} + {{ OCP_APPNODES }}"
+      OCP_NODES: "{{ OCP_MASTERS }} + {{ OCP_INFRANODES }} + {{ OCP_APPNODES }}"
+      HA: "{{ True if (OCP_LB.0 is defined) else False}}"
+
+  # Check if OpenShift API is working
+  - name: Login to OpenShift and test API
+    shell: oc login https://{{OCP_WEBCONSOLE}}.{{OCP_DOMAIN}}:8443 -u admin -p {{TENANT_PWD}} --insecure-skip-tls-verify
+    ignore_errors: yes
+    register: result
+
+  - set_fact:
+      OCP_login_status={{ false if (result.stdout | search('failed')) else true}}
+
+  # Finish LB configuration
+  - name: Copy the haproxy file to the bastion, in case there is LB
+    template:
+      src: haproxy.j2
+      dest: /home/cloud-user/haproxy
+    when: (HA == true) and (OCP_login_status == false)
+  - name: Copy the file to the LB
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa lb -m copy -a 'src=/home/cloud-user/haproxy dest=/etc/haproxy/haproxy.cfg'
+    when: (HA == true) and (OCP_login_status == false)
+  - name: Create new iptables rule for 80 port
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa lb -a 'iptables -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT'
+    when: (HA == true) and (OCP_login_status == false)
+  - name: Create new iptables rule for 80 port
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa lb -a 'iptables -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT'
+    when: (HA == true) and (OCP_login_status == false)
+  - name: Save permanently new iptables rules
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa lb -a 'iptables -save'
+    when: (HA == true) and (OCP_login_status == false)
+
+  - name: Enable and start Haproxy on the LB
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa lb -m service -a 'name=haproxy state=started enabled=yes'
+    when: (HA == true) and (OCP_login_status == false)
+
+  # Create admin user and award cluster-admin permission
+  - name: Create admin user
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa masters -a 'htpasswd -b /etc/origin/master/htpasswd admin "{{ TENANT_PWD }}"'
+    when: OCP_login_status == false
+  - name: Award cluster-admin permission to this new user
+    shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa masters -a 'sudo oadm policy add-cluster-role-to-user cluster-admin admin'
+    when: OCP_login_status == false
+
+  # Check if there is a StorageClass already created
+  - name: Check if there is a StorageClass already created
+    shell: oc describe storageclass {{VOLUME_TYPE}} | grep Name | awk '{print $2}'
+    ignore_errors: yes
+    register: StorageClass_status
+    when: OCP_login_status == true 
+
+  # Copy the storage class file to the bastion and create the storage class
+  - name: Copy the storage class file to the bastion
+    template:
+      src: storageclass.j2
+      dest: /home/cloud-user/storageclass.yaml   
+    when: (OCP_login_status == true) and (StorageClass_status.stdout != VOLUME_TYPE)
+
+  - name: Create the storage class
+    shell: oc create -f /home/cloud-user/storageclass.yaml
+    when: (OCP_login_status == true) and (StorageClass_status.stdout != VOLUME_TYPE)
+
+  # Check if there is a volume already attached for the registry
+  - name: Check if there is a volume already attached for the registry
+    shell: oc get pvc -n default | grep pvc-registry | awk '{print $1}'
+    ignore_errors: yes
+    register: RegistryVolume_status
+    when: OCP_login_status == true 
+
+  # Provide a volume for the registry
+  - name: Attach a persistent volume to the registry
+    shell: oc volume deploymentconfigs/docker-registry --add --name=registry-storage -t pvc --claim-name=pvc-registry --claim-size="{{ VOLUME_REGISTRY_SIZE }}" --overwrite -n default
+    when: (OCP_login_status == true) and (RegistryVolume_status.stdout != 'pvc-registry')
+
+  # Check if there is a working metrics
+  - name: Check if there is a working metrics
+    shell: oc get rc -n openshift-infra | grep hawkular-metrics | awk '{print $1}'  
+    ignore_errors: yes
+    register: Metrics_status
+    when: OCP_login_status == true 
+
+  # Install metrics
+  - name: Install metrics
+    shell: ansible-playbook --private-key=/home/cloud-user/.ssh/id_rsa /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_hawkular_hostname=metrics."{{OCP_APPSSUBDOMAIN | replace("*.","")}}.{{OCP_DOMAIN}}" -e openshift_metrics_cassandra_storage_type=dynamic -e openshift_metrics_cassandra_pvc_size="{{VOLUME_METRICS_SIZE}}"
+    when: (OCP_login_status == true) and (Metrics_status.stdout != 'hawkular-metrics')
+
+  # Check if there is a working logging
+  - name: Check if there is a working logging
+    shell: oc get dc -n logging | grep logging-kibana | awk '{print $1}' 
+    ignore_errors: yes
+    register: Logging_status
+    when: OCP_login_status == true 
+
+  # Install logging
+  - name: Install logging
+    shell: ansible-playbook --private-key=/home/cloud-user/.ssh/id_rsa /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml -e openshift_logging_namespace=logging -e openshift_logging_install_logging=true -e openshift_logging_es_pvc_dynamic=true -e openshift_logging_es_pvc_size="{{VOLUME_LOGGING_SIZE}}G"
+    when: (OCP_login_status == true) and (Logging_status.stdout != 'logging-kibana')
+
+
+
+  
+
+
+    
+
+    
+
+
