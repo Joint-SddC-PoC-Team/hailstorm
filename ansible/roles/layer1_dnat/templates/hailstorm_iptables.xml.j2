@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <hs:iptables xmlns:hs="https://github.com/wrichter/hailstorm">
   {% for network in infrastructure_networks %}
-  <network name="{{ network.netname }}">
+  <network name="{% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ network.netname }}">
   {% for mapping in external_network_config.services_network_dnat.mapping %}
   {% if mapping.expose_machine is defined and network.netname == mapping.via_network %}
 
@@ -10,7 +10,7 @@
 
   {% for port in mapping.ports %}
   <rule>PREROUTING -t nat -p {{ port.proto }} --dport {{ port.from_port }} -d {{ mapping.on_host_prefix }} -j DNAT --to {{ nic.ip }}:{{ port.to_port }}</rule>
-  <rule>FORWARD -t filter -o {{ network.bridge }} -p {{ port.proto }} -d {{ nic.ip }} --dport {{ port.to_port }} -j ACCEPT</rule>
+  <rule>FORWARD -t filter -o {% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ network.bridge }} -p {{ port.proto }} -d {{ nic.ip }} --dport {{ port.to_port }} -j ACCEPT</rule>
   {% endfor %}
 
   {% endif %}

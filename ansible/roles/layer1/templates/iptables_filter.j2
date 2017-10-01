@@ -1,1 +1,1 @@
--A INPUT -i {{ item.nic }} -p {{ item.proto }} --dport {{ item.port }} -j ACCEPT
+-A INPUT -i {% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ item.nic }} -p {{ item.proto }} --dport {{ item.port }} -j ACCEPT

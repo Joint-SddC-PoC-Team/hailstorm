@@ -1,13 +1,13 @@
 - block:
     - name: remove DNAT config
-      command: /etc/libvirt/hooks/network {{ item }} stopped
+      command: /etc/libvirt/hooks/network {% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ item }} stopped
       with_items: "{{ infrastructure_networks|map(attribute='netname')|list }}"
       ignore_errors: true
     - name: create /etc/hailstorm_iptables.xml
       template: src=hailstorm_iptables.xml.j2 dest=/etc/hailstorm_iptables.xml
       register: iptables
     - name: create DNAT config
-      command: /etc/libvirt/hooks/network {{ item }} started
+      command: /etc/libvirt/hooks/network {% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ item }} started
       with_items: "{{ infrastructure_networks|map(attribute='netname')|list }}"
   when: >
     external_network_config is defined and
