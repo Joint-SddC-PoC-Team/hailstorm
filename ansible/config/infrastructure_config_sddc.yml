@@ -272,7 +272,7 @@ infrastructure_networks:
 # - "{{ infrastructure_network_provider3 }}"
 # - "{{ infrastructure_network_provider4 }}"
 
-
+#if infrastructure_network_master is defined, the multi-node network config will be set up
 infrastructure_network_master: storm4.coe.muc.redhat.com
 hailstorm_dns_domain: hailstorm4.coe.muc.redhat.com
 ocp_apps_dns_domain: apps.{{ hailstorm_dns_domain }}

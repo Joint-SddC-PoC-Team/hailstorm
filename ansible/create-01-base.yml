@@ -24,36 +24,36 @@
       prompt: "what is your Red Hat Subscription Manager password?"
       private: yes
 
-- hosts: cloudforms-osp
-  remote_user: root
-  gather_facts: false
-  # DONE: this is ugly as we first have to look for running OSP and running CFME, before we should continue here to avoid unneeded --skip-tags and --tags
-  tasks:
-    - name: check if openstack is available
-      shell: curl -k {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://{{ hostvars['openstack'].vm_nics[0].ip }}/ || true
-      register: openstack_available
-      changed_when: false
-      delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
-      tags:
-        - cfme_on_osp
-    - block:
-        - include: roles/layer3_vm_on_openstack/tasks/set_floating_ip_as_fact.yml
-        - include: roles/layer3_vm_on_openstack/tasks/set_vm_nics_facts.yml
-        - debug: var=vm_nics
-      when: openstack_available.stdout|length > 0
+# - hosts: cloudforms-osp
+#   remote_user: root
+#   gather_facts: false
+#   # DONE: this is ugly as we first have to look for running OSP and running CFME, before we should continue here to avoid unneeded --skip-tags and --tags
+#   tasks:
+#     - name: check if openstack is available
+#       shell: curl -k {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://{{ hostvars['openstack'].vm_nics[0].ip }}/ || true
+#       register: openstack_available
+#       changed_when: false
+#       delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+#       tags:
+#         - cfme_on_osp
+#     - block:
+#         - include: roles/layer3_vm_on_openstack/tasks/set_floating_ip_as_fact.yml
+#         - include: roles/layer3_vm_on_openstack/tasks/set_vm_nics_facts.yml
+#         - debug: var=vm_nics
+#       when: openstack_available.stdout|length > 0
 
 - hosts: layer1
   remote_user: root
   gather_facts: false
   pre_tasks:
     - setup:
-      tags: [ 'layer1', 'rhosp', 'rhev', 'ose3', 'dnat' ]
+      tags: [ 'layer1', 'rhosp', 'rhev', 'ose3', 'dnat', 'layer1-dnat' ]
   roles:
     - role: layer1
       tags: [ 'layer1' ]
       mode: create
     - role: layer1_dnat
-      tags: [ 'layer1', 'dnat' ]
+      tags: [ 'layer1', 'dnat', 'layer1-dnat' ]
       mode: create
     - role: layer1_ceph_inventory
       tags: [ 'layer2', 'ceph', 'ipa' ]

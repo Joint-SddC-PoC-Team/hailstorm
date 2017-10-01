@@ -87,40 +87,40 @@ lifecycle_environments:
     cfme_rhconsulting_scripts_hash: 4a9c5478e58181c099cd9f1dce00ae09c55f2298
     ansible_tower_url: http://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-3.0.3.tar.gz
 
-  - name: 'PROD'
-    prior: 'TEST'
-    description: 'Production'
-    label: 'production'
-    content_view_date_filter:
-      "*": "2016-09-28"
-      "CV-RHOSE3": "2016-10-21"
-      "CV-RHOSE3-CLIENT": "2016-10-21"
-      "CV-RHOSP": "2016-09-12"
-    errata_for_demo_scenario:
-      - RHSA-2016:1940
-    openshift_version: 3.3
-    openstack_version: 9
-    osp_controlled_node_placement: false
-    osp_use_tls: false
-    osp_storage_backend: nfs_layer1
-    ocp_use_cns: false
-    rhv_version: 3
-    cloudforms_version: 5.6
-    cloudforms_ova_appliance: cfme-rhevm-5.6.1.2-1.x86_64.rhevm.ova
-    rhel6_iso_image: rhel-server-6.8-x86_64-dvd.iso
-    rhel7_iso_image: rhel-server-7.2-x86_64-dvd.iso
-    osp_kvm_images:
-      - name: RHEL7
-        image: rhel-guest-image-7.2-20160302.0.x86_64.qcow2
-      - name: CirrOS
-        image: cirros-0.3.4-x86_64-disk.img
-      - name: Windows
-        image: windows_server_2012_r2_standard_eval_kvm_20151021.qcow2.gz
-    rhev_templates:
-      - name: RHEL7
-        image: rhel-guest-image-7.2-20160302.0.x86_64.qcow2
-    cfme_rhconsulting_scripts_hash: 4a9c5478e58181c099cd9f1dce00ae09c55f2298
-    ansible_tower_url: http://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-3.0.2.tar.gz
+  # - name: 'PROD'
+  #   prior: 'TEST'
+  #   description: 'Production'
+  #   label: 'production'
+  #   content_view_date_filter:
+  #     "*": "2016-09-28"
+  #     "CV-RHOSE3": "2016-10-21"
+  #     "CV-RHOSE3-CLIENT": "2016-10-21"
+  #     "CV-RHOSP": "2016-09-12"
+  #   errata_for_demo_scenario:
+  #     - RHSA-2016:1940
+  #   openshift_version: 3.3
+  #   openstack_version: 9
+  #   osp_controlled_node_placement: false
+  #   osp_use_tls: false
+  #   osp_storage_backend: nfs_layer1
+  #   ocp_use_cns: false
+  #   rhv_version: 3
+  #   cloudforms_version: 5.6
+  #   cloudforms_ova_appliance: cfme-rhevm-5.6.1.2-1.x86_64.rhevm.ova
+  #   rhel6_iso_image: rhel-server-6.8-x86_64-dvd.iso
+  #   rhel7_iso_image: rhel-server-7.2-x86_64-dvd.iso
+  #   osp_kvm_images:
+  #     - name: RHEL7
+  #       image: rhel-guest-image-7.2-20160302.0.x86_64.qcow2
+  #     - name: CirrOS
+  #       image: cirros-0.3.4-x86_64-disk.img
+  #     - name: Windows
+  #       image: windows_server_2012_r2_standard_eval_kvm_20151021.qcow2.gz
+  #   rhev_templates:
+  #     - name: RHEL7
+  #       image: rhel-guest-image-7.2-20160302.0.x86_64.qcow2
+  #   cfme_rhconsulting_scripts_hash: 4a9c5478e58181c099cd9f1dce00ae09c55f2298
+  #   ansible_tower_url: http://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-3.0.2.tar.gz
 
 current_lifecycle_env: "{{ lifecycle_environments|selectattr('name','match','^'+stage+'$')|first }}"
 
@@ -205,13 +205,13 @@ satellite_product_config:
       # - name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
       #   releasever: "7.2"
       - name: "Red Hat Satellite Tools {{ satellite_version }} (for RHEL 7 Server) (RPMs)"
-      - name: "Red Hat Enterprise Linux 6 Server (RPMs)"
-        releasever: 6Server
-      - name: "Red Hat Enterprise Linux 6 Server - Supplementary (RPMs)"
-        releasever: 6Server
-      # - name: "Red Hat Enterprise Linux 6 Server (Kickstart)"
-      #   releasever: "6.7"
-      - name: "Red Hat Satellite Tools {{ satellite_version }} (for RHEL 6 Server) (RPMs)"
+      # - name: "Red Hat Enterprise Linux 6 Server (RPMs)"
+      #   releasever: 6Server
+      # - name: "Red Hat Enterprise Linux 6 Server - Supplementary (RPMs)"
+      #   releasever: 6Server
+      # # - name: "Red Hat Enterprise Linux 6 Server (Kickstart)"
+      # #   releasever: "6.7"
+      # - name: "Red Hat Satellite Tools {{ satellite_version }} (for RHEL 6 Server) (RPMs)"
       - name: "Red Hat Ceph Storage Tools 2 for Red Hat Enterprise Linux 7 Server (RPMs)"
         releasever: 7Server
   - product: "Red Hat Enterprise Linux Fast Datapath"
@@ -241,12 +241,12 @@ satellite_product_config:
   - product: Red Hat OpenStack
     basearch: x86_64
     repos:
-      - name: Red Hat OpenStack Platform 9 director for RHEL 7 (RPMs)
-        releasever: 7Server
-      - name: Red Hat OpenStack Platform 9 for RHEL 7 (RPMs)
-        releasever: 7Server
-      - name: Red Hat OpenStack Platform 9 Operational Tools for RHEL 7 (RPMs)
-        releasever: 7Server
+      # - name: Red Hat OpenStack Platform 9 director for RHEL 7 (RPMs)
+      #   releasever: 7Server
+      # - name: Red Hat OpenStack Platform 9 for RHEL 7 (RPMs)
+      #   releasever: 7Server
+      # - name: Red Hat OpenStack Platform 9 Operational Tools for RHEL 7 (RPMs)
+      #   releasever: 7Server
       - name: Red Hat OpenStack Platform 10 Developer Tools for RHEL 7 (RPMs)
         releasever: 7Server
       - name: Red Hat OpenStack Platform 10 for RHEL 7 (RPMs)
@@ -256,12 +256,12 @@ satellite_product_config:
       - name: Red Hat OpenStack Platform 11 Developer Tools for RHEL 7 (RPMs)
       - name: Red Hat OpenStack Platform 11 for RHEL 7 (RPMs)
       - name: Red Hat OpenStack Platform 11 Operational Tools for RHEL 7 (RPMs)
-      - name: "Red Hat Ceph Storage Tools 2 for Red Hat Enterprise Linux 7 Server (RPMs)"
-        releasever: 7Server
-      - name: Red Hat Ceph Storage MON 2 for Red Hat Enterprise Linux 7 Server (RPMs)
-        releasever: 7Server
-      - name: Red Hat Ceph Storage OSD 2 for Red Hat Enterprise Linux 7 Server (RPMs)
-        releasever: 7Server
+      # - name: "Red Hat Ceph Storage Tools 2 for Red Hat Enterprise Linux 7 Server (RPMs)"
+      #   releasever: 7Server
+      # - name: Red Hat Ceph Storage MON 2 for Red Hat Enterprise Linux 7 Server (RPMs)
+      #   releasever: 7Server
+      # - name: Red Hat Ceph Storage OSD 2 for Red Hat Enterprise Linux 7 Server (RPMs)
+      #   releasever: 7Server
 #need manifest WITH satellite
 #  - product: Red Hat Satellite
 #    basearch: x86_64
@@ -276,8 +276,8 @@ satellite_product_config:
   - product: Red Hat OpenShift Container Platform
     basearch: x86_64
     repos:
-      - name: "Red Hat OpenShift Container Platform 3.3 (RPMs)"
-      - name: "Red Hat OpenShift Container Platform 3.4 (RPMs)"
+      # - name: "Red Hat OpenShift Container Platform 3.3 (RPMs)"
+      # - name: "Red Hat OpenShift Container Platform 3.4 (RPMs)"
       - name: "Red Hat OpenShift Container Platform 3.5 (RPMs)"
       - name: "Red Hat OpenShift Container Platform 3.6 (RPMs)"
   - product: Red Hat Virtualization
@@ -285,7 +285,7 @@ satellite_product_config:
     repos:
       - name: Red Hat Enterprise Virtualization Management Agents for RHEL 7 (RPMs)
         releasever: 7Server
-      - name: Red Hat Enterprise Virtualization Manager 3.6 (RPMs)
+      # - name: Red Hat Enterprise Virtualization Manager 3.6 (RPMs)
       - name: Red Hat Virtualization 4 Management Agents for RHEL 7 (RPMs)
         releasever: 7Server
       - name: Red Hat Virtualization Manager 4.1 (RHEL 7 Server) (RPMs)
@@ -293,8 +293,8 @@ satellite_product_config:
   - product: JBoss Enterprise Application Platform
     basearch: x86_64
     repos:
-      - name: JBoss Enterprise Application Platform 6 (RHEL 6 Server) (RPMs)
-        releasever: 6Server
+      # - name: JBoss Enterprise Application Platform 6 (RHEL 6 Server) (RPMs)
+      #   releasever: 6Server
       - name: JBoss Enterprise Application Platform 7 (RHEL 7 Server) (RPMs)
         releasever: 7Server
       - name: JBoss Enterprise Application Platform 7.0 (RHEL 7 Server) (RPMs)
@@ -306,7 +306,7 @@ satellite_product_config:
   - product: Red Hat CloudForms
     basearch: x86_64
     repos:
-      - name: Red Hat CloudForms Management Engine 5.6 (RPMs)
+      # - name: Red Hat CloudForms Management Engine 5.6 (RPMs)
       - name: Red Hat CloudForms Management Engine 5.7 (RPMs)
       - name: Red Hat CloudForms Management Engine 5.8 (RPMs)
   - product: Red Hat Ceph Storage MON
@@ -338,12 +338,12 @@ satellite_product_config:
         releasever: 7Server
 
 satellite_content_config:
-  - content_view: "CV-OS-RHEL6-SERVER"
-    content:
-      - product: "Red Hat Enterprise Linux Server"
-        repository: "Red Hat Enterprise Linux 6 Server RPMs x86_64 6Server"
-      - product: "Red Hat Enterprise Linux Server"
-        repository: "Red Hat Satellite Tools {{ satellite_version }} for RHEL 6 Server RPMs x86_64"
+  # - content_view: "CV-OS-RHEL6-SERVER"
+  #   content:
+  #     - product: "Red Hat Enterprise Linux Server"
+  #       repository: "Red Hat Enterprise Linux 6 Server RPMs x86_64 6Server"
+  #     - product: "Red Hat Enterprise Linux Server"
+  #       repository: "Red Hat Satellite Tools {{ satellite_version }} for RHEL 6 Server RPMs x86_64"
 
   - content_view: "CV-OS-RHEL7-SERVER"
     content:
@@ -368,16 +368,16 @@ satellite_content_config:
 
   - content_view: "CV-RHEV-MANAGER"
     content:
-      - product: "Red Hat Virtualization"
-        repository: "Red Hat Enterprise Virtualization Manager 3.6 RPMs x86_64"
-      - product: "Red Hat Enterprise Linux Server"
-        repository: "Red Hat Enterprise Linux 6 Server RPMs x86_64 6Server"
-      - product: "Red Hat Enterprise Linux Server"
-        repository: "Red Hat Satellite Tools {{ satellite_version }} for RHEL 6 Server RPMs x86_64"
-      - product: "Red Hat Enterprise Linux Server"
-        repository: "Red Hat Enterprise Linux 6 Server - Supplementary RPMs x86_64 6Server"
-      - product: "JBoss Enterprise Application Platform"
-        repository: "JBoss Enterprise Application Platform 6 RHEL 6 Server RPMs x86_64 6Server"
+      # - product: "Red Hat Virtualization"
+      #   repository: "Red Hat Enterprise Virtualization Manager 3.6 RPMs x86_64"
+      # - product: "Red Hat Enterprise Linux Server"
+      #   repository: "Red Hat Enterprise Linux 6 Server RPMs x86_64 6Server"
+      # - product: "Red Hat Enterprise Linux Server"
+      #   repository: "Red Hat Satellite Tools {{ satellite_version }} for RHEL 6 Server RPMs x86_64"
+      # - product: "Red Hat Enterprise Linux Server"
+      #   repository: "Red Hat Enterprise Linux 6 Server - Supplementary RPMs x86_64 6Server"
+      # - product: "JBoss Enterprise Application Platform"
+      #   repository: "JBoss Enterprise Application Platform 6 RHEL 6 Server RPMs x86_64 6Server"
       - product: "Red Hat Enterprise Linux Server"
         repository: "Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server"
       - product: "Red Hat Enterprise Linux Server"
@@ -416,12 +416,12 @@ satellite_content_config:
 
   - content_view: "CV-RHOSP"
     content:
-      - product: "Red Hat OpenStack"
-        repository: "Red Hat OpenStack Platform 9 director for RHEL 7 RPMs x86_64 7Server"
-      - product: "Red Hat OpenStack"
-        repository: "Red Hat OpenStack Platform 9 for RHEL 7 RPMs x86_64 7Server"
-      - product: "Red Hat OpenStack"
-        repository: "Red Hat OpenStack Platform 9 Operational Tools for RHEL 7 RPMs x86_64 7Server"
+      # - product: "Red Hat OpenStack"
+      #   repository: "Red Hat OpenStack Platform 9 director for RHEL 7 RPMs x86_64 7Server"
+      # - product: "Red Hat OpenStack"
+      #   repository: "Red Hat OpenStack Platform 9 for RHEL 7 RPMs x86_64 7Server"
+      # - product: "Red Hat OpenStack"
+      #   repository: "Red Hat OpenStack Platform 9 Operational Tools for RHEL 7 RPMs x86_64 7Server"
       - product: "Red Hat OpenStack"
         repository: "Red Hat OpenStack Platform 10 Developer Tools for RHEL 7 RPMs x86_64 7Server"
       - product: "Red Hat OpenStack"
@@ -455,10 +455,10 @@ satellite_content_config:
 
   - content_view: "CV-RHOSE3"
     content:
-      - product: "Red Hat OpenShift Container Platform"
-        repository: "Red Hat OpenShift Container Platform 3.3 RPMs x86_64"
-      - product: "Red Hat OpenShift Container Platform"
-        repository: "Red Hat OpenShift Container Platform 3.4 RPMs x86_64"
+      # - product: "Red Hat OpenShift Container Platform"
+      #   repository: "Red Hat OpenShift Container Platform 3.3 RPMs x86_64"
+      # - product: "Red Hat OpenShift Container Platform"
+      #   repository: "Red Hat OpenShift Container Platform 3.4 RPMs x86_64"
       - product: "Red Hat OpenShift Container Platform"
         repository: "Red Hat OpenShift Container Platform 3.5 RPMs x86_64"
       - product: "Red Hat OpenShift Container Platform"
@@ -476,10 +476,10 @@ satellite_content_config:
 
   - content_view: "CV-RHOSE3-CLIENT"
     content:
-      - product: "Red Hat OpenShift Container Platform"
-        repository: "Red Hat OpenShift Container Platform 3.3 RPMs x86_64"
-      - product: "Red Hat OpenShift Container Platform"
-        repository: "Red Hat OpenShift Container Platform 3.4 RPMs x86_64"
+      # - product: "Red Hat OpenShift Container Platform"
+      #   repository: "Red Hat OpenShift Container Platform 3.3 RPMs x86_64"
+      # - product: "Red Hat OpenShift Container Platform"
+      #   repository: "Red Hat OpenShift Container Platform 3.4 RPMs x86_64"
       - product: "Red Hat OpenShift Container Platform"
         repository: "Red Hat OpenShift Container Platform 3.5 RPMs x86_64"
       - product: "Red Hat Enterprise Linux Server"
@@ -502,8 +502,8 @@ satellite_content_config:
       - product: "Red Hat Enterprise Linux Server"
         repository: "Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server"
       - product: "Red Hat CloudForms"
-        repository: "Red Hat CloudForms Management Engine 5.6 RPMs x86_64"
-      - product: "Red Hat CloudForms"
+      #   repository: "Red Hat CloudForms Management Engine 5.6 RPMs x86_64"
+      # - product: "Red Hat CloudForms"
         repository: "Red Hat CloudForms Management Engine 5.7 RPMs x86_64"
       - product: "Red Hat CloudForms"
         repository: "Red Hat CloudForms Management Engine 5.8 RPMs x86_64"
