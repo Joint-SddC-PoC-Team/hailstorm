@@ -1,5 +1,5 @@
-layer1_ansible_host: storm5.coe.muc.redhat.com
-# hailstorm_dns_domain: hailstorm5.coe.muc.redhat.com
+layer1_ansible_host: storm6.coe.muc.redhat.com
+# hailstorm_dns_domain: hailstorm6.coe.muc.redhat.com
 # ocp_apps_dns_domain: apps.{{ hailstorm_dns_domain }}
 
 # disable_registration_against_satellite: false
