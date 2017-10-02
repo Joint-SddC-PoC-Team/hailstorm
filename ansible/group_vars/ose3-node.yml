@@ -31,7 +31,7 @@ disk:
     - name: var
       fstype: "{{ fstype }}"
       mountpoint: /var
-      size: 15360
+      size: 40720
 
 extra_disk_files: "{% if current_lifecycle_env.ocp_use_cns %}{{ cns_disk_files}}{% else %}[]{% endif %}"
 

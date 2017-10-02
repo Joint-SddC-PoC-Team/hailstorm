@@ -31,7 +31,7 @@ disk:
     - name: var
       fstype: "{{ fstype }}"
       mountpoint: /var
-      size: 30720
+      size: 40720
 
 
 openshift_master_api_host_and_port: openshift.{{ hailstorm_dns_domain }}:443
