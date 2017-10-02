@@ -58,7 +58,7 @@ infrastructure_network_guests:
   #vlan                   -1
   floating_start:         "10.32.105.163"
   floating_end:           "10.32.105.177"
-  dns_server:             10.32.96.1"
+  dns_server:             "10.32.96.1"
   #infra_start:            "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.129{%  else %}{{ external_network_config.guest_network_bridging.osp_infra_start }}{% endif %}"
   #infra_end:              "{% if external_network_config.guest_network_bridging is not defined %}10.116.121.149{%  else %}{{ external_network_config.guest_network_bridging.osp_infra_end }}{% endif %}"
   nic:
