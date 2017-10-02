@@ -42,11 +42,6 @@ parameter_defaults:
   # Set to the router gateway on the external network
   ExternalInterfaceDefaultRoute: {{ infrastructure_network_services.default_gw_host_prefix | ipaddr('address') }}
 
-  # @Wolfram: why this? Management should be the Admin Network (which is OOB), not the Guests (which is external)
-  #ManagementNetCidr: {{ infrastructure_network_guests.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_guests.default_gw_host_prefix | ipaddr('prefix') }}
-  #ManagementAllocationPools: [{'start': '{{ infrastructure_network_guests.infra_start }}', 'end': '{{ infrastructure_network_guests.infra_end }}'}]
-  #ManagementInterfaceDefaultRoute: {{ infrastructure_network_guests.default_gw_host_prefix | ipaddr('address') }}
-  # changed here for testing
   ManagementNetCidr: {{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('prefix') }}
   ManagementAllocationPools: [{'start': '{{ infrastructure_network_admin.osp_overcloud_start }}', 'end': '{{ infrastructure_network_admin.osp_overcloud_end }}'}]
   ManagementInterfaceDefaultRoute: {{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('address') }}
