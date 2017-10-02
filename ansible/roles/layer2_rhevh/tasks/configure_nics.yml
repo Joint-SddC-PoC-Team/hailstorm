@@ -105,7 +105,7 @@
   delegate_to: rhevm
 
 - name: assign nic to network (RHEV 4.x)
-  shell: ovirt-shell -E 'add networkattachment --parent-host-name {{ hostname }} --host_nic-name {{ item.item.dev }} --network-name {{ item.item.netname[0:10] }} --ip_address_assignments-ip_address_assignment "ip_address_assignment.ip.address={{ item.item.ip }},ip_address_assignment.assignment_method.ip.netmask={{ item.item.netmask }},ip_address_assignment.assignment_method.ip.gateway={{ item.item.default_gw }},ip_address_assignment.assignment_method=static"'
+  shell: ovirt-shell -E 'add networkattachment --parent-host-name {{ hostname }} --host_nic-name {{ item.item.dev }} --network-name {{ item.item.netname[0:10] }} {% if item.item.ip != "" %}--ip_address_assignments-ip_address_assignment "ip_address_assignment.ip.address={{ item.item.ip }},ip_address_assignment.assignment_method.ip.netmask={{ item.item.netmask }},ip_address_assignment.assignment_method.ip.gateway={{ item.item.default_gw }},ip_address_assignment.assignment_method=static"{% endif %}'
   when: item.stdout == "" and current_lifecycle_env.rhv_version == 4
   with_items: "{{ unassigned_nic.results }}"
   delegate_to: rhevm
