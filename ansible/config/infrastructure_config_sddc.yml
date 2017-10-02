@@ -93,7 +93,7 @@ infrastructure_network_admin:
   bridge: 'admin'
   forward_mode: 'nat'
   default_gw_host_prefix: 10.116.127.254/24
-#  vlan:       1
+  vlan:       2823
   dhcp_start: 10.116.127.140
   dhcp_end:   10.116.127.159
   osp_overcloud_start: 10.116.127.160
