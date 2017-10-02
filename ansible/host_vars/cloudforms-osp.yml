@@ -10,16 +10,18 @@ vm_networks:
   - "provisioning"
 
 vm_secgroups:
-  - "webserver":
-    - protocol: tcp
-      port_range: "80:80"
-    - protocol: tcp
-      port_range: "443:443"
-  - "default":
-    - protocol: icmp
-      port_range: ""
-    - protocol: tcp
-      port_range: "22:22"
+  # - "webserver":
+  #   - protocol: tcp
+  #     port_range: "80:80"
+  #   - protocol: tcp
+  #     port_range: "443:443"
+  # - "default":
+  #   - protocol: icmp
+  #     port_range: ""
+  #   - protocol: tcp
+  #     port_range: "22:22"
+    - webserver
+    - default
 
 # add a volume type with the respective type-keys for the VM (actually for the Tenant)
 vm_vol_types:
