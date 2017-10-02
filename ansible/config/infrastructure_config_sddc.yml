@@ -12,6 +12,15 @@ infrastructure_address_ntp_server: "{{ infrastructure_network_admin.default_gw_h
 infrastructure_address_default_dns: "{{ infrastructure_network_services.default_gw_host_prefix | ipaddr('address') }}"
 infrastructure_address_nfs_server: "{{ infrastructure_network_storage.default_gw_host_prefix | ipaddr('address') }}"
 
+hailstorm_dns_domain: "hailstorm4.coe.muc.redhat.com"
+ocp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
+disable_registration_against_satellite: false
+satellite_version: 6.2
+stage: DEV
+
+#if infrastructure_network_master is defined, the multi-node network config will be set up
+infrastructure_network_master: storm4.coe.muc.redhat.com
+
 # services is an external network to access all public services (accept for storage that has its own net), so this can be seen as a carved out part of OpenStacks br-ex for the public services
 # SDDC: BGP1 breakout?
 infrastructure_network_services:
@@ -271,12 +280,3 @@ infrastructure_networks:
   - "{% if infrastructure_network_provider2 is defined %}{{ infrastructure_network_provider2 }}{% endif %}"
 # - "{{ infrastructure_network_provider3 }}"
 # - "{{ infrastructure_network_provider4 }}"
-
-#if infrastructure_network_master is defined, the multi-node network config will be set up
-infrastructure_network_master: storm4.coe.muc.redhat.com
-hailstorm_dns_domain: hailstorm4.coe.muc.redhat.com
-ocp_apps_dns_domain: apps.{{ hailstorm_dns_domain }}
-
-disable_registration_against_satellite: false
-satellite_version: 6.2
-stage: DEV
