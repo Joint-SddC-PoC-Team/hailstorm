@@ -3,7 +3,7 @@ ansible_ssh_common_args: "-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o Proxy
 vm_nics: >
   [{% if nic_attachments is defined %}{% for nic_attachment in nic_attachments %}{
   "mac":        "{{ nic_attachment.mac_prefix }}{{ "%02X" % (ansible_host.split('.')[3]|int) }}",
-  "ip":         "{% if nic_attachment.ip_assignment is not defined or nic_attachment.ip_assignment == true %}{{ nic_attachment.default_gw_host_prefix | regex_replace('^(.*\.).*$','\1') }}{{ ansible_host.split('.')[3] }}{% endif %}",
+  "ip":         "{% if not (nic_attachment.no_ip_assignment|default(false,true)) %}{{ nic_attachment.default_gw_host_prefix | regex_replace('^(.*\.).*$','\1') }}{{ ansible_host.split('.')[3] }}{% endif %}",
   "dev":        "eth{{ loop.index0 }}",
   "default_gw": "{{ nic_attachment.default_gw_host_prefix | ipaddr('address') }}",
   "netmask":    "{{ nic_attachment.default_gw_host_prefix | ipaddr('netmask') }}",
