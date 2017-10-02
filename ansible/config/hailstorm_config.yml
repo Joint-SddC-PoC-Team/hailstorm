@@ -568,7 +568,7 @@ satellite_activation_keys_and_host_collections:
     content_view: "CV-RHEV-MANAGER"
     host_collection: "RHEVM"
     activation_key_subscription_regex: "{{ rhev_subscription_pool_regex }}"
-    override: "rhel-6-server-satellite-tools-{{ satellite_version }}-rpms"
+  #  override: "rhel-6-server-satellite-tools-{{ satellite_version }}-rpms"
 
   - activation_key: AK-CV-RHEV-HYPERVISOR
     content_view: "CV-RHEV-HYPERVISOR"
