@@ -50,14 +50,14 @@
       shell: >
         . ~/overcloudrc_v3 &&
         openstack network create --internal --project-domain hailstorm --project {{ item }} internal_{{ item }}
-      when: '"internal_{{ item }}" not in networks.stdout | from_json | map(attribute="Name") | list'
+      when: '("internal_" + item) not in networks.stdout | from_json | map(attribute="Name") | list'
       with_items: "{{ osp_projects }}"
 
     - name: create internal sub-network
       shell: >
         . ~/overcloudrc_v3 &&
         openstack subnet create sub_internal_{{ item }} --network internal_{{ item }} --project-domain hailstorm --project {{ item }} --dhcp --gateway 172.20.0.1 --dns-nameserver={{ infrastructure_network_guests.dns_server }} --subnet-range 172.20.0.0/16
-      when: '"internal_{{ item }}" not in networks.stdout | from_json | map(attribute="Name") | list'
+      when: '("internal_" + item) not in networks.stdout | from_json | map(attribute="Name") | list'
       with_items: "{{ osp_projects }}"
 
     - name: get existing routers
@@ -72,21 +72,21 @@
       shell: >
         . ~/overcloudrc_v3 &&
         openstack router create --project {{ item.item }} --project-domain hailstorm router_internal_{{ item.item }}
-      when: '"router_internal_{{ item.item }}" not in item.stdout | from_json | map(attribute="Name") | list'
+      when: '("router_internal_" + item.item) not in item.stdout | from_json | map(attribute="Name") | list'
       with_items: "{{ routers.results }}"
 
     - name: set gateway on router
       shell: >
         . ~/overcloudrc_v3 &&
         openstack router set --external-gateway guests router_internal_{{ item.item }}
-      when: '"router_internal_{{ item.item }}" not in item.stdout | from_json | map(attribute="Name") | list'
+      when: '("router_internal_" + item.item) not in item.stdout | from_json | map(attribute="Name") | list'
       with_items: "{{ routers.results }}"
 
     - name: add interface to internal
       shell: >
         . ~/overcloudrc_v3 &&
         openstack router add subnet router_internal_{{ item.item }} sub_internal_{{ item.item }}
-      when: '"router_internal_{{ item.item }}" not in item.stdout | from_json | map(attribute="Name") | list'
+      when: '("router_internal_" + item.item) not in item.stdout | from_json | map(attribute="Name") | list'
       with_items: "{{ routers.results }}"
   become: yes
   become_user: "{{ rhosp_stack_user }}"
