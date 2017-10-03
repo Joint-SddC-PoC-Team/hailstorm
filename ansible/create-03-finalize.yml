@@ -65,6 +65,7 @@
     - { role: layer2_tdagent, tags: [ 'layer3', 'cloudforms-osp', 'tdagent', 'cf-tdagent', 'cf-osp-tdagent'], mode: create }
     - { role: layer2_ipa_certificate, tags: ['layer2', 'cloudforms-osp', 'cf-certificate', 'cf-osp-certificate'], mode: create }
     - { role: layer3_cloudforms_certificate, tags: ['layer2', 'cloudforms-osp', 'cf-certificate', 'cf-osp-certificate'], mode: create }
+    - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'cloudforms-osp', 'cf-provider', 'cf-osp-provider-osp', 'cf-osp-provider-tower', 'cf-osp-provider-rhev', 'cf-osp-provider-ocp' ], mode: readfacts }
     - { role: layer3_cloudforms_osp_provider, tags: [ 'layer3', 'cloudforms-osp', 'cf-provider', 'cf-provider-osp', 'cf-osp-provider-osp' ], mode: create }
     - { role: layer3_cloudforms_tower_provider, tags: [ 'layer3', 'cloudforms-osp', 'cf-provider', 'cf-provider-tower', 'cf-osp-provider-tower' ], mode: create }
     - { role: layer3_cloudforms_rhev_provider, tags: [ 'layer3', 'cloudforms-osp', 'cf-provider', 'cf-provider-rhev', 'cf-osp-provider-rhev' ], mode: create }
