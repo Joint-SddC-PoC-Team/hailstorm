@@ -5,8 +5,8 @@
   {# if a bridging configuration is present for the host and we are not creating the master networks #}
   {% if ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is defined and not temp_master_network|default(false,true) %}
   <forward mode="bridge"/>
-  {% else %}
-  <forward mode="nat"/>
+  {% elif item.forward_mode|default(false,true) %}
+  <forward mode="{{ item.forward_mode }}"/>
   {% endif %}
 
   {# if no bridging information is present, we can add the IP configuration directly - otherwise via patched master network #}

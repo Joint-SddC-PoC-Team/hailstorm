@@ -1,7 +1,7 @@
 #!/bin/bash
 {% for network in infrastructure_networks %}
 
-{% if network.forward_mode != 'bridge'%}
+{% if network.forward_mode|default("",true) != 'bridge'%}
 ip link set l{{ network.bridge }} down
 ip link set lx{{ network.bridge }} down
 brctl delif {{ network.bridge }} lx{{ network.bridge }}

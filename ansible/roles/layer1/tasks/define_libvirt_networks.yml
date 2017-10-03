@@ -2,8 +2,8 @@
 # - name: start default network to ensure host IP can be determined
 #   virt_net: uri=qemu:///system name=default state=active
 #   ignore_errors: true
-- name: reread system facts
-  setup:
+# - name: reread system facts
+#   setup:
 
 # - name: delete networks that need to be reconfigured
 #   virt_net: uri=qemu:///system name={{ item.netname }} command=destroy state=absent
@@ -26,22 +26,23 @@
   with_items: "{{ infrastructure_networks }}"
 
 - block:
-    - set_fact:
+    - name: prepare master networks creation
+      set_fact:
         temp_master_network: "true"
-    # - debug: msg={{ lookup("template", "libvirt_network.xml.j2") }}
+    # - debug: msg="{{ lookup("template", "libvirt_network.xml.j2") }}"
+    #   when: item.forward_mode|default("",true) != 'bridge'
     #   with_items: "{{ infrastructure_networks }}"
-
     - name: define master networks
       virt_net: uri=qemu:///system name=x{{ item.netname }} command=define state=present xml='{{ lookup("template", "libvirt_network.xml.j2") }}'
-      when: item.forward_mode != 'bridge'
+      when: item.forward_mode|default("",true) != 'bridge'
       with_items: "{{ infrastructure_networks }}"
     - name: start master networks
       virt_net: uri=qemu:///system name=x{{ item.netname }} state=active
-      when: item.forward_mode != 'bridge'
+      when: item.forward_mode|default("",true) != 'bridge'
       with_items: "{{ infrastructure_networks }}"
     - name: set autostart master networks
       virt_net: uri=qemu:///system name=x{{ item.netname }} autostart=yes
-      when: item.forward_mode != 'bridge'
+      when: item.forward_mode|default("",true) != 'bridge'
       with_items: "{{ infrastructure_networks }}"
 
     - name: create script to create veth pairs and link bridges
