@@ -61,7 +61,7 @@ http_proxy:
 
 external_network_config:
   services_network_dnat:
-    layer1_dev: em1
+    layer1_dev: guests
     mapping:
       - expose_machine: satellite
         on_host_prefix: 10.32.105.220/32

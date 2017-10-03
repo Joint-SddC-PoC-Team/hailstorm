@@ -17,34 +17,43 @@
 #     and
 #     infrastructure_network_guests.bridge not in current_connections.stdout_lines
 
-- name: check bridge devices
-  shell: virsh iface-list --all | awk 'NR>2 {print $1}'
-  changed_when: false
-  register: temp_bridge_config
+- debug:
+    msg: |
+      destroy code will no longer remove bridge devices,
+      because this may leave the system without configured IP addresses.
+      Cautiously use "virsh iface-destroy <network>" and "virsh iface-undefine <network>"
 
-- name: turn off libvirt iface
-  shell: virsh iface-destroy {{ item.bridge }}
-  with_items: "{{ infrastructure_networks }}"
-  when: >
-    (item.nic|default({},true))[layer1_ansible_host]|default(false,true)
-    and
-    item.bridge in temp_bridge_config.stdout_lines
+- block:
+    - name: check bridge devices
+      shell: virsh iface-list --all | awk 'NR>2 {print $1}'
+      changed_when: false
+      register: temp_bridge_config
+      when: false
 
-- name: remove libvirt iface
-  shell: virsh iface-undefine {{ item.bridge }}
-  with_items: "{{ infrastructure_networks }}"
-  when: >
-    (item.nic|default({},true))[layer1_ansible_host]|default(false,true)
-    and
-    item.bridge in temp_bridge_config.stdout_lines
+    - name: turn off libvirt iface
+      shell: virsh iface-destroy {{ item.bridge }}
+      with_items: "{{ infrastructure_networks }}"
+      when: >
+        ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is defined
+        and
+        item.bridge in temp_bridge_config.stdout_lines
 
-# - name: reconstitute ifcfg file
-#   copy: src="/etc/sysconfig/network-scripts/BACKUP-{{ external_network_config.guest_network_bridging.layer1_dev }}" dest="/etc/sysconfig/network-scripts/ifcfg-{{ external_network_config.guest_network_bridging.layer1_dev }}" remote_src=true
+    - name: remove libvirt iface
+      shell: virsh iface-undefine {{ item.bridge }}
+      with_items: "{{ infrastructure_networks }}"
+      when: >
+        ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is defined
+        and
+        item.bridge in temp_bridge_config.stdout_lines
 
-- name: remove bridge definition file
-  file: name=/tmp/iface-{{ item.bridge }} state=absent
-  with_items: "{{ infrastructure_networks }}"
-  when: >
-    (item.nic|default({},true))[layer1_ansible_host]|default(false,true)
-    and
-    item.bridge in temp_bridge_config.stdout_lines
+    # - name: reconstitute ifcfg file
+    #   copy: src="/etc/sysconfig/network-scripts/BACKUP-{{ external_network_config.guest_network_bridging.layer1_dev }}" dest="/etc/sysconfig/network-scripts/ifcfg-{{ external_network_config.guest_network_bridging.layer1_dev }}" remote_src=true
+
+    - name: remove bridge definition file
+      file: name=/tmp/iface-{{ item.bridge }} state=absent
+      with_items: "{{ infrastructure_networks }}"
+      when: >
+        ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is defined
+        and
+        item.bridge in temp_bridge_config.stdout_lines
+  when: false

@@ -31,11 +31,20 @@
   changed_when: false
   register: temp_bridge_config
 
+- name: backup device config if present (if not present errors will be ignored)
+  copy: src="/etc/sysconfig/network-scripts/ifcfg-{{ node_bridge_config[item.netname].nic }}{% if item.vlan is defined%}.{{ item.vlan }}{% endif %}" dest="/etc/sysconfig/network-scripts/BACKUP-{{ node_bridge_config[item.netname].nic }}{% if item.vlan is defined%}.{{ item.vlan }}{% endif %}" force=no remote_src=true mode=644
+  with_items: "{{ infrastructure_networks }}"
+  when: >
+    ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is defined
+    and
+    item.bridge not in temp_bridge_config.stdout_lines
+  ignore_errors: true
+
 - name: create bridge definition files
   template: src=libvirt_interface.xml.j2 dest=/tmp/iface-{{ item.bridge }}.xml
   with_items: "{{ infrastructure_networks }}"
   when: >
-    (item.nic|default({},true))[layer1_ansible_host]|default(false,true)
+    ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is defined
     and
     item.bridge not in temp_bridge_config.stdout_lines
   register: temp_bridge_file
@@ -44,6 +53,16 @@
   shell: virsh iface-define --file /tmp/iface-{{ item.item.bridge }}.xml
   when: not item|skipped
   with_items: "{{ temp_bridge_file.results }}"
+
+- name: add additional config to ifcfg files
+  blockinfile: dest=/etc/sysconfig/network-scripts/ifcfg-{{ item.bridge }} block="{{ node_bridge_config[item.netname].additional }}"
+  with_items: "{{ infrastructure_networks }}"
+  when: >
+    ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is defined
+    and
+    item.bridge not in temp_bridge_config.stdout_lines
+    and
+    ((node_bridge_config|default({},true))[item.netname]|default({},true)).additional is defined
 
 - name: start bridge
   shell: virsh iface-start {{ item.item.bridge }}

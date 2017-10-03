@@ -1,14 +1,23 @@
+{# see https://libvirt.org/guide/html/Application_Development_Guide-Network_Interfaces-XML_Format.html #}
 <interface type='bridge' name='{{ item.bridge }}'>
   <start mode='onboot'/>
+  {% if node_bridge_config is defined and node_bridge_config[item.netname] is defined and node_bridge_config[item.netname].host_prefix is defined %}
+  <protocol family="ipv4">
+    <ip address="{{ node_bridge_config[item.netname].host_prefix | ipaddr('address') }}" prefix="{{ node_bridge_config[item.netname].host_prefix | ipaddr('prefix') }}" />
+    {% if node_bridge_config[item.netname].default_gw is defined %}
+    <route gateway="{{ node_bridge_config[item.netname].default_gw }}"/>
+    {% endif %}
+  </protocol>
+  {% endif %}
   <bridge stp='off' delay='2'>
     {% if item.vlan is defined %}
-    <interface type='vlan' name='{{ item.nic[layer1_ansible_host] }}.{{ item.vlan }}'>
+    <interface type='vlan' name='{{ node_bridge_config[item.netname].nic }}.{{ item.vlan }}'>
       <vlan tag='{{ item.vlan }}'>
-        <interface name='{{ item.nic[layer1_ansible_host] }}'/>
+        <interface name='{{ node_bridge_config[item.netname].nic }}'/>
       </vlan>
     </interface>
     {% else %}
-    <interface type='ethernet' name='{{ item.nic[layer1_ansible_host] }}' />
+    <interface type='ethernet' name='{{ node_bridge_config[item.netname].nic }}' />
     {% endif %}
   </bridge>
 </interface>

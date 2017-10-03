@@ -3,14 +3,14 @@
   <bridge name="{% if temp_master_network|default(false,true) %}x{% endif %}{{ item.bridge }}" />
 
   {# if a bridging configuration is present for the host and we are not creating the master networks #}
-  {% if item.nic is defined and item.nic[layer1_ansible_host]|default(false,true) and not temp_master_network|default(false,true) %}
+  {% if ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is defined and not temp_master_network|default(false,true) %}
   <forward mode="bridge"/>
   {% else %}
   <forward mode="nat"/>
   {% endif %}
 
   {# if no bridging information is present, we can add the IP configuration directly - otherwise via patched master network #}
-  {% if temp_master_network|default(false,true) or item.nic is not defined or not item.nic[layer1_ansible_host]|default(false,true) %}
+  {% if temp_master_network|default(false,true) or ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is not defined %}
   <ip address="{{ item.default_gw_host_prefix | ipaddr('address') }}" netmask="{{ item.default_gw_host_prefix | ipaddr('netmask') }}">
 
   {% if item.dhcp_start is defined and item.dhcp_end is defined %}
