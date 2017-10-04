@@ -84,8 +84,14 @@
     enabled: yes
     state: started
 
-- name: wait for rhsso service to be online
+- name: wait for rhsso admin to be online
   wait_for:
     host: localhost
     port: 9990
+    timeout: 90
+
+- name: wait for rhsso service to be online
+  wait_for:
+    host: localhost
+    port: 8080
     timeout: 90

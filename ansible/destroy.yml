@@ -395,10 +395,10 @@
   remote_user: root
   roles:
     - role: layer2_vms
-      tags: [ 'layer2', 'rhsso', 'vm' ]
+      tags: [ 'layer2', 'rhsso', 'vm', 'rhsso-install' ]
       mode: start
     - role: layer2_rhsso
-      tags: [ 'layer2', 'rhsso' ]
+      tags: [ 'layer2', 'rhsso', 'rhsso-install' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
     - role: layerX_ipa_client

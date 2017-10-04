@@ -7,6 +7,10 @@
     config credentials --server http://localhost:8080/auth \
     --realm master --user admin --password {{ root_password }}
   changed_when: false
+  register: result
+  until: result.stderr.find("404 Not Found") == -1 and result.rc == 0
+  retries: 30
+  delay: 1
 
 - name: create infra realm
   shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh \
