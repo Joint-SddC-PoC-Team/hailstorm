@@ -14,3 +14,61 @@
     path: /etc/yum.repos.d/epel.repo
     regexp: '^enabled='
     line: 'enabled=0'
+
+- name: Install python2-pip, python2-virtualenv and dependencies for ansible
+  yum: name="{{ item }}" state=present
+  with_items:
+    - python2-pip
+    - python-virtualenv
+    - libffi-devel
+    - openssl-devel
+
+- name: Install ansible from pip
+  pip: 
+    name=ansible 
+    state=present 
+    version={{ ansible_use_version|default('2.3.2.0') }}
+
+- name: Configure virtualenv for each ansible extra version
+  file: 
+    path="/opt/ansible-{{ item }}" 
+    state=directory 
+    owner=root 
+    group=root 
+    mode=0755
+  with_items: "{{ansible_available_versions}}"
+
+- name: Run virtualenv command for the directories
+  shell: ls /opt/ansible-{{ item }}/bin/activate >/dev/null  2>&1 || virtualenv /opt/ansible-{{ item }}
+  changed_when: False
+  with_items:  "{{ansible_available_versions}}"
+
+- name: Install ansible inside the virtualenv
+  pip: 
+    name=ansible 
+    state=present 
+    version="{{ item }}" 
+    virtualenv="/opt/ansible-{{ item }}"
+  with_items:  "{{ansible_available_versions}}"
+
+- name: Install python-shade for openstack module 
+  pip: 
+    name=shade 
+    state=present
+
+- name: Synchronize current directory to install-host
+  synchronize: 
+    src=../../../../ 
+    dest=/root/hailstorm-{{ rhsm_username.split('@')[0] }}/ 
+    use_ssh_args=True
+
+- get_argv:
+
+- name: Chheck if a tmux session already exists for your user
+  command: tmux has-session -t  ansible-{{ rhsm_username.split('@')[0] }}
+  register: has_session
+
+- name: Continuing the installation using install host
+  command: tmux  new-session -s ansible-{{ rhsm_username.split('@')[0] }} -d "{{ argv | join(' ') }};bash -i"
+  args:
+    chdir: "/root/hailstorm-{{ rhsm_username.split('@')[0] }}/ansible/"

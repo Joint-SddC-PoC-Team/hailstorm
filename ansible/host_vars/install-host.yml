@@ -30,6 +30,11 @@ disk:
       size: 2048
 
 pool_regex: "{{ rhel_subscription_pool_regex }}"
+repos:
+  - rhel-7-server-rpms
+  - rhel-7-server-optional-rpms
+  - rhel-7-server-extras-rpms
+
 packages:
   - git
   - python
