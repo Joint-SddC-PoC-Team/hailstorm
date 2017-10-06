@@ -60,4 +60,4 @@ parameter_defaults:
 
   NeutronExternalNetworkBridge: "''"
   NeutronBridgeMappings: "datacentre:br-services,guests:br-guests,admin:br-admin,provisioning:br-prov{% if infrastructure_network_provider1 is defined %},provider1:br-provider1{% endif %}{% if infrastructure_network_provider2 is defined %},provider2:br-provider2{% endif %}"
-  NeutronFlatNetworks: "datacentre, guests, admin, provisioning,{% if infrastructure_network_provider1 is defined %}, provider1{% endif %}{% if infrastructure_network_provider2 is defined %}, provider2{% endif %}"
+  NeutronFlatNetworks: "datacentre, guests, admin, provisioning{% if infrastructure_network_provider1 is defined %}, provider1{% endif %}{% if infrastructure_network_provider2 is defined %}, provider2{% endif %}"
