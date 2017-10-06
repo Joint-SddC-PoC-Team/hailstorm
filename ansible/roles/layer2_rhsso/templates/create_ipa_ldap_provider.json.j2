@@ -11,7 +11,7 @@
       "true"
     ],
     "usersDn": [
-      "cn=compat,dc=hailstorm3,dc=coe,dc=muc,dc=redhat,dc=com"
+      "cn=compat,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}"
     ],
     "connectionPooling": [
       "true"

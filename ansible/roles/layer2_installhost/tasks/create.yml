@@ -14,3 +14,67 @@
     path: /etc/yum.repos.d/epel.repo
     regexp: '^enabled='
     line: 'enabled=0'
+
+- name: Install python2-pip, python2-virtualenv and dependencies for ansible
+  yum: name="{{ item }}" state=present
+  with_items:
+    - python2-pip
+    - python-virtualenv
+    - libffi-devel
+    - openssl-devel
+
+- name: Install ansible from pip
+  pip: 
+    name=ansible 
+    state=present 
+    version={{ current_lifecycle_env.ansible_use_version }}
+
+- name: Configure virtualenv for each ansible extra version
+  file: 
+    path="/opt/ansible-{{ item }}" 
+    state=directory 
+    owner=root 
+    group=root 
+    mode=0755
+  with_items: "{{current_lifecycle_env.ansible_available_versions}}"
+
+- name: Run virtualenv command for the directories
+  shell: ls /opt/ansible-{{ item }}/bin/activate >/dev/null  2>&1 || virtualenv /opt/ansible-{{ item }}
+  changed_when: False
+  with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
+
+- name: Install ansible inside the virtualenv
+  pip: 
+    name=ansible 
+    state=present 
+    version="{{ item }}" 
+    virtualenv="/opt/ansible-{{ item }}"
+  with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
+
+- name: Install python-shade for openstack module 
+  pip: 
+    name=shade 
+    state=present
+
+- name: get your username
+  command: whoami
+  register: whoami
+  delegate_to: localhost
+
+- fail: msg="Don't work with root user!!"
+  when: whoami.stdout == "root"
+
+- name: Synchronize current directory to install-host
+  synchronize: 
+    src=../../../../ 
+    dest=/root/hailstorm-{{ whoami.stdout }}/ 
+    use_ssh_args=True
+
+- get_argv:
+
+
+- name: Continuing the installation using install host
+  command: tmux  new-session -s ansible-{{ whoami.stdout }} -d "ANSIBLE_HOST_KEY_CHECKING=False {{ argv | join(' ') }};bash -i"
+  args:
+    chdir: "/root/hailstorm-{{ whoami.stdout }}/ansible/"
+  when: current_lifecycle_env.use_install_host==True
