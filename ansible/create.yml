@@ -24,8 +24,9 @@
         - name: get your username
           command: whoami
           register: whoami
+          changed_when: False
           delegate_to: localhost
-        - debug: msg="Installation continues on install host, connect to {{ hostvars['install-host'].vm_nics[0].ip }} and run tmux attach -t ansible-{{ whoami }}"
+        - debug: msg="Installation continues on install host, connect to {{ hostvars['install-host'].vm_nics[0].ip }} and run tmux attach -t ansible-{{ whoami.stdout }}"
       when: current_lifecycle_env.use_install_host is defined and current_lifecycle_env.use_install_host==True
 
 
