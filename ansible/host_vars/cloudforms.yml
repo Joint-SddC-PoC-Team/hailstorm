@@ -1,6 +1,6 @@
 ---
 mem: 16384
-vcpu: 8
+vcpu: 4
 disk:
   size: 50
 
