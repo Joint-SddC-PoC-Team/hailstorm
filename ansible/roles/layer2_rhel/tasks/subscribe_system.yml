@@ -63,7 +63,6 @@
         activationkey: "{{ activation_key }}"
         pool: "{{ pool_regex }}"
         consumer_name: "{{ hostname }}"
-        force_register: True
 
     - name: install katello-agent
       yum:

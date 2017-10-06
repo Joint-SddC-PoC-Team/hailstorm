@@ -77,3 +77,4 @@
   command: tmux  new-session -s ansible-{{ whoami.stdout }} -d "ANSIBLE_HOST_KEY_CHECKING=False {{ argv | join(' ') }};bash -i"
   args:
     chdir: "/root/hailstorm-{{ whoami.stdout }}/ansible/"
+  when: current_lifecycle_env.use_install_host==True
