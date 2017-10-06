@@ -1,27 +1,31 @@
 
 # Condition bug https://github.com/ansible/ansible/issues/17193
 - include: create-01-base.yml
-  when: current_lifecycle_env.use_install_host==True
+  when: is_install_host is not defined or is_install_host!="yes"
 
 - include: create-02-ansibletower.yml
-  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
-
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-02-rhev.yml
-  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-02-osp.yml
-  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-02-ocp.yml
-  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-03-finalize.yml
-  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-04-democontent.yml
-  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 
 # If we use a install host, indicate how to continue
 - hosts: localhost
   tags: always
   tasks:
-    - debug: msg="Installation continues on install host, connect to {{ hostvars['install-host'].vm_nics[0].ip }} and run tmux attach -t ansible-{{ whoami }}"
+    - block:
+        - name: get your username
+          command: whoami
+          register: whoami
+          delegate_to: localhost
+        - debug: msg="Installation continues on install host, connect to {{ hostvars['install-host'].vm_nics[0].ip }} and run tmux attach -t ansible-{{ whoami }}"
       when: current_lifecycle_env.use_install_host is defined and current_lifecycle_env.use_install_host==True
 
 

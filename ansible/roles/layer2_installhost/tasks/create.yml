@@ -67,16 +67,13 @@
 - name: Synchronize current directory to install-host
   synchronize: 
     src=../../../../ 
-    dest=/root/hailstorm-{{ whoami }}/ 
+    dest=/root/hailstorm-{{ whoami.stdout }}/ 
     use_ssh_args=True
 
 - get_argv:
 
-- name: Chheck if a tmux session already exists for your user
-  command: tmux has-session -t  ansible-{{ whoami }}
-  register: has_session
 
 - name: Continuing the installation using install host
-  command: tmux  new-session -s ansible-{{ whoami }} -d "{{ argv | join(' ') }};bash -i"
+  command: tmux  new-session -s ansible-{{ whoami.stdout }} -d "ANSIBLE_HOST_KEY_CHECKING=False {{ argv | join(' ') }};bash -i"
   args:
-    chdir: "/root/hailstorm-{{ whoami }}/ansible/"
+    chdir: "/root/hailstorm-{{ whoami.stdout }}/ansible/"
