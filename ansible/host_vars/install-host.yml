@@ -43,3 +43,7 @@ packages:
   - nmap
   - screen
   - iotop
+  - gcc
+  - python-devel
+  - tmux
+  - rsync

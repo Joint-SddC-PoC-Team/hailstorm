@@ -1,7 +1,27 @@
+
+# Condition bug https://github.com/ansible/ansible/issues/17193
 - include: create-01-base.yml
+  when: current_lifecycle_env.use_install_host==True
+
 - include: create-02-ansibletower.yml
+  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
+
 - include: create-02-rhev.yml
+  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
 - include: create-02-osp.yml
+  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
 - include: create-02-ocp.yml
+  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
 - include: create-03-finalize.yml
+  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
 - include: create-04-democontent.yml
+  when: current_lifecycle_env.use_install_host==True and use_install_host=="no" 
+
+# If we use a install host, indicate how to continue
+- hosts: localhost
+  tags: always
+  tasks:
+    - debug: msg="Installation continues on install host, connect to {{ hostvars['install-host'].vm_nics[0].ip }} and run tmux attach -t ansible-{{ whoami }}"
+      when: current_lifecycle_env.use_install_host is defined and current_lifecycle_env.use_install_host==True
+
+
