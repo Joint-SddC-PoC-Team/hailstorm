@@ -83,3 +83,10 @@
   become_user: "{{ rhosp_stack_user }}"
   failed_when: "'FAILED' in ( stacklist.stdout | from_json )[0]['Stack Status']"
   changed_when: false
+
+- name: create ansible inventory as /etc/ansible/hosts
+  shell: . ~/stackrc && tripleo-ansible-inventory --static-inventory ansible_hosts && sudo cp ansible_hosts /etc/ansible/hosts
+  become: yes
+  become_user: "{{ rhosp_stack_user }}"
+  changed_when: false
+  
