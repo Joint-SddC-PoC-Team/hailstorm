@@ -108,6 +108,10 @@ install-host ansible_host=10.116.127.6 activation_key="AK-CV-OS-RHEL7-SERVER-{{ 
 [rh-sso]
 rh-sso ansible_host=10.116.127.7 activation_key="AK-CV-RH-SSO-{{ stage }}"
 
+[proxy-group]
+proxy ansible_host=10.116.127.50 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+# not very happy about .50 since it is in the IP range used by undercloud provisioning, but since the VM doesn't share the network...
+
 [nuage]
 vsd ansible_host=10.116.127.8 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 #vsc ansible_host=10.116.127.9 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
@@ -186,6 +190,7 @@ ose3-master1
 
 # All layer2 node groups that are installed with RHEL7
 [rhel7:children]
+proxy-group
 install-host
 rh-sso
 nuage
@@ -212,6 +217,7 @@ test-rhel6
 
 # everything on layer2
 [layer2:children]
+proxy-group
 install-host
 rh-sso
 nuage
