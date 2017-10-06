@@ -8,6 +8,7 @@
       vars:
         templates:
           - commandlineparams-environment.yaml
+          - network-isolation.yaml
           - network-environment.yaml
           - ips-from-pool-environment.yaml
           - extra-config-post-deployment-environment.yaml
@@ -46,6 +47,7 @@
       vars:
         templates:
           - commandlineparams-environment.yaml
+          - network-isolation.yaml
           - network-environment.yaml
           - ips-from-pool-environment.yaml
           - extra-config-post-deployment-environment.yaml
