@@ -6,12 +6,6 @@ resource_registry:
   OS::TripleO::Compute::Net::SoftwareConfig: ./nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: ./nic-configs/controller.yaml
   OS::TripleO::Network::Management: /usr/share/openstack-tripleo-heat-templates/network/management.yaml
-  OS::TripleO::Controller::Ports::ManagementPort:   /usr/share/openstack-tripleo-heat-templates/network/ports/management.yaml
-  OS::TripleO::Compute::Ports::ManagementPort:      /usr/share/openstack-tripleo-heat-templates/network/ports/management.yaml
-  OS::TripleO::CephStorage::Ports::ManagementPort:  /usr/share/openstack-tripleo-heat-templates/network/ports/management.yaml
-  OS::TripleO::SwiftStorage::Ports::ManagementPort: /usr/share/openstack-tripleo-heat-templates/network/ports/management.yaml
-  OS::TripleO::BlockStorage::Ports::ManagementPort: /usr/share/openstack-tripleo-heat-templates/network/ports/management.yaml
-
 
 parameter_defaults:
   PublicVirtualFixedIPs: [{'ip_address':'{{ hostvars['openstack'].vm_nics[0].ip }}'}]
