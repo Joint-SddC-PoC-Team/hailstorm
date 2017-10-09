@@ -51,10 +51,13 @@
     virtualenv="/opt/ansible-{{ item }}"
   with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
 
-- name: Install python-shade for openstack module 
+- name: Install pip packages to be able to use ansible modules (shade, nailgun)
   pip: 
-    name=shade 
+    name="{{ item }}"
     state=present
+  with_items:
+    - shade
+    - nailgun
 
 - name: get your username
   command: whoami
