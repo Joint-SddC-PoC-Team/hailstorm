@@ -258,7 +258,7 @@
     shell: openstack server create "{{OCP_LB.0}}.{{OCP_DOMAIN}}" --image "{{ RHEL_IMAGE_NAME }}" --key-name "{{ OCP_KEYPAIR }}" --flavor "{{ LB_FLAVOR_NAME }}" --user-data cloudinit/"{{OCP_LB.0}}".yaml --security-group all_open --nic net-id="{{ OCP_NETWORK_UUID.stdout }}"
     when: (OCP_LB.0 is defined) and (LB_check.stdout == "")
     environment: "{{openshift_tenant}}"
-  
+
   # Create bastion instance
   - name: Check if there is already a Bastion
     shell: openstack server list | grep "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}" | awk '{print $2}'
@@ -301,10 +301,14 @@
     with_items: "{{OCP_APPNODES}}"
     when: (OCP_APPNODES.0 is defined) and (app_check.stdout == "")
     environment: "{{openshift_tenant}}"
-  - name: Wait 30s for instances to be built
-    wait_for:
-      timeout: 30
-    when: (master_check.stdout == "") or (infra_check.stdout == "") or (app_check.stdout == "") or (bastion_check.stdout == "")
+  - name: Wait until App Nodes are up and running
+    shell: openstack server list | grep "{{item}}.{{OCP_DOMAIN}}" | awk '{print $6}'
+    environment: "{{openshift_tenant}}"
+    register: result
+    until: result.stdout == "ACTIVE"
+    retries: 5
+    delay: 20
+    with_items: "{{ALL_NODES}}"
   - name: Attach docker disk volumes to every instance
     shell: openstack server add volume --device "{{ VOLUME_DEV }}" "{{item}}.{{OCP_DOMAIN}}" "{{item}}"-docker 
     with_items: "{{OCP_NODES}}"
@@ -319,7 +323,7 @@
   - name: Attach floating IP to Bastion, if it's defined
     shell: openstack server add floating ip "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}" $(openstack floating ip create {{PUBLIC_NETWORK_NAME}} | grep " floating_ip_address " | awk '{print $4}')
     when: (OCP_BASTION.0 is defined) and (bastion_check.stdout == "")
-    environment: "{{openshift_tenant}}"    
+    environment: "{{openshift_tenant}}"  
   - name: Attach floating IPs to 1st master, if there are not defined LBs
     shell: openstack server add floating ip "{{OCP_MASTERS.0}}.{{OCP_DOMAIN}}" $(openstack floating ip create {{PUBLIC_NETWORK_NAME}} | grep " floating_ip_address " | awk '{print $4}')
     when: (OCP_LB.0 is undefined) and (master_check.stdout == "")

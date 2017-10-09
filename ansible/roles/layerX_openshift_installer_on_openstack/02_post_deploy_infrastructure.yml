@@ -29,7 +29,7 @@
 
   # Load private IPs
   - name: Load private IPs into array
-    shell: openstack server list --project openshift | grep "{{item}}" | awk '{print $8}' | awk -F[=,] '{print $2}'
+    shell: openstack server list --project "{{TENANT_NAME}}" | grep "{{item}}" | awk '{print $8}' | awk -F[=,] '{print $2}'
     with_items: "{{ALL_NODES}}"
     environment: "{{openshift_tenant}}"
     register: private_IPs
@@ -43,31 +43,42 @@
       zone: "{{OCP_DOMAIN}}"
       record: "{{item.item}}"
       value: "{{item.stdout | ipaddr}}"
-    with_items: "{{private_IPs.results}}"    
+    with_items: "{{private_IPs.results}}"
+        
+  # Verify created floating IPs 
+  - name: Verify created floating IPs 
+    shell: openstack floating ip list -f yaml | grep "Floating IP Address:" | wc -l
+    register: floating_IPs_number
+  - fail:
+      msg: When HA is configured, there should have been 2 floating IPs created
+    when: (OCP_LB.0 is undefined) and (floating_IPs_number.stdout == "2")
+  - fail:
+      msg: When non HA is configured, there should have been 3 floating IPs created
+    when: (OCP_LB.0 is defined) and (floating_IPs_number.stdout == "3")
 
   # Load bastion public IP
   - name: Load bastion public IP
-    shell: openstack server list --project openshift | grep "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
+    shell: openstack server list --project "{{TENANT_NAME}}" | grep "{{OCP_BASTION.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
     register: bastion_public_IP
     environment: "{{openshift_tenant}}"
 
   # Load LB public IP
   - name: Load LB public IP
-    shell: openstack server list --project openshift | grep "{{OCP_LB.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
+    shell: openstack server list --project "{{TENANT_NAME}}" | grep "{{OCP_LB.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
     register: LB_public_IP
     environment: "{{openshift_tenant}}"
     when: HA == true
 
   # Load master public IP
   - name: Load master public IP
-    shell: openstack server list --project openshift | grep "{{OCP_MASTERS.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
+    shell: openstack server list --project "{{TENANT_NAME}}" | grep "{{OCP_MASTERS.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
     register: master_public_IP
     environment: "{{openshift_tenant}}"
     when: HA == false
 
   # Load infranode public IP
   - name: Load infranode public IP
-    shell: openstack server list --project openshift | grep "{{OCP_INFRANODES.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
+    shell: openstack server list --project "{{TENANT_NAME}}" | grep "{{OCP_INFRANODES.0}}.{{OCP_DOMAIN}}" | awk '{print $9}'
     register: infra_public_IP
     environment: "{{openshift_tenant}}"
     when: HA == false    

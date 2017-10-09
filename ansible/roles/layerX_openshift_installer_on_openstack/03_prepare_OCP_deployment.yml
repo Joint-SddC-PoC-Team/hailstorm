@@ -164,8 +164,11 @@
     shell: ansible --private-key=/home/cloud-user/.ssh/id_rsa nodes -m service -a 'name=docker state=started enabled=yes'
     when: OCP_master_status|bool == false
 
-  # Deploy OpenShift Container Platform
+# Deploy OpenShift Container Platform
   - name: Deploy OpenShift Container Platform - This step will take some time, please be patient
-    shell: ansible-playbook --private-key=/home/cloud-user/.ssh/id_rsa /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+    shell: ansible-playbook —private-key=/home/cloud-user/.ssh/id_rsa /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+    register: ocpdeployment_log
     when: OCP_master_status|bool == false
+  - name: Save OpenShift deployment log to file
+    local_action: copy content="{{ ocpdeployment_log.stdout }}" dest="ocpdeployment.log"
  
