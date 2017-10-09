@@ -6,6 +6,7 @@ AUTH_USERNAME: admin
 AUTH_PASSWORD: YOURPASSWORD
 ADMIN_PROJECT_NAME: admin
 REGION_NAME: RegionOne
+DOMAIN_NAME: hailstorm
 
 # OpenShift tenant details
 TENANT_NAME: openshift
@@ -21,7 +22,7 @@ KEY_SECRET: "KRXMTEv6Q+3ztY1TMQvSu5ZZtyzkkKYvr+OcWwtOX/amI3HEVnzfNcy4ZjAKN9lyoOI
 PUBLIC_NETWORK_NAME: public_network
 PUBLIC_SUBNET_NAME: public_subnet
 PUBLIC_NETWORK_POOL_START: 192.168.1.200
-PUBLIC_NETWORK_POOL_END: 192.168.1.240
+PUBLIC_NETWORK_POOL_END: 192.168.1.205
 PUBLIC_NETWORK_GATEWAY: 192.168.1.1
 PUBLIC_SUBNET_RANGE: 192.168.1.0/24
 
@@ -102,6 +103,9 @@ OCP_PACKAGES:
 - kexec-tools
 - sos
 - psacct
+
+# Certs location
+
 
 # Proxy configuration
 proxy_http: 

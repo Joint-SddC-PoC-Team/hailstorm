@@ -1,0 +1,95 @@
+---
+
+# The purpose of this role is to prepare the NFS exports for OCP deployment. It doesn't apply - REMOVE
+- hosts: layer1
+  remote_user: root
+  gather_facts: false
+  pre_tasks:
+    - setup:
+      tags: [ 'layer1', 'ose3' ]
+  roles:
+    - role: layer1_openshift
+      tags: [ 'ose3', layer1 ]
+      mode: create
+
+# PARTIALLY REQUIRED
+# layer2_vms: Purpose is to provision a set of fixed set of KVM based VMs. It doesn't apply - REMOVE
+# layer2_rhel_reconfigure_dns: Configure DNS machines. Not required as it's done at OSP level - REMOVE. Check how to operate with nameserver.
+# layer2_rhel: Here is the satellite connection details - REUSE
+# layerX_distribute_pubkey: Not required as we use OpenStack keypair - REMOVE
+- hosts: ose3
+  remote_user: root
+  gather_facts: false
+  # pre_tasks:
+  #   - setup:
+  #     tags: [ 'layer2', 'rhev' ]
+  roles:
+    - { role: layer2_vms, tags: [ 'layer2', 'ose3', 'vm' ], mode: create }
+    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'ose3', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+    - { role: layer2_rhel, tags: [ 'layer2', 'ose3', 'rhel' ], mode: create }
+    - { role: layerX_distribute_pubkey, tags: [ 'layer2', 'ose3', 'ose3-installprep' ], mode: create, pubkeyhost: ose3-master1 }
+    # - role: layerX_ipa_client
+    #   tags: [ 'layer2', 'ose3',  'ipa-client']
+    #   mode: create
+
+# NOT REQUIRED as node preparation is somehow different now in 3.6 - REMOVE
+- hosts: ose3-common
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layerX_openshift_node, tags: [ 'layer2', 'ose3', 'ose3-node' ], mode: create }
+
+# PARTIALLY REQUIRED - Keep certificates creation. Reuse them to provide the certs files to every section of the hosts template
+- hosts: ose3-installer
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer2_ipa_certificate, tags: ['layer2', 'ose3', 'ose3-install', 'ose3-roles'], mode: create, certcn: 'openshift.{{ hailstorm_dns_domain }}', factprefix: openshift }
+    - { role: layerX_openshift_installer, tags: [ 'layer2', 'ose3', 'ose3-install', 'ose3-metrics', 'ose3-roles' ], mode: create }
+    - { role: layer2_ipa_certificate, tags: ['layer2', 'ose3', 'ose3-install', 'ose3-logging-certificate'], mode: create, certcn: 'kibana.{{ ocp_apps_dns_domain }}' }
+    - { role: layerX_openshift_route_certificate, tags: ['layer2', 'ose3', 'ose3-install', 'ose3-logging-certificate'], mode: create, route: "logging-kibana", namespace: "logging" }
+    - { role: layer2_ipa_certificate, tags: ['layer2', 'ose3', 'ose3-install', 'ose3-metrics-certificate'], mode: create, certcn: 'hawkular-metrics.{{ ocp_apps_dns_domain }}' }
+    - { role: layerX_openshift_route_certificate, tags: ['layer2', 'ose3', 'ose3-install', 'ose3-metrics-certificate'], mode: create, route: "hawkular-metrics", namespace: "openshift-infra" }
+    - { role: layer2_ipa_certificate, tags: ['layer2', 'ose3', 'ose3-install', 'ose3-router-certificate'], mode: create, certcn: '{{ ocp_apps_dns_domain }}', wildcard: true, factprefix: wildcard }
+    - { role: layerX_openshift_router_wildcardcertificate, tags: ['layer2', 'ose3', 'ose3-install', 'ose3-router-certificate'], mode: create }
+
+### BEGIN CONTAINER NATIVE STORAGE - NOT REQUIRED - REMOVE
+- hosts: ose3-node
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layerX_openshift_cns_prepare_nodes
+      tags: [ 'layer2', 'ose3', 'ose3-install','ose3-cns' ]
+      mode: create
+      when: current_lifecycle_env.ocp_use_cns|default(false)
+- hosts: ose3-installer
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layerX_openshift_cns_deploy_cns
+      tags: [ 'layer2', 'ose3', 'ose3-install','ose3-cns' ]
+      mode: create
+      when: current_lifecycle_env.ocp_use_cns|default(false)
+### END CONTAINER NATIVE STORAGE
+
+# REQUIRED
+- hosts: ose3-installer
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layerX_openshift_devops_tools, tags: [layer2, 'ose3', 'ose3-devops'], mode: create }
+
+### NOT REQUIRED - REMOVE
+- hosts: ose3-lb
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layerX_openshift_lb, tags: [ 'layer2', 'ose3', 'ose3-install','ose3-lb' ], mode: create }
+
+### NOT REQUIRED - REMOVE
+- hosts: ose3-master
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layerX_openshift_enablepipelines, tags: [ 'layer2', 'ose3', 'ose3-install','ose3-pipelines' ], mode: create, when: current_lifecycle_env.openshift_version == 3.3 }
+    - { role: layerX_openshift_fix_metrics_url_bug, tags: [ 'layer2', 'ose3', 'ose3-install', 'ose3-fixmetricsurl'], mode: create, when: current_lifecycle_env.openshift_version < 3.5 }
