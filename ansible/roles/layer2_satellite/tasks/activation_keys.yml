@@ -52,4 +52,4 @@
   with_nested:
     - "{{ current_lifecycle_environments.stdout_lines }}"
     - "{{ satellite_activation_keys_and_host_collections }}"
-  when: "item.1.override is defined and '{{ item.1.activation_key }}-{{ item.0 }}' not in current_activation_keys.stdout"
+  when: "item.1.override is defined and (item.1.activation_key + '-' + item.0) not in current_activation_keys.stdout"

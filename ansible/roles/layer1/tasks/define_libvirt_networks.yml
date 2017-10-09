@@ -51,4 +51,4 @@
       template: src=unlink_networks.j2 dest=~/unlink_networks.sh mode=0744
     - name: execute script to create veth pairs and link bridges
       shell: ~/link_networks.sh
-  when: layer1_ansible_host == infrastructure_network_master
+  when: layer1_ansible_host == infrastructure_network_master|default("")
