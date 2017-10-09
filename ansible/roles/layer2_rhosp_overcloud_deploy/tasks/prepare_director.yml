@@ -1,4 +1,5 @@
-- stat: path=/home/stack/bin/osp-status.sh
+- name: check overcloud deployment
+  stat: path=/home/stack/bin/osp-status.sh
   register: already_prepared
 #- debug: var=already_prepared
 

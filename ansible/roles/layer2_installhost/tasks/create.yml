@@ -24,17 +24,17 @@
     - openssl-devel
 
 - name: Install ansible from pip
-  pip: 
-    name=ansible 
-    state=present 
+  pip:
+    name=ansible
+    state=present
     version={{ current_lifecycle_env.ansible_use_version }}
 
 - name: Configure virtualenv for each ansible extra version
-  file: 
-    path="/opt/ansible-{{ item }}" 
-    state=directory 
-    owner=root 
-    group=root 
+  file:
+    path="/opt/ansible-{{ item }}"
+    state=directory
+    owner=root
+    group=root
     mode=0755
   with_items: "{{current_lifecycle_env.ansible_available_versions}}"
 
@@ -44,15 +44,15 @@
   with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
 
 - name: Install ansible inside the virtualenv
-  pip: 
-    name=ansible 
-    state=present 
-    version="{{ item }}" 
+  pip:
+    name=ansible
+    state=present
+    version="{{ item }}"
     virtualenv="/opt/ansible-{{ item }}"
   with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
 
 - name: Install pip packages to be able to use ansible modules (shade, nailgun)
-  pip: 
+  pip:
     name="{{ item }}"
     state=present
   with_items:
@@ -63,14 +63,15 @@
   command: whoami
   register: whoami
   delegate_to: localhost
+  changed_when: false
 
 - fail: msg="Don't work with root user!!"
   when: whoami.stdout == "root"
 
 - name: Synchronize current directory to install-host
-  synchronize: 
-    src=../../../../ 
-    dest=/root/hailstorm-{{ whoami.stdout }}/ 
+  synchronize:
+    src=../../../../
+    dest=/root/hailstorm-{{ whoami.stdout }}/
     use_ssh_args=True
 
 - get_argv:
