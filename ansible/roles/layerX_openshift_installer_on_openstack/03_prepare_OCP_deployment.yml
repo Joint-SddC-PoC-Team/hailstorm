@@ -19,7 +19,7 @@
     DOCKER_DEV: "{{ VOLUME_DEV }}"
 
   vars:
-    ansible_ssh_private_key_file: ./ocpkp
+    ansible_ssh_private_key_file: ./"{{ OCP_KEYPAIR }}"
     ansible_ssh_user: cloud-user
     ansible_become: true
 
@@ -80,7 +80,7 @@
 
   - name: Copy the private key to the bastion
     copy:
-      src: ./ocpkp
+      src: ./"{{ OCP_KEYPAIR }}"
       dest: /home/cloud-user/.ssh/id_rsa
       owner: cloud-user
       group: cloud-user
