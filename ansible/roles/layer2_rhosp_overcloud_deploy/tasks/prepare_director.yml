@@ -13,6 +13,10 @@
     copy: src="{{ item }}" dest=/home/stack/ owner=stack mode=644
     with_fileglob:
       - files/.screenrc
+  - name: symlink some directories for convenience
+    file: src=/usr/share/openstack-tripleo-heat-templates/network dest=/home/stack/network state=link
+  - name: symlink some directories for convenience
+    file: src=/usr/share/openstack-tripleo-heat-templates/puppet dest=/home/stack/puppet state=link
   - name: extend .bashrc_profile to use stackrc by default and inhibit ssh to save HostKeys
     lineinfile:
       path: /home/stack/.bash_profile
