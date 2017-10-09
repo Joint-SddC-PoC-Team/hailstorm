@@ -3,7 +3,7 @@
       vars:
         items:
           - path: "{{ nfs_nuage_binary_dir }}"
-        export_params: "(ro)"
+        export_params: "(rw)"
   when: mode=="create"
 
 - block:
