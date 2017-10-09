@@ -66,6 +66,7 @@
 #- debug: msg={{packages.split(',')}}
 - name: install all prerequisites
   yum: name="{{ packages }}" state=present
+  changed_when: false
   register: prerequisites
   async: 600
   poll: 0
@@ -112,9 +113,9 @@
   async: 1
   poll: 0
   ignore_errors: true
-  when: prerequisites|changed or enable|changed or disable|changed
+  when: job_result|changed or enable|changed or disable|changed
 - name: waiting for server to come back
   wait_for: host={{ ansible_host }} port=22 delay=30 timeout=600
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
   # https://github.com/ansible/ansible/issues/11705
-  when: prerequisites|changed or enable|changed or disable|changed
+  when: job_result|changed or enable|changed or disable|changed
