@@ -59,7 +59,9 @@
     - role: layer1_ceph_inventory
       tags: [ 'layer2', 'ceph', 'ipa' ]
       when: current_lifecycle_env.osp_storage_backend == "ceph_ownvms"
-
+    - role: layer1_nuage
+      mode: create
+      tags: [ 'layer2', 'nuage' ]
 #### SATELLITE ####
 
 - hosts: satellite

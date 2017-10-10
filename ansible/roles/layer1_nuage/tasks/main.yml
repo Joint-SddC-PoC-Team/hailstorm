@@ -1,0 +1,14 @@
+- block:
+    - include: roles/common/tasks/prepare_nfs_export.yml
+      vars:
+        items:
+          - path: "{{ nfs_nuage_binary_dir }}"
+        export_params: "(rw)"
+  when: mode=="create"
+
+- block:
+    - include: roles/common/tasks/remove_nfs_export.yml
+      vars:
+        items:
+          - path: "{{ nfs_nuage_binary_dir }}"
+  when: mode=="destroy"

@@ -55,7 +55,7 @@
         verbosity: 0
     - name: deploy overcloud (even more coffee!)
       shell: >
-        . ~/stackrc && rm ~/deploy_overcloud.log &&
+        . ~/stackrc ; rm ~/deploy_overcloud.log ;
         {{ lookup('template','deploy-overcloud.j2') }} 2>&1 >> ~/deploy_overcloud.log
       tags: ['deploy']
     #   async: 7200
@@ -89,4 +89,3 @@
   become: yes
   become_user: "{{ rhosp_stack_user }}"
   changed_when: false
-  

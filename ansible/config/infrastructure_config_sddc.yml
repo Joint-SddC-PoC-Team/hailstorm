@@ -1,5 +1,5 @@
 #if infrastructure_network_master is defined, the multi-node network config will be set up
-#infrastructure_network_master: storm4.coe.muc.redhat.com
+infrastructure_network_master: storm4.coe.muc.redhat.com
 
 # This is to make the various roles the layer1 host plays obvious
 # layer1 roles used for delegation - here we use the host name and let ansible resolve the connection info through the inventory
@@ -17,7 +17,7 @@ infrastructure_address_default_dns: "{{ infrastructure_network_services.default_
 infrastructure_address_nfs_server: "{{ infrastructure_network_storage.default_gw_host_prefix | ipaddr('address') }}"
 
 hailstorm_dns_domain: "{% if infrastructure_network_master is defined %}hailstorm4.coe.muc.redhat.com{% else %}{{ node_hailstorm_dns_domain }}{% endif %}"
-disable_registration_against_satellite: "{% if infrastructure_network_master is defined %}false{% else %}{{ node_disable_registration_against_satellite }}{% endif %}"
+disable_registration_against_satellite: "{% if infrastructure_network_master is defined %}False{% else %}{{ node_disable_registration_against_satellite }}{% endif %}"
 satellite_version:    "{% if infrastructure_network_master is defined %}6.2{% else %}{{ node_satellite_version }}{% endif %}"
 stage:                "{% if infrastructure_network_master is defined %}DEV{% else %}{{ node_stage }}{% endif %}"
 ocp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
