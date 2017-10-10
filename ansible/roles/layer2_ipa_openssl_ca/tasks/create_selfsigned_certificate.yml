@@ -4,7 +4,7 @@
 - name: create key
   shell: >
     cd {{ ca_dir }} &&
-    openssl genrsa -out private/{{ basefilename }}.key.pem {{ key_bitsize }}
+    openssl genrsa -passout pass:{{ key_passwd }} -out private/{{ basefilename }}.key.pem {{ key_bitsize }}
     creates={{ ca_dir }}/private/{{ basefilename }}.key.pem
 - name: set key mode
   file: state=file path={{ ca_dir }}/private/{{ basefilename }}.key.pem mode="400"

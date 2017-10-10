@@ -59,7 +59,9 @@
     - role: layer1_ceph_inventory
       tags: [ 'layer2', 'ceph', 'ipa' ]
       when: current_lifecycle_env.osp_storage_backend == "ceph_ownvms"
-
+    - role: layer1_nuage
+      mode: create
+      tags: [ 'layer2', 'nuage' ]
 #### SATELLITE ####
 
 - hosts: satellite
@@ -87,9 +89,13 @@
     - { role: layer2_ipa_etc_hosts, tags: [ 'layer2', 'ipa', 'rhel', 'ipa-rhel' ], mode: create }
     - { role: layer2_rhel, tags: [ 'layer2', 'ipa', 'rhel', 'ipa-rhel' ], mode: create }
     - { role: layer2_ipa_etc_hosts, tags: [ 'layer2', 'ipa', 'rhel', 'ipa-rhel' ], mode: destroy }
+# DFR: Preparation for HSRACKDEV-358 Constant Root CA - work in progress currently disabled:
+#    - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'ipa', 'rootca' ], mode: create }
+#    - { role: layer2_ipa, tags: [ 'layer2', 'ipa' ], mode: create-csr }
+#    - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'ipa', 'rootca' ], mode: signcertreq, csr_name: "ipa",csr_req: "???" , factprefix: ipa  }
+#    - { role: layer2_ipa, tags: [ 'layer2', 'ipa' ], mode: create }
     - { role: layer2_ipa, tags: [ 'layer2', 'ipa' ], mode: create }
     - { role: layer2_tdagent, tags: [ 'layer2', 'ipa', 'tdagent', 'ipa-tdagent'], mode: create }
-    #- { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'ipa', 'ca' ], mode: create }
 
 #### SATELLITE (again) ####
 

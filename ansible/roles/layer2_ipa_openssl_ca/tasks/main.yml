@@ -1,31 +1,97 @@
 #https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html
 
+#
+# This sets up the openssl root CA.
+# Either the Private Key and Certs exist in the local "binary"
+# Directory, then we copy these to the host.
+- include: create_ca_dirstructure.yml
+  vars:
+    ca_dir: /root/openssl_ca/rootca
+
+- name: check if root ca private key exists in local binary directory
+  local_action: stat path=binary/rootca.key.pem
+  register: local_rootca_key
+
+- fail:
+    msg: "binary/rootca.key.pem does not exit and create_rootca is not set. Either you get the Hailstorm Root CA key and cert from the google drive (see https://mojo.redhat.com/docs/DOC-1148464) to the local binary directory. Or you re-run with -e create_rootca=true to create a new root ca key and cert if you really know what you are doing."
+  when: local_rootca_key.stat.exists == false and mode=="create" and (create_rootca is not defined or create_rootca == false)
+
+# when exists in local binary folder, copy to remote host:
 - block:
-    - include: create_ca_dirstructure.yml
-      vars:
-        ca_dir: /root/openssl_ca
+    - name: copy rootca key to host
+      copy:
+        src: binary/rootca.key.pem
+        dest: /root/openssl_ca/rootca/private/rootca.key.pem
+        mode: 400
+    - name: copy rootca cert to host
+      copy:
+        src: binary/rootca.cert.pem
+        dest: /root/openssl_ca/rootca/certs/rootca.cert.pem
+        mode: 444
+  when: local_rootca_key.stat.exists == true and mode=="create"
+
+# when not exists and create is enabled, create a new one and copy to local binary
+- block:
     - include: create_selfsigned_certificate.yml
       vars:
-        ca_dir: /root/openssl_ca
+        ca_dir: /root/openssl_ca/rootca
         ca_policy: policy_strict
-        cert_cn: "{{ hailstorm_dns_domain }} Root CA"
+        cert_cn: "Hailstorm Root CA"
         key_bitsize: 4096
-        basefilename: ca
+        key_passwd: "{{ root_password }}"
+        basefilename: rootca
+    - name: copy rootca key to localhost
+      fetch:
+        src: /root/openssl_ca/rootca/private/rootca.key.pem
+        dest: binary/
+        flat: yes
+    - name: copy rootca cert to localhost
+      fetch:
+        src: /root/openssl_ca/rootca/certs/rootca.cert.pem
+        dest: binary/rootca.cert.pem
+        flat: yes
+  when: local_rootca_key.stat.exists == false and mode=="create" and create_rootca is defined and create_rootca
 
-    - include: create_ca_dirstructure.yml
-      vars:
-        ca_dir: /root/openssl_ca/intermediate
-    - include: create_signed_certificate.yml
-      vars:
-        ca_dir: /root/openssl_ca/intermediate
-        cert_cn: "{{ hailstorm_dns_domain }} Intermediate CA"
-        key_bitsize: 4096
-        basefilename: ca
-        signing_ca_dir: /root/openssl_ca
-        extension: v3_intermediate_ca
-        days: 3650
-  when: mode=="create"
+# ------- mode=="signcertreq"-------
+# Purpose: signs an existing cert request
+# caller must set:
+#   csr_name: with name of the request, e.g the name of the server for which this csr is for
+#   csr_req: content of the cert request
+# caller can set:
+#   factprefix (default: "ssl").
+# Returns:
+#   <factprefix>_cert with the signed server cert
+#   <factprefix>_cacert with the ca cert
+- block:
+    - name: copy csr to root ca
+      copy: content="{{ csr_req }}" dest="/root/openssl_ca/rootca/csr/{{ csr_name }}.csr.pem"
 
+    - include: sign_certificate_request.yml
+      vars:
+        ca_dir: /root/openssl_ca/rootca
+        basefilename: "{{ csr_name }}"
+        extension: server_cert
+        days: 730
+    - name: get cert
+      shell: cat {{ item }}
+      with_items:
+        - "/root/openssl_ca/rootca/certs/{{ csr_name }}.cert.pem"
+        - "/root/openssl_ca/rootca/certs/rootca.cert.pem"
+      register: keydata
+      changed_when: false
+    - name: set cert + key as facts
+      set_fact: {"{{ factprefix|default('ssl') }}_cert":"{{ keydata.results[0].stdout }}","{{ factprefix|default('ssl') }}_cacert":"{{ keydata.results[1].stdout }}"}
+  delegate_to: ipa
+  when: mode=="signcertreq"
+
+# ------- mode=="servercert"-------
+# Purpose: Creates a servercert
+# caller must set:
+#   cert_cn: CN of the server
+#   cert_san: System Alternate Names of the server to be added to the cert_san
+# caller can set:
+#   factprefix (default: "ssl")
+# TODO: Test and document results!
 - block:
     # caller should set cert_cn and cert_san
     - include: create_signed_certificate.yml
