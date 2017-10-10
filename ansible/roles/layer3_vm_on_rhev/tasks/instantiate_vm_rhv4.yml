@@ -59,7 +59,7 @@
       with_items: "{{ vm_nics }}"
 
     - name: create additional disks & attach it to VM
-      shell: ovirt-shell -E 'add disk --parent-vm-name {{ inventory_hostname_short }} --format cow --interface virtio --size {{ item }}'
+      shell: ovirt-shell -E 'add disk --parent-vm-name {{ inventory_hostname_short }} --format cow --interface virtio --size {{ item }} --storage_domains-storage_domain storage_domain.name=data1'
       with_items: "{{ vm_additional_disks|default([]) }}"
 
     - name: increase CFME VM memory
