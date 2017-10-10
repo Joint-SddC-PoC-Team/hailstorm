@@ -1,6 +1,8 @@
 - block:
     - include: create.yml
-      tags: ["installhost"]
+      tags: ["installhost-create"]
+    - include: sync_and_continue.yml
+      tags: ["installhost-sync"]
   when: mode=="create"
 
 - block:
