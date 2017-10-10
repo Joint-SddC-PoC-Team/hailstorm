@@ -183,7 +183,7 @@ ose3_repos:
   - rhel-7-server-extras-rpms
   - rhel-7-server-ose-{{ current_lifecycle_env.openshift_version }}-rpms
   - '{% if current_lifecycle_env.openshift_version >= 3.5 %}rhel-7-fast-datapath-rpms{% endif %}'
-  - '{% if current_lifecycle_env.ocp_use_cns %}rh-gluster-3-for-rhel-7-server-rpms{% endif %}'
+  - '{% if current_lifecycle_env.ocp_use_cns and current_lifecycle_env.openshift_version == 3.5 %}rh-gluster-3-for-rhel-7-server-rpms{% endif %}'
 ose3_additional_packages: docker
 
 tdagent_rpm:
