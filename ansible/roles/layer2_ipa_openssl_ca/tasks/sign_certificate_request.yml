@@ -1,0 +1,16 @@
+- name: sign csr
+  shell: >
+    cd {{ signing_ca_dir|default(ca_dir) }} &&
+    openssl ca
+    -config {{ ca_dir }}/rootca.cnf
+    -extensions {{ extension }}
+    -days {{ days }}
+    -notext
+    -md sha256
+    -batch
+    -in {{ ca_dir }}/csr/{{ basefilename }}.csr.pem
+    -out {{ ca_dir }}/certs/{{ basefilename }}.cert.pem
+    creates={{ ca_dir }}/certs/{{ basefilename }}.cert.pem
+
+- name: set cert mode
+  file: state=file path={{ ca_dir }}/certs/{{ basefilename }}.cert.pem mode="444"
