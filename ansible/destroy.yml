@@ -160,6 +160,10 @@
       tags: ['ose3-metrics', 'ose3-roles', 'ose3-content', 'content']
       mode: destroy
       when: vm_exists is defined and vm_exists == true
+    - role: layer2_rhsso_client
+      tags: ['layer2', 'ose3', 'ose3-oidc']
+      mode: destroy
+      oidcClientName: 'ocp-master'
 
 - hosts: ose3
   gather_facts: false
