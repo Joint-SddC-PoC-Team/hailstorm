@@ -31,9 +31,5 @@
   changed_when: false
   failed_when: oidcClientSecret.stderr != ""
 
-- debug: var=oidcClientSecret
-
 - name: set client secret as fact
   set_fact: {"{{ factprefix|default('oidcClient') }}Secret":"{{ oidcClientSecret.stdout }}"}
-
-- debug: var=ocpOidcClientSecret
