@@ -297,7 +297,9 @@ external_network_config:
         on_host_prefix: 10.32.105.232/32
         via_network: services
         ports:
-          # ssh port 22 not needed as we can come in via floating IP in guest network
+          - from_port: 22
+            to_port: 22
+            proto: tcp
           - from_port: 80
             to_port: 80
             proto: tcp
