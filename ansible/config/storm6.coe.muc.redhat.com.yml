@@ -218,7 +218,7 @@ external_network_config:
             to_port: 22
             proto: tcp
       - expose_machine: undercloud-public
-        on_host_prefix: 10.32.105.249/32
+        on_host_prefix: 10.32.105.248/32
         via_network: rhosp_provisioning
         ports:
           # webui
@@ -250,7 +250,7 @@ external_network_config:
             to_port: 9000
             proto: tcp
       - expose_machine: openstack
-        on_host_prefix: 10.32.105.250/32
+        on_host_prefix: 10.32.105.249/32
         via_network: services
         ports:
           - from_port: 80
@@ -268,7 +268,7 @@ external_network_config:
             to_port: 13080
             proto: tcp
       - expose_machine: tower
-        on_host_prefix: 10.32.105.251/32
+        on_host_prefix: 10.32.105.250/32
         via_network: services
         ports:
           - from_port: 80
@@ -281,7 +281,7 @@ external_network_config:
             to_port: 22
             proto: tcp
       - expose_machine: rh-sso
-        on_host_prefix: 10.32.105.252/32
+        on_host_prefix: 10.32.105.251/32
         via_network: services
         ports:
           - from_port: 8443
@@ -295,7 +295,7 @@ external_network_config:
       # from the start as it is created dynamically within OSP; by using the tag cfme_on_osp the vm_nics can be
       # created for IPA/DNS and DNAT settings after creation of the cloudforms-osp VM
       - expose_machine: cloudforms-osp
-        on_host_prefix: 10.32.105.253/32
+        on_host_prefix: 10.32.105.252/32
         via_network: services
         ports:
           # ssh port 22 not needed as we can come in via floating IP in guest network
@@ -306,7 +306,7 @@ external_network_config:
             to_port: 443
             proto: tcp
       - expose_machine: install-host
-        on_host_prefix: 10.32.105.254/32
+        on_host_prefix: 10.32.105.253/32
         via_network: services
         ports:
           - from_port: 22
