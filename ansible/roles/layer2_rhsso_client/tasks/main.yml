@@ -1,0 +1,20 @@
+# Role for creating / deleting oidc clients in rhsso.
+# Callers must set for mode create:
+#    oidcClientName: name of clientId
+#    oidcRedirect: oidc redirect URI
+# Caller can set:
+#   factprefix: prefix for vars containing client secret. Default: oidcClient
+# Returns:
+#  <factprefix>Secret: client secret
+#
+# Callers must set for mode delete:
+#    oidcClientName: name of clientId
+#
+# Fails when: RH-SSO not available
+- block:
+    - include: create_sso_oidc_client.yml
+  when: mode=="create"
+
+- block:
+    - include: delete_sso_oidc_client.yml
+  when: mode=="destroy"

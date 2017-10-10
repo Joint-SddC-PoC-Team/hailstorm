@@ -1,0 +1,19 @@
+- name: login to sso
+  shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh \
+    config credentials --server http://localhost:8080/auth \
+    --realm master --user admin --password {{ root_password }}
+  changed_when: false
+  delegate_to: rh-sso
+
+- name: get client id from rh-sso for {{ oidcClientName }}
+  shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh get clients -r infra --fields=id -q clientId={{ oidcClientName }} --format=csv --noquotes
+  delegate_to: rh-sso
+  register: ssoClientId
+  changed_when: false
+
+- name: delete oidc client in rh-sso for {{ oidcClientName }}
+  shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh delete clients/{{ssoClientId.stdout}} -r infra
+  changed_when: delete_client_result.rc == 0
+  delegate_to: rh-sso
+  register: delete_client_result
+  when: ssoClientId.stdout != ""
