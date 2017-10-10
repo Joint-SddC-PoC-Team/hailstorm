@@ -13,8 +13,7 @@
 
   - block:
     - name: create userdata file
-      template: src=cloud-config.txt.j2 dest=/tmp/{{ osp_tenant }}_{{ inventory_hostname_short }}_userdata.txt
-      when: instance_data.stdout | from_json | length == 0
+      template: "src=cloud-config.txt.j2 dest=/tmp/{{ osp_tenant }}_{{ inventory_hostname_short }}_userdata.txt"
 
     #- name: get ids of all networks
     #  shell: >
@@ -28,16 +27,17 @@
     #  changed_when: false
     #- debug: var=osp_network_ids.stdout|from_json
 
+    - debug: var=vm_nics
     - name: get IDs of needed networks
       shell: >
         . ~/overcloudrc_v3_hailstorm &&
         OS_TENANT_NAME={{ osp_tenant }}
         OS_PROJECT_NAME={{ osp_tenant }}
         OS_PASSWORD={{ root_password }}
-        openstack network show {{ item }} -f json|grep '"id":'|cut -d'"' -f4
+        openstack network show {{ item.netname|regex_replace('rhosp_','') }} -f json|grep '"id":'|cut -d'"' -f4
       register: vm_networks_ids
-      with_items: "{{ vm_networks }}"
-    - debug: var=vm_networks_ids
+      with_items: "{{ vm_nics }}"
+      changed_when: false
 
     - name: instantiate image
       shell: >
@@ -49,8 +49,9 @@
         --image "{{ osp_image }}"
         --flavor "{{ osp_flavor }}"
         --user-data "/tmp/{{ osp_tenant }}_{{ inventory_hostname_short }}_userdata.txt"
-        {% for network in vm_networks_ids.results %}--nic net-id={{ network.stdout }} {% endfor %}
-        {% for secgroup in vm_secgroups %}--security-group {{ secgroup }} {% endfor %}
+        --config-drive True
+        {% for network in vm_networks_ids.results %}--nic net-id={{ network.stdout }}{% if network.item.ip|default("") != "" %},v4-fixed-ip={{ network.item.ip }}{% endif %} {% endfor %}
+        {% for secgroup in vm_secgroups|default([]) %}--security-group {{ secgroup }} {% endfor %}
         {{ inventory_hostname_short }}
     when: instance_data.stdout | from_json | length == 0
 

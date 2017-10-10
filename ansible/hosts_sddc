@@ -128,7 +128,7 @@ undercloud-admin  ansible_host=10.116.124.41 nic_attachments="[ {{ infrastructur
 lookbusy-osp    activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
 
 [cloudforms-osp]
-cloudforms-osp  activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
+cloudforms-osp ansible_host=10.116.127.51 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
 
 [ansible-jump-host]
 ansible-jump-demo-vms  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-vms" osp_flavor="m1.small" osp_image="RHEL7"
@@ -235,7 +235,7 @@ dev-client
 tower
 storage-console
 
-# to let it participate in the calculation of ansible_host and vm_nics
+# to let it participate in the calculation of ansible_host
 # and the ssh proxy command used to communicate with all layer2/3 hosts
 [accessible_via_admin_network:children]
 layer2
@@ -244,6 +244,14 @@ cloudforms-osp
 vips
 lookbusy-rhev
 
+[accessible_via_floating_ip:children]
+ansible-jump-host
+lookbusy-osp
+
+# to let it participate in the calculation of vm_nics
+[automated_vmnics_calculation:children]
+accessible_via_floating_ip
+accessible_via_admin_network
 
 # A group to capture all nodes with standard 3-NIC network layout (services, admin, storage)
 [niclayout-standard:children]

@@ -10,8 +10,18 @@
       failed_when: instance_data.stdout == ""
       changed_when: false
 
-    # - set_fact:
-    #     needs_floting_ip: {{ (instance_data.stdout|from_json)[0]["Networks"]|regex_replace('internal_'+osp_tenant+'=\d+\.\d+\.\d+\.\d+,?\s*','') == "" }}
+    - name: store internal network info
+      set_fact:
+        temp_internal_network: "{{ (instance_data.stdout|from_json)[0]['Networks']|regex_replace('.*(' + infrastructure_osp_tenant_internal_network.netname + '=\\d+\\.\\d+\\.\\d+\\.\\d+(,\\s*\\d+\\.\\d+\\.\\d+\\.\\d+)?).*','\\1') }}"
+
+    - name: determine floating IP (if set)
+      set_fact:
+        temp_floating_ip: "{{ temp_internal_network|regex_replace(infrastructure_osp_tenant_internal_network.netname + '=\\d+\\.\\d+\\.\\d+\\.\\d+,?\\s*','') }}"
+        temp_internal_network_ip: "{{ temp_internal_network|regex_replace( '.*=(\\d+\\.\\d+\\.\\d+\\.\\d+).*','\\1') }}"
+
+    # - debug: var=temp_internal_network
+    # - debug: var=temp_floating_ip
+    # - debug: var=temp_internal_network_ip
 
     - block:
         - name: create floating IP
@@ -23,9 +33,25 @@
             openstack ip floating create {{ infrastructure_network_guests.netname }} -f json
           register: floating_ip_results
 
-        - name: determine floating IP
+        # - debug: var=floating_ip_results
+        # - debug: msg="{{ floating_ip_results.stdout|from_json }}"
+        # - debug: msg="{{ (floating_ip_results.stdout|from_json).id }}"
+
+        - name: determine new floating IP
           set_fact:
             floating_ip: '{% if current_lifecycle_env.openstack_version < 10 %}{{ floating_ip_results.stdout | from_json | selectattr("Field","match","^ip$") | map(attribute="Value") | first }}{% else %}{{ (floating_ip_results.stdout | from_json).floating_ip_address }}{% endif %}'
+
+        - name: determine port
+          shell: >
+            . ~/overcloudrc_v3_hailstorm &&
+            OS_TENANT_NAME={{ osp_tenant }}
+            OS_PROJECT_NAME={{ osp_tenant }}
+            OS_PASSWORD={{ root_password }}
+            openstack port list -f json --server {{ inventory_hostname_short }}
+          register: temp_ports
+
+        - set_fact:
+            temp_port: "{{ temp_ports.stdout|from_json|selectattr('Fixed IP Addresses','match', '.*' + temp_internal_network_ip + '.*')|map(attribute='ID')|first }}"
 
         - name: associate floating IP
           shell: >
@@ -33,9 +59,14 @@
             OS_TENANT_NAME={{ osp_tenant }}
             OS_PROJECT_NAME={{ osp_tenant }}
             OS_PASSWORD={{ root_password }}
-            openstack ip floating add {{ floating_ip }} {{ inventory_hostname_short }}
-      when: ( instance_data.stdout | from_json )[0]["Networks"] | regex_replace('internal_' + osp_tenant + "=\d+\.\d+\.\d+\.\d+,?\s*",'') == ""
+            neutron floatingip-associate {{ (floating_ip_results.stdout|from_json).id }} {{ temp_port }}
+      when: temp_floating_ip == ''
+
+    - set_fact:
+        floating_ip: "{{ temp_floating_ip }}"
+      when: temp_floating_ip != ''
 
   become: yes
   become_user: "{{ hostvars['rhosp-director'].rhosp_stack_user }}"
   delegate_to: rhosp-director
+  when: infrastructure_osp_tenant_internal_network.netname in (vm_nics|map(attribute="netname")|list)
