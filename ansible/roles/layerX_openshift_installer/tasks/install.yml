@@ -13,11 +13,13 @@
 
 - name: ensure that /etc/origin/master directory exists
   file: dest=/etc/origin/master state=directory
+  delegate_to: "{{item}}"
+  with_items: "{{groups['ose3-master']}}"
 
 - name: distribute ipa cert on ocp masters
   copy: content="{{ certificate.stdout }}" dest=/etc/origin/master/ipa-ca.crt
-  delegate_to: $item
-  with_items: {{groups.ose3-master}}
+  delegate_to: "{{item}}"
+  with_items: "{{groups['ose3-master']}}"
   when: ipa_available|success
 
 - name: create certificate files
