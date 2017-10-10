@@ -1,5 +1,5 @@
 #if infrastructure_network_master is defined, the multi-node network config will be set up
-#infrastructure_network_master: storm4.coe.muc.redhat.com
+infrastructure_network_master: storm4.coe.muc.redhat.com
 
 # This is to make the various roles the layer1 host plays obvious
 # layer1 roles used for delegation - here we use the host name and let ansible resolve the connection info through the inventory
