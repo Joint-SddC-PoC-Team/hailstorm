@@ -36,6 +36,8 @@ infrastructure_network_services:
   osp_undercloud_end:     10.116.120.80
   osp_overcloud_start:    10.116.120.81
   osp_overcloud_end:      10.116.120.100
+  nuage_start:            10.116.120.101
+  nuage_end:              10.116.120.115
   dhcp_start:             10.116.120.128
   dhcp_end:               10.116.120.172
   floating_start:         10.116.120.173
@@ -107,6 +109,8 @@ infrastructure_network_tenant:
   vlan:       2815
   osp_overcloud_start: 10.116.124.81
   osp_overcloud_end:   10.116.124.100
+  nuage_start:            10.116.124.101
+  nuage_end:              10.116.124.115
   mac_prefix: "02:00:00:00:05:"
 
 # this is a network for accessing the storage systems (aka public APIs); if applicable the storage systems on their own should not utilize this network, e.g. for syncing; for that the Storage Management network should be used like it is done in OpenStack
