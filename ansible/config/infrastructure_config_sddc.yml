@@ -139,6 +139,10 @@ infrastructure_network_rhosp_provisioning:
   forward_mode: 'nat'
   default_gw_host_prefix: 10.116.122.1/24
 #  vlan: 1
+  undercloud_dhcp_start:  10.116.122.43
+  undercloud_dhcp_end:    10.116.122.60
+  undercloud_discovery_start: 10.116.122.61
+  undercloud_discovery_end: 10.116.122.80
   floating_start:         10.116.122.101
   floating_end:           10.116.122.120
   mac_prefix: "02:00:00:00:08:"

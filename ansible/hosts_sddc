@@ -128,8 +128,8 @@ undercloud-admin  ansible_host=10.116.124.41 nic_attachments="[ {{ infrastructur
 lookbusy-osp    activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
 
 [cloudforms-osp-group]
-cloudforms-osp ansible_host=10.116.127.51 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
-cloudforms-osp-2 ansible_host=10.116.127.52 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
+cloudforms-osp ansible_host=10.116.127.121 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
+cloudforms-osp-2 ansible_host=10.116.127.122 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
 
 [ansible-jump-host]
 ansible-jump-demo-vms  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-vms" osp_flavor="m1.small" osp_image="RHEL7"
