@@ -1,6 +1,14 @@
 #https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html
 
 #
+# Modes:
+# create: create or setup the Hailstorm Root CA using a key+cert from binary folder
+# signcertreq: signs an existing cert request using the Hailstorm Root CA
+# servercert: create a server cert using the Hailstorm Root CA
+# alienservercert: creates a server cert using an Alien CA
+#
+
+#
 # This sets up the openssl root CA.
 # Either the Private Key and Certs exist in the local "binary"
 # Directory, then we copy these to the host.
@@ -35,6 +43,7 @@
     - include: create_selfsigned_certificate.yml
       vars:
         ca_dir: /root/openssl_ca/rootca
+        ca_name: rootca
         ca_policy: policy_strict
         cert_cn: "Hailstorm Root CA"
         key_bitsize: 4096
@@ -69,6 +78,7 @@
     - include: sign_certificate_request.yml
       vars:
         ca_dir: /root/openssl_ca/rootca
+        ca_name: rootca
         basefilename: "{{ csr_name }}"
         extension: server_cert
         days: 730
@@ -85,7 +95,7 @@
   when: mode=="signcertreq"
 
 # ------- mode=="servercert"-------
-# Purpose: Creates a servercert
+# Purpose: Creates a servercert using the hailstorm root ca
 # caller must set:
 #   cert_cn: CN of the server
 #   cert_san: System Alternate Names of the server to be added to the cert_san
@@ -96,7 +106,8 @@
     # caller should set cert_cn and cert_san
     - include: create_signed_certificate.yml
       vars:
-        ca_dir: /root/openssl_ca/intermediate
+        ca_dir: /root/openssl_ca/rootca
+        ca_name: rootca
         key_bitsize: 2048
         basefilename: "{{ cert_cn }}"
         extension: server_cert
@@ -104,13 +115,68 @@
     - name: get cert + key
       shell: cat {{ item }}
       with_items:
-        - "/root/openssl_ca/intermediate/certs/{{ cert_cn }}.cert.pem"
-        - "/root/openssl_ca/intermediate/private/{{ cert_cn }}.key.pem"
-        - "/root/openssl_ca/intermediate/certs/ca.cert.pem"
-        - "/root/openssl_ca/certs/ca.cert.pem"
+        - "/root/openssl_ca/rootca/certs/{{ cert_cn }}.cert.pem"
+        - "/root/openssl_ca/rootca/private/{{ cert_cn }}.key.pem"
+        - "/root/openssl_ca/rootca/certs/ca.cert.pem"
+        - "/root/openssl_ca/rootca/certs/rootca.cert.pem"
       register: keydata
       changed_when: false
     - name: set cert + key as facts
       set_fact: {"{{ factprefix|default('ssl') }}_cert":"{{ keydata.results[0].stdout }}\n{{ keydata.results[2].stdout }}","{{ factprefix|default('ssl') }}_key":"{{ keydata.results[1].stdout }}","{{ factprefix|default('ssl') }}_cacert":"{{ keydata.results[3].stdout }}"}
   delegate_to: ipa
   when: mode=="servercert"
+
+# ------- mode=="alienservercert"-------
+# Purpose: Creates a servercert using an Alien Root CA (one that is not present on any hailstorm machine)
+# caller must set:
+#   cert_cn: CN of the server
+#   cert_san: System Alternate Names of the server to be added to the cert_san
+# caller can set:
+#   factprefix (default: "ssl")
+# Returns:
+#   <factprefix>_cert: server cert, followed by ca cert
+#   <factprefix>_key: private key for server cert
+#   <factprefix>_cacert: just the ca cert
+- block:
+    # Make sure alien CA exists:
+    - include: create_ca_dirstructure.yml
+      vars:
+        ca_dir: /root/openssl_ca/alienca
+
+    - debug: msg="before Create Self Signed"
+
+    - include: create_selfsigned_certificate.yml
+      vars:
+        ca_dir: /root/openssl_ca/alienca
+        ca_name: alienca
+        ca_policy: policy_strict
+        cert_cn: "Hailstorm Alien CA"
+        cert_san: ""
+        key_bitsize: 4096
+        key_passwd: "{{ root_password }}"
+        basefilename: alienca
+
+    - debug: msg="create server cert using alien ca:"
+
+    # create server cert using alien ca:
+    - include: create_signed_certificate.yml
+      vars:
+        ca_dir: /root/openssl_ca/alienca
+        ca_name: alienca
+        key_bitsize: 2048
+        basefilename: "{{ cert_cn }}"
+        extension: server_cert
+        days: 730
+    - name: get cert + key
+      shell: cat {{ item }}
+      with_items:
+        - "/root/openssl_ca/alienca/certs/{{ cert_cn }}.cert.pem"
+        - "/root/openssl_ca/alienca/private/{{ cert_cn }}.key.pem"
+        - "/root/openssl_ca/alienca/certs/alienca.cert.pem"
+        - "/root/openssl_ca/alienca/certs/alienca.cert.pem"
+      register: keydata
+      changed_when: false
+    - name: set cert + key as facts
+      set_fact: {"{{ factprefix|default('ssl') }}_cert":"{{ keydata.results[0].stdout }}\n{{ keydata.results[2].stdout }}","{{ factprefix|default('ssl') }}_key":"{{ keydata.results[1].stdout }}","{{ factprefix|default('ssl') }}_cacert":"{{ keydata.results[3].stdout }}"}
+  delegate_to: ipa
+  when: mode=="alienservercert"
