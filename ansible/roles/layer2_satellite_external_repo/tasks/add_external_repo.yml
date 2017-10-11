@@ -1,0 +1,33 @@
+- name: get current list of GPG Keys
+  shell: hammer --output json gpg list --organization "{{ organization }}"
+  register: current_gpg_keys
+  changed_when: false
+
+- name: get current list of products
+  shell: hammer --output json product list --organization "{{ organization }}"
+  register: current_product_list
+  changed_when: false
+
+- name: get current list of repos
+  shell: hammer --output json repository list --organization "{{ organization }}"
+  register: current_repo_list
+  changed_when: false
+
+- name: download repo GPG key
+  get_url:
+    url: "{{ satellite_external_repos.gpgkey_url }}"
+    dest: "/tmp/{{ satellite_external_repos.gpgkey_name }}"
+    mode: 0400
+  when: satellite_external_repos.gpgkey_name not in (current_gpg_keys.stdout|from_json)|map(attribute="Name")
+
+- name: add repo GPG key
+  shell: hammer gpg create --organization "{{ organization }}" --name "{{ satellite_external_repos.gpgkey_name }}" --key "/tmp/{{ satellite_external_repos.gpgkey_name }}"
+  when: satellite_external_repos.gpgkey_name not in (current_gpg_keys.stdout|from_json)|map(attribute="Name")
+
+- name: add new product group
+  shell: hammer product create --name "{{ satellite_external_repos.product_name }}" --organization "{{ organization }}"
+  when: satellite_external_repos.product_name not in (current_product_list.stdout|from_json)|map(attribute="Name")
+
+- name: add new repo
+  shell: hammer repository create --name "{{ satellite_external_repos.repo_name }}" --organization "{{ organization }}" --product "{{ satellite_external_repos.product_name }}" --content-type yum --gpg-key {{satellite_external_repos.gpgkey_name}} --publish-via-http true --url "{{ satellite_external_repos.repository_url }}"
+  when: satellite_external_repos.repo_name not in (current_product_list.stdout|from_json)|map(attribute="Name")
