@@ -69,4 +69,7 @@
   become: yes
   become_user: "{{ hostvars['rhosp-director'].rhosp_stack_user }}"
   delegate_to: rhosp-director
-  when: infrastructure_osp_tenant_internal_network.netname in (vm_nics|map(attribute="netname")|list)
+  when: >
+    infrastructure_osp_tenant_internal_network.netname in (vm_nics|map(attribute="netname")|list)
+    and
+    jump_host is not defined

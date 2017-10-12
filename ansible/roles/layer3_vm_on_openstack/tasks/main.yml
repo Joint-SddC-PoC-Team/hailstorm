@@ -17,8 +17,12 @@
     - block:
        - name: wait for vm to become available
          wait_for: host={{ ansible_host }} port=22 timeout=600
-         delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
-         when: vm_exists
+         delegate_to: "{{ override_wait_for_delegate_host|default(infrastructure_delegate_host_used_to_test_if_layer2_host_is_available) }}"
+         when: vm_exists and (jump_host is not defined)
+       - name: wait for vm to become available after jump host is available
+         wait_for: host={{ ansible_host }} port=22 timeout=600
+         delegate_to: "{{ override_wait_for_delegate_host|default(infrastructure_delegate_host_used_to_test_if_layer2_host_is_available) }}"
+         when: vm_exists and (jump_host is defined)
        - include: add_volumes.yml
       when: mode=="create"
 
