@@ -37,5 +37,8 @@
 
 - name: add SRV dns record
   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }}. {{ hostvars[item].srv_dns[0] }} --srv-rec='{{ hostvars[item].srv_dns[1] }} {{ item }}'
+  register: srv_dns
   when: hostvars[item].srv_dns is defined
+  failed_when: "'ERROR: no modifications to be performed' not in srv_dns.stderr"
+  changed_when: srv_dns.rc == 0
   with_items: "{{ groups.all }}"
