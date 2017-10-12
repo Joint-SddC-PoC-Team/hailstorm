@@ -3,15 +3,24 @@
   register: dns_records
   changed_when: false
 
-# - name: add dns records
-#   shell: "echo {% if hostvars[item].vm_nics is defined %}{% for _nic in hostvars[item].vm_nics %}{% if _nic.netname is defined and _nic.netname == 'services' and _nic.ip is defined %}{{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ hostvars[item].inventory_hostname_short }} --a-rec {{ _nic.ip }}{% endif %}{% endfor %}{% endif %}"
-#   when: item != 'localhost' and hostvars[item].inventory_hostname_short is defined and hostvars[item].inventory_hostname_short not in dns_records.stdout_lines
-#   with_items: "{{ groups.all }}"
-#   ignore_errors: true
+
+
 
 - name: add dns records
   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item.name }} --a-rec {{ item.ip }}
   when: item.name != 'localhost' and item.name not in dns_records.stdout_lines
+  with_items: "{{ lookup('template','a_records.j2') }}"
+  ignore_errors: true
+
+- name: find existing ptr records
+  shell:  echo "{{ ipa_admin_password }}" | ( kinit admin && for zone in $(ipa dnszone-find |grep "Zone name"|grep arpa|cut -c14-); do ipa dnsrecord-find $zone | grep "PTR record:"| cut -c15- | sed "s/, /\\n/g"; done)
+  register: ptr_records
+  changed_when: false
+
+
+- name: add ptr records
+  shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ item.ip | ipaddr('revdns') | regex_replace('^\d+\.(.*)$', '\1') }} {{ item.ip.split('.')[3] }} --ptr-rec={{ item.name }}.{{ hailstorm_dns_domain }}.
+  when: item.name != 'localhost' and item.name + "." + hailstorm_dns_domain + "."  not in ptr_records.stdout_lines
   with_items: "{{ lookup('template','a_records.j2') }}"
   ignore_errors: true
 
@@ -25,3 +34,8 @@
 - name: add MX dns record
   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }}. {{ hailstorm_dns_domain }}. --mx-rec "10 infrastructure"
   when: mx_record.stdout == ""
+
+- name: add SRV dns record
+  shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }}. {{ hostvars[item].srv_dns[0] }} --srv-rec='{{ hostvars[item].srv_dns[1] }} {{ item }}'
+  when: hostvars[item].srv_dns is defined
+  with_items: "{{ groups.all }}"
