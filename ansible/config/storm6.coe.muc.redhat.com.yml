@@ -267,6 +267,10 @@ external_network_config:
           - from_port: 13080
             to_port: 13080
             proto: tcp
+          #
+          - from_port: 13000
+            to_port: 13000
+            proto: tcp
       - expose_machine: tower
         on_host_prefix: 10.32.105.250/32
         via_network: services
@@ -314,7 +318,7 @@ external_network_config:
           - from_port: 22
             to_port: 22
             proto: tcp
-      - expose_machine: ose3-lb
+      - expose_machine: ose3-osp-lb
         on_host_prefix: 10.32.105.239/32
         via_network: services
         ports:
@@ -330,7 +334,7 @@ external_network_config:
           - from_port: 8443
             to_port: 8443
             proto: tcp
-      - expose_machine: ose3-infranode1
+      - expose_machine: ose3-osp-infranode1
         on_host_prefix: 10.32.105.238/32
         via_network: services
         ports:
