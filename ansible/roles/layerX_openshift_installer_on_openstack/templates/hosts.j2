@@ -49,6 +49,9 @@ openshift_master_ldap_ca_file=/etc/origin/master/ipa-ca.crt
 openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider' }]
 {% endif %}
 
+# disable checks
+openshift_disable_check=memory_availability,disk_availability
+
 #openshift_use_dnsmasq=False
 openshift_master_cluster_method=native
 openshift_master_cluster_hostname=openshift-osp.{{ hailstorm_dns_domain }}
