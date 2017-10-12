@@ -1,0 +1,12 @@
+- block:
+    - name: install docker
+      yum: name={{ ose3_additional_packages }} state=present
+    - name: Copy the docker file to the hosts
+      template:
+        src: docker.j2
+        dest: /etc/sysconfig/docker-storage-setup
+    - name: ensure docker is running
+      service: name=docker state=started enabled=yes
+    - name: remove DNS2 config from ifcfg-eth0
+      lineinfile: regexp="^DNS2=.*" state=absent dest=/etc/sysconfig/network-scripts/ifcfg-eth0
+  when: mode=="create"

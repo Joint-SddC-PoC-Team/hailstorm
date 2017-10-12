@@ -127,8 +127,18 @@ proxy ansible_host=10.116.127.50 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage 
 # not very happy about .50 since it is in the IP range used by undercloud provisioning, but since the VM doesn't share the network...
 
 [nuage]
-vsd ansible_host=10.116.127.8 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
-#vsc ansible_host=10.116.127.9 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+vsd1 ansible_host=10.116.120.101 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsd2 ansible_host=10.116.120.102 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsd3 ansible_host=10.116.120.103 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsc1 ansible_host=10.116.120.104 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsc2 ansible_host=10.116.120.105 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsc3 ansible_host=10.116.120.106 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsc4 ansible_host=10.116.120.107 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
+elastic1 ansible_host=10.116.120.108 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+elastic2 ansible_host=10.116.120.109 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+elastic3 ansible_host=10.116.120.110 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsr1 ansible_host=10.116.120.111 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsr2 ansible_host=10.116.120.112 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
 
 # virtual IPs - these will not be instantiated through Ansible (but need them for DNS records, DNAT, etc)
 [vips]
@@ -278,10 +288,14 @@ lookbusy-rhev
 ansible-jump-host
 lookbusy-osp
 
+[accessible_via_services_network:children]
+nuage
+
 # to let it participate in the calculation of vm_nics
 [automated_vmnics_calculation:children]
 accessible_via_floating_ip
 accessible_via_admin_network
+accessible_via_services_network
 
 # A group to capture all nodes with standard 3-NIC network layout (services, admin, storage)
 [niclayout-standard:children]

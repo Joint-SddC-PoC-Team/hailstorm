@@ -1,0 +1,22 @@
+- block:
+    - include: prereqs.yml
+      tags: ["ose3-prereqs"]
+    - include: create_sso_oidc_client.yml
+      tags: ["ose3-rhsso"]
+    - include: install.yml
+      tags: ["ose3-ansible"]
+    - include: add_users_to_roles.yml
+      tags: ["ose3-roles"]
+    - include: register_pvs.yml
+      tags: ["ose3-pv"]
+    - include: deploy_containers.yml
+      tags: ["ose3-infracontainer"]
+  when: mode=="create"
+
+- block:
+    - include: remove_metrics.yml
+      tags: ["ose3-metrics"]
+      when: current_lifecycle_env.openshift_version == 3.2 or current_lifecycle_env.openshift_version == 3.3 or current_lifecycle_env.openshift_version == 3.4
+    - include: remove_users_from_roles.yml
+      tags: ["ose3-roles"]
+  when: mode=="destroy"

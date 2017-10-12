@@ -1,0 +1,9 @@
+- name: get existing Storage Classes
+  shell: oc get storageclass |awk '!/NAME/{print $1}'
+  register: storageclasses
+  changed_when: false
+
+- name: create Cinder Storage Class
+  shell: "oc create -f - <<EOF
+         {{ lookup('template','cinder_storageclass.yaml.j2') }}"
+  when: "'cinder' not in storageclasses.stdout_lines"

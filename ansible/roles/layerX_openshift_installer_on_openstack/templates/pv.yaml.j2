@@ -1,0 +1,20 @@
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ item }}
+#  annotations:
+#    volume.beta.kubernetes.io/storage-class: nfs
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteMany
+  - ReadWriteOnce
+  - ReadOnlyMany
+  nfs:
+    path: {{ nfs_ose3_pv_path }}/{{ item }}
+    server: {{ infrastructure_address_nfs_server }}
+  persistentVolumeReclaimPolicy: Recycle
+EOF
