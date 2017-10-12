@@ -1,0 +1,19 @@
+---
+- name: Download and install haproxy
+  yum: 
+    name: haproxy
+    state: present
+
+- name: Configure the haproxy cnf file with hosts
+  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg
+  notify: restart haproxy
+
+- name: Start the haproxy service
+  service: name=haproxy state=started enabled=yes
+
+- firewalld:
+    service: http
+    zone: public
+    permanent: true
+    immediate: true
+    state: enabled
