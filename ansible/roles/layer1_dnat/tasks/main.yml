@@ -1,5 +1,6 @@
 - block:
     - include: configure_additional_ip_addresses.yml
+      tags: [layer1-dnat-ip, dnat-ip]
     - include: register_libvirt_hook.yml
     - include: create_iptables_config.yml
   when: mode=="create" and external_network_config.services_network_dnat is defined

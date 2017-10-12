@@ -71,7 +71,9 @@
     - { role: layer2_vms, tags: [ 'layer2', 'satellite', 'vm', 'satellite-vm' ], mode: create }
     - { role: layer2_rhel, tags: [ 'layer2','satellite', 'rhel','satellite-rhel' ], mode: create }
     - { role: layer2_satellite, tags: [ 'layer2','satellite' ], mode: create }
-    - { role: layer2_satellite_external_repo, tags: [ 'external_repo' ], mode: create }
+
+# Moved into mail Satellite Sync role.
+#    - { role: layer2_satellite_external_repo, tags: [ 'external_repo' ], mode: create }
 
 # - hosts: test-rhel
 #   remote_user: root
@@ -149,6 +151,8 @@
     - { role: layer2_rhel, tags: [ 'layer2', 'infrastructure', 'rhel' ], mode: create }
     - { role: layer2_infrastructure, tags: [ 'layer2', 'infrastructure' ], mode: create }
     - { role: layer2_tdagent, tags: [ 'layer2', 'tdagent', 'infrastructure'], mode: create }
+    - { role: layer2_haproxy_service, tags: [ 'haproxy_setup' ], mode: create }
+  
 
 #### VIRT-WHO host (either infrastrcture or satellite)
 
