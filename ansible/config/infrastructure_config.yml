@@ -1,3 +1,6 @@
+THIS IS NOT A WORKING FILE FOR THE SDDC CASE
+SO THIS TEXT SHOULD BREAK ANY EXECUTION
+
 # This is to make the various roles the layer1 host plays obvious
 # layer1 roles used for delegation - here we use the host name and let ansible resolve the connection info through the inventory
 infrastructure_delegate_host_used_to_test_if_layer2_host_is_available: "layer1"
