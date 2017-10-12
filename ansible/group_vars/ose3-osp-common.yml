@@ -1,0 +1,4 @@
+---
+repos: "{{ ose3_repos|select|list }}"
+packages: "wget,git,net-tools,bind-utils,iptables-services,bridge-utils,bash-completion,atomic-openshift-utils"
+pool_regex: "{{ ose_subscription_pool_regex }}"
