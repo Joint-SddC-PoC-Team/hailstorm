@@ -1,11 +1,32 @@
 - block:
+    - name: read instance data
+      shell: >
+        . ~/overcloudrc_v3_hailstorm &&
+        OS_TENANT_NAME={{ osp_tenant }}
+        OS_PROJECT_NAME={{ osp_tenant }}
+        OS_PASSWORD={{ root_password }}
+        openstack server list -f json --name {{ inventory_hostname_short }}
+      register: instance_data
+      failed_when: instance_data.stdout == ""
+      changed_when: false
+
+    - name: store internal network info
+      set_fact:
+        temp_internal_network: "{{ (instance_data.stdout|from_json)[0]['Networks']|regex_replace('.*(' + infrastructure_osp_tenant_internal_network.netname + '=\\d+\\.\\d+\\.\\d+\\.\\d+(,\\s*\\d+\\.\\d+\\.\\d+\\.\\d+)?).*','\\1') }}"
+
+    - name: determine floating IP (if set)
+      set_fact:
+        temp_floating_ip: "{{ temp_internal_network|regex_replace(infrastructure_osp_tenant_internal_network.netname + '=\\d+\\.\\d+\\.\\d+\\.\\d+,?\\s*','') }}"
+        temp_internal_network_ip: "{{ temp_internal_network|regex_replace( '.*=(\\d+\\.\\d+\\.\\d+\\.\\d+).*','\\1') }}"
+
     - name: remove floating IP from server
       shell: >
         . ~/overcloudrc_v3_hailstorm &&
         OS_TENANT_NAME={{ osp_tenant }}
         OS_PROJECT_NAME={{ osp_tenant }}
         OS_PASSWORD={{ root_password }}
-        openstack ip floating remove {{ ansible_host }} {{ inventory_hostname_short }}
+        openstack ip floating remove {{ temp_floating_ip }} {{ inventory_hostname_short }}
+      when: temp_floating_ip != ""
 
     - name: remove floating IP
       shell: >
@@ -13,7 +34,8 @@
         OS_TENANT_NAME={{ osp_tenant }}
         OS_PROJECT_NAME={{ osp_tenant }}
         OS_PASSWORD={{ root_password }}
-        openstack ip floating delete {{ ansible_host }}
+        openstack ip floating delete {{ temp_floating_ip }}
+      when: temp_floating_ip != ""
   become: yes
   become_user: "{{ hostvars['rhosp-director'].rhosp_stack_user }}"
   delegate_to: rhosp-director

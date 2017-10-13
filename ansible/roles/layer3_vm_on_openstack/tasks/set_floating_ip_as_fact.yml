@@ -17,8 +17,20 @@
   set_fact:
     vm_exists: "{{ instance_data.stdout|from_json|list|length > 0 }}"
 
-- name: save floating IP as fact ansible_host
+# if ansible_host is not explicitly set in the inventory, it contains the inventory hostname
+- name: save floating IP as fact ansible_host and set ansible_ssh_common_args
   set_fact:
     ansible_host: "{{ (instance_data.stdout|from_json)[0]['Networks']|regex_replace('.*internal_'+osp_tenant+'=\\d+\\.\\d+\\.\\d+\\.\\d+,?\\s*','')|regex_replace(';.*','') }}"
     ansible_ssh_common_args: "-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no"
-  when: vm_exists
+  when: vm_exists and ansible_host == inventory_hostname_short and jump_host is not defined
+
+- name: set ansible_host and set ansible_ssh_common_args for VMs via jump host
+  set_fact:
+    ansible_host: "{{ (instance_data.stdout|from_json)[0]['Networks']|regex_replace('.*internal_'+osp_tenant+'=(\\d+\\.\\d+\\.\\d+\\.\\d+).*','\\1') }}"
+    ansible_ssh_common_args: "-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no -o ProxyCommand='ssh -i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p -q root@{{ hostvars[jump_host].ansible_host }}'"
+    vm_exists: true
+    override_wait_for_delegate_host: "{{ jump_host }}"
+  when: vm_exists and ansible_host == inventory_hostname_short and jump_host is defined
+
+- debug: var=ansible_host
+- debug: var=ansible_ssh_common_args

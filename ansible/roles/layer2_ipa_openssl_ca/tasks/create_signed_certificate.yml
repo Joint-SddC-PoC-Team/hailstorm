@@ -24,7 +24,7 @@
   shell: >
     cd {{ signing_ca_dir|default(ca_dir) }} &&
     openssl ca
-    -config ca.cnf
+    -config {{ ca_name }}.cnf
     -extensions {{ extension }}
     -days {{ days }}
     -notext

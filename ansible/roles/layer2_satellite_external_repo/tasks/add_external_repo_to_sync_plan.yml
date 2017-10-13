@@ -1,0 +1,14 @@
+---
+- name: get existing sync plans
+  command: hammer --output=json sync-plan list --organization "{{ organization }}"
+  register: sync_plans
+  changed_when: false
+
+- name: get product sync plan
+  command: hammer --output=json product info --organization "{{ organization }}" --name "{{ satellite_external_repos.product_name }}"
+  register: product_info
+  changed_when: false
+
+- name: add product to primary sync plan
+  command: hammer --output=json product set-sync-plan --organization "{{ organization }}" --name "{{ satellite_external_repos.product_name }}" --sync-plan-id {{ (sync_plans.stdout|from_json|selectattr('Name','match','^Hailstorm$')|first).ID }}
+  when: (sync_plans.stdout|from_json)|map(attribute="ID") != (product_info.stdout|from_json)|map(attribute="Sync Plan ID")

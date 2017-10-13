@@ -53,6 +53,7 @@
     - { role: layer3_cloudforms_rhev_provider, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-rhev' ], mode: create }
     - { role: layer3_cloudforms_openshift_provider, tags: [ 'layer3', 'cf','cf-provider', 'cf-provider-ocp' ], mode: create }
 
+<<<<<<< HEAD
 - hosts: cloudforms-db
   remote_user: root
   gather_facts: false
@@ -130,7 +131,7 @@
 
 #### CLOUDFORMS on OSP ####
 
-- hosts: cloudforms-osp
+- hosts: cloudforms-osp-group
   remote_user: root
   gather_facts: false
   roles:
@@ -138,7 +139,7 @@
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer3', 'cloudforms-osp', 'dns', 'cf-osp-vm' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer3_cloudforms_config, tags: [ 'layer3', 'cloudforms-osp', 'cfme-config', 'cf-osp-config' ], mode: create }
 # RHEL after cloudforms config, to ensure the hostname is set before subscribing
-    - { role: layer2_rhel, tags: [ 'layer3', 'cloudforms-osp', 'rhel', 'cf-rhel', 'cf-osp-rhel'], mode: create }
+#    - { role: layer2_rhel, tags: [ 'layer3', 'cloudforms-osp', 'rhel', 'cf-rhel', 'cf-osp-rhel'], mode: create }
     - { role: layer2_tdagent, tags: [ 'layer3', 'cloudforms-osp', 'tdagent', 'cf-tdagent', 'cf-osp-tdagent'], mode: create }
     - { role: layer2_ipa_certificate, tags: ['layer2', 'cloudforms-osp', 'cf-certificate', 'cf-osp-certificate'], mode: create }
     - { role: layer3_cloudforms_certificate, tags: ['layer2', 'cloudforms-osp', 'cf-certificate', 'cf-osp-certificate'], mode: create }

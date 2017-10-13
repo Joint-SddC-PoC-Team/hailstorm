@@ -1,0 +1,10 @@
+# Check if there is a working logging
+- name: Check if there is a working logging
+  shell: oc get dc -n logging | grep logging-kibana | awk '{print $1}' 
+  ignore_errors: yes
+  register: logging_status
+
+# Install logging
+- name: Install logging
+  shell: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml -e openshift_logging_namespace=logging -e openshift_logging_install_logging=true -e openshift_logging_es_pvc_dynamic=true -e openshift_logging_es_pvc_size=10G
+  when: logging_status.stdout != 'logging-kibana'

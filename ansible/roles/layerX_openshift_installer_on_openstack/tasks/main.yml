@@ -1,0 +1,21 @@
+- block:
+    - include: prereqs.yml
+      tags: ["ose3-prereqs"]
+    - include: install.yml
+      tags: ["ose3-ansible"]
+    - include: add_users_to_roles.yml
+      tags: ["ose3-roles"]
+    - include: create_storageclass.yml
+      tags: ["ose3-storageclass"]
+    - include: deploy_containers.yml
+      tags: ["ose3-infracontainer"]
+    - include: deploy_logging.yml
+      tags: ["ose3-logging"]
+    - include: deploy_metrics.yml
+      tags: ["ose3-metrics"]
+  when: mode=="create"
+
+- block:
+    - include: remove_openshift.yml
+      tags: ["ose3-ansible"]
+  when: mode=="destroy"

@@ -1,9 +1,9 @@
 ---
 ### OpenStack related data
 # Auth details
-AUTH_URL: http://192.168.1.40:5000/v2.0
+AUTH_URL: https://openstack.hailstorm6.coe.muc.redhat.com:13000/v3
 AUTH_USERNAME: admin
-AUTH_PASSWORD: YOURPASSWORD
+AUTH_PASSWORD: redhat01
 ADMIN_PROJECT_NAME: admin
 REGION_NAME: RegionOne
 DOMAIN_NAME: hailstorm
@@ -11,7 +11,7 @@ DOMAIN_NAME: hailstorm
 # OpenShift tenant details
 TENANT_NAME: openshift
 TENANT_USER: openshift
-TENANT_PWD: YOURPASSWORD # it's also the same password for the OCP admin user
+TENANT_PWD: redhat01 # it's also the same password for the OCP admin user
 
 # DNS server details
 NAMESERVER: 192.168.1.14
@@ -105,7 +105,9 @@ OCP_PACKAGES:
 - psacct
 
 # Certs location
-
+certfile: 
+keyfile:
+cafile:
 
 # Proxy configuration
 proxy_http: 

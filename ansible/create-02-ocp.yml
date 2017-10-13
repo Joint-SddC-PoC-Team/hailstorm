@@ -47,6 +47,7 @@
     - { role: layerX_openshift_router_wildcardcertificate, tags: ['layer2', 'ose3', 'ose3-install', 'ose3-router-certificate'], mode: create }
 
 ### BEGIN CONTAINER NATIVE STORAGE
+### DFR: Only for OCP <=3.5, starting with OCP3.6, this is done using the OCP installer
 - hosts: ose3-node
   remote_user: root
   gather_facts: false
@@ -54,7 +55,7 @@
     - role: layerX_openshift_cns_prepare_nodes
       tags: [ 'layer2', 'ose3', 'ose3-install','ose3-cns' ]
       mode: create
-      when: current_lifecycle_env.ocp_use_cns|default(false)
+      when: current_lifecycle_env.ocp_use_cns|default(false) and current_lifecycle_env.openshift_version <= 3.5
 - hosts: ose3-installer
   remote_user: root
   gather_facts: false
@@ -62,7 +63,7 @@
     - role: layerX_openshift_cns_deploy_cns
       tags: [ 'layer2', 'ose3', 'ose3-install','ose3-cns' ]
       mode: create
-      when: current_lifecycle_env.ocp_use_cns|default(false)
+      when: current_lifecycle_env.ocp_use_cns|default(false) and and current_lifecycle_env.openshift_version <= 3.5
 ### END CONTAINER NATIVE STORAGE
 
 - hosts: ose3-installer

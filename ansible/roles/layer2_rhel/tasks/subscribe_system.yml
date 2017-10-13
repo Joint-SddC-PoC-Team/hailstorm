@@ -47,6 +47,7 @@
       lineinfile: dest=/etc/hosts line="{{ item }}"
       with_items:
         - "{{ hostvars['satellite'].vm_nics[0].ip }} satellite {{ hostvars['satellite'].hostname }}"
+      when: hostvars['satellite'].vm_nics[0].netname in (vm_nics|map(attribute="netname")|list)
 
     - name: install katello-ca-consumer-latest
       # yum module can't do localinstall...

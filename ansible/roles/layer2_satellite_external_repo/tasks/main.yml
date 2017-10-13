@@ -1,0 +1,6 @@
+- block:
+    - include: add_external_repo.yml
+      tags: ['external_repo']
+    - include: add_external_repo_to_sync_plan.yml
+      tags: ['external_repo']
+

@@ -80,7 +80,7 @@
       delegate_to: rhevm
 
     - name: pause for rhevm to react
-      pause: seconds=15
+      pause: seconds=60
 
     - name: find VM Start URL
       shell: curl -XGET {{ lookup('template','roles/common/templates/rhev_curl_xml_params.j2') | trim }} \

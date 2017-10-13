@@ -1,0 +1,2 @@
+nic_attachments:
+  - "{{ infrastructure_osp_tenant_internal_network }}"

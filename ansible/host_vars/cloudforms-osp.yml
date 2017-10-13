@@ -3,11 +3,12 @@ vm_additional_disks:
   - 26843545600
   - 107374182400
 
-vm_networks:
-  - "internal_demo-infra"
-  - "services"
-  - "admin"
-  - "provisioning"
+nic_attachments:
+  - "{{ infrastructure_network_services }}"
+  - "{{ infrastructure_network_admin }}"
+  - "{{ infrastructure_network_rhosp_provisioning }}"
+default_route_via: "{{ infrastructure_network_services }}"
+name_service_via: "{{ infrastructure_network_services }}"
 
 vm_secgroups:
   # - "webserver":
@@ -27,8 +28,6 @@ vm_secgroups:
 vm_vol_types:
   - "ocp":
     - volume_backend_name: "ssd"
-
-default_route_via: "{{ infrastructure_network_services }}"
 
 repos: "{{ cloudforms_repos }}"
 pool_regex: "{{ cloudforms_subscription_pool_regex }}"
@@ -61,7 +60,6 @@ cfme_settings:
     value: '--- false\n...\n'
   - key: '/smtp/openssl_verify_mode'
     value: "--- ''''\\n"
-
 
 tdagent_configs:
   - tag: evm.log

@@ -561,6 +561,30 @@
       mode: destroy
       when: destroy_satellite is defined and destroy_satellite
 
+- hosts: proxy-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer2_vms
+      tags: [ 'layer2','proxy', 'vm' ]
+      mode: start
+    - role: layer2_installhost
+      tags: [ 'layer2', 'proxy' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layerX_ipa_client
+      tags: [ 'layer2','proxy', 'ipa-client' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer2_rhel
+      tags: [ 'layer2','proxy', 'rhel' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer2_vms
+      tags: [ 'layer2','proxy', 'vm' ]
+      mode: destroy
+
+
 - hosts: layer1
   gather_facts: false
   remote_user: root

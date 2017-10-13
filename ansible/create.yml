@@ -11,6 +11,8 @@
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-02-ocp.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
+- include: create-03-ocp.yml
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-03-finalize.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-04-democontent.yml

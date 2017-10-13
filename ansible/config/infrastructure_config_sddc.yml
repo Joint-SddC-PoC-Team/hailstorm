@@ -1,5 +1,5 @@
 #if infrastructure_network_master is defined, the multi-node network config will be set up
-infrastructure_network_master: storm4.coe.muc.redhat.com
+#infrastructure_network_master: storm4.coe.muc.redhat.com
 
 # This is to make the various roles the layer1 host plays obvious
 # layer1 roles used for delegation - here we use the host name and let ansible resolve the connection info through the inventory
@@ -21,6 +21,7 @@ disable_registration_against_satellite: "{% if infrastructure_network_master is 
 satellite_version:    "{% if infrastructure_network_master is defined %}6.2{% else %}{{ node_satellite_version }}{% endif %}"
 stage:                "{% if infrastructure_network_master is defined %}DEV{% else %}{{ node_stage }}{% endif %}"
 ocp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
+ocp_on_osp_apps_dns_domain: "apps-osp.{{ hailstorm_dns_domain }}"
 
 
 # services is an external network to access all public services (accept for storage that has its own net), so this can be seen as a carved out part of OpenStacks br-ex for the public services
@@ -35,6 +36,8 @@ infrastructure_network_services:
   osp_undercloud_end:     10.116.120.80
   osp_overcloud_start:    10.116.120.81
   osp_overcloud_end:      10.116.120.100
+  nuage_start:            10.116.120.101
+  nuage_end:              10.116.120.115
   dhcp_start:             10.116.120.128
   dhcp_end:               10.116.120.172
   floating_start:         10.116.120.173
@@ -106,6 +109,8 @@ infrastructure_network_tenant:
   vlan:       2815
   osp_overcloud_start: 10.116.124.81
   osp_overcloud_end:   10.116.124.100
+  nuage_start:            10.116.124.101
+  nuage_end:              10.116.124.115
   mac_prefix: "02:00:00:00:05:"
 
 # this is a network for accessing the storage systems (aka public APIs); if applicable the storage systems on their own should not utilize this network, e.g. for syncing; for that the Storage Management network should be used like it is done in OpenStack
@@ -139,6 +144,10 @@ infrastructure_network_rhosp_provisioning:
   forward_mode: 'nat'
   default_gw_host_prefix: 10.116.122.1/24
 #  vlan: 1
+  undercloud_dhcp_start:  10.116.122.43
+  undercloud_dhcp_end:    10.116.122.60
+  undercloud_discovery_start: 10.116.122.61
+  undercloud_discovery_end: 10.116.122.80
   floating_start:         10.116.122.101
   floating_end:           10.116.122.120
   mac_prefix: "02:00:00:00:08:"
@@ -189,6 +198,10 @@ infrastructure_network_provider2:
 # vlan:       2802
 # mac_prefix: "02:00:00:00:12:"
 
+infrastructure_osp_tenant_internal_network:
+  netname: "internal_{{ osp_tenant }}"
+  dhcp: true
+
 infrastructure_networks:
   - "{{ infrastructure_network_services }}"
   - "{{ infrastructure_network_guests }}"
@@ -198,7 +211,6 @@ infrastructure_networks:
   - "{{ infrastructure_network_storage }}"
   - "{{ infrastructure_network_storage_mgmt }}"
   - "{{ infrastructure_network_rhosp_provisioning }}"
-#  - "{{ infrastructure_network_rhosp_internal }}"
   - "{% if infrastructure_network_provider1 is defined %}{{ infrastructure_network_provider1 }}{% endif %}"
   - "{% if infrastructure_network_provider2 is defined %}{{ infrastructure_network_provider2 }}{% endif %}"
 # - "{{ infrastructure_network_provider3 }}"

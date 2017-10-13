@@ -195,6 +195,12 @@ epel_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 cfme_rhconsulting_scripts_repo: https://github.com/rhtconsulting/cfme-rhconsulting-scripts.git
 
+satellite_external_repos:
+  gpgkey_url: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+  gpgkey_name: RPM-GPG-KEY-EPEL-7
+  product_name: EPEL-7
+  repo_name: EPEL-7
+  repository_url: https://dl.fedoraproject.org/pub/epel/7/x86_64/
 
 satellite_product_config:
   - product: "Red Hat Enterprise Linux Server"
@@ -362,6 +368,8 @@ satellite_content_config:
         repository: "Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64"
       - product: "Red Hat Enterprise Linux Server"
         repository: "Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server"
+      - product: "EPEL-7"
+        repository: "EPEL-7"
 
   # for HANA
   # - content_view: "CV-OS-RHEL7.2-EUS-SAP"

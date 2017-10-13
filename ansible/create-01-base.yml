@@ -72,6 +72,9 @@
     - { role: layer2_rhel, tags: [ 'layer2','satellite', 'rhel','satellite-rhel' ], mode: create }
     - { role: layer2_satellite, tags: [ 'layer2','satellite' ], mode: create }
 
+# Moved into mail Satellite Sync role.
+#    - { role: layer2_satellite_external_repo, tags: [ 'external_repo' ], mode: create }
+
 # - hosts: test-rhel
 #   remote_user: root
 #   gather_facts: false
@@ -89,10 +92,11 @@
     - { role: layer2_ipa_etc_hosts, tags: [ 'layer2', 'ipa', 'rhel', 'ipa-rhel' ], mode: create }
     - { role: layer2_rhel, tags: [ 'layer2', 'ipa', 'rhel', 'ipa-rhel' ], mode: create }
     - { role: layer2_ipa_etc_hosts, tags: [ 'layer2', 'ipa', 'rhel', 'ipa-rhel' ], mode: destroy }
+    - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'ipa', 'ca', 'rootca' ], mode: create, ca_name: "rootca" }
+    - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'ipa', 'ca', 'alienca' ], mode: create, ca_name: "alienca" }
 # DFR: Preparation for HSRACKDEV-358 Constant Root CA - work in progress currently disabled:
-#    - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'ipa', 'rootca' ], mode: create }
 #    - { role: layer2_ipa, tags: [ 'layer2', 'ipa' ], mode: create-csr }
-#    - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'ipa', 'rootca' ], mode: signcertreq, csr_name: "ipa",csr_req: "???" , factprefix: ipa  }
+#    - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'ipa', 'rootca' ], mode: signcertreq, csr_name: "ipa",csr_req: "???" , factprefix: ipaCert  }
 #    - { role: layer2_ipa, tags: [ 'layer2', 'ipa' ], mode: create }
     - { role: layer2_ipa, tags: [ 'layer2', 'ipa' ], mode: create }
     - { role: layer2_tdagent, tags: [ 'layer2', 'ipa', 'tdagent', 'ipa-tdagent'], mode: create }
@@ -136,6 +140,7 @@
     - { role: layer2_rhel, tags: [ 'layer2', 'install-host', 'rhel' ], mode: create }
     - { role: layerX_ipa_client, tags: [ 'layer2', 'install-host',  'ipa-client'], mode: create }
     - { role: layer2_installhost, tags: [ 'layer2', 'install-host' ], mode: create }
+    - { role: layerX_distribute_proxycert, tags: [ 'layer2', 'install-host', 'proxy-cert' ], mode: create }
 
 #### Infrastructure (DNS, SMTP/IMAP) ####
 
@@ -148,6 +153,8 @@
     - { role: layer2_rhel, tags: [ 'layer2', 'infrastructure', 'rhel' ], mode: create }
     - { role: layer2_infrastructure, tags: [ 'layer2', 'infrastructure' ], mode: create }
     - { role: layer2_tdagent, tags: [ 'layer2', 'tdagent', 'infrastructure'], mode: create }
+    - { role: layer2_haproxy_service, tags: [ 'haproxy_setup' ], mode: create }
+
 
 #### VIRT-WHO host (either infrastrcture or satellite)
 
@@ -236,9 +243,9 @@
   remote_user: root
   gather_facts: false
   roles:
-    - role: layer2_vms
-      tags: [ 'layer2', 'proxy', 'vm' ]
-      mode: create
-    - role: layer2_rhel
-      tags: [ 'layer2', 'proxy', 'rhel' ]
-      mode: create
+     - { role: layer2_vms, tags: [ 'layer2', 'proxy', 'vm' ], mode: create }
+     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'proxy', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+     - { role: layer2_rhel, tags: [ 'layer2', 'proxy', 'rhel' ], mode: create }
+     - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'proxy', 'aliencatest' ], mode: alienservercert, cert_cn: "proxy.{{ hailstorm_dns_domain }}",  factprefix: proxyCert }
+     - { role: layer2_proxy, tags: [ 'layer2', 'proxy', 'proxy-config' ], mode: create }
+

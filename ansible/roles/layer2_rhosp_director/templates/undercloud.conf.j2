@@ -6,11 +6,11 @@ undercloud_public_vip = {% if current_lifecycle_env.openstack_version >= 10 %}{{
 
 undercloud_admin_vip = {{ hostvars['undercloud-admin'].vm_nics[0].ip }}
 masquerade_network = {{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}0/24
-dhcp_start = {{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}{{ vm_nics[0].ip.split('.')[3] | int + 13 }}
-dhcp_end = {{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}{{ vm_nics[0].ip.split('.')[3] | int + 30 }}
-network_cidr = {{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}0/24
-network_gateway = {{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}1
-discovery_iprange = {{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}{{ vm_nics[0].ip.split('.')[3] | int + 31 }},{{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}{{ vm_nics[0].ip.split('.')[3] | int + 50 }}
+dhcp_start = {{ infrastructure_network_rhosp_provisioning.undercloud_dhcp_start }}
+dhcp_end = {{ infrastructure_network_rhosp_provisioning.undercloud_dhcp_end }}
+network_cidr = {{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix }}
+network_gateway = {{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix|ipaddr('address') }}
+discovery_iprange = {{ infrastructure_network_rhosp_provisioning.undercloud_discovery_start }},{{ infrastructure_network_rhosp_provisioning.undercloud_discovery_end }}
 store_events = true
 
 {% if current_lifecycle_env.openstack_version >= 10 %}
