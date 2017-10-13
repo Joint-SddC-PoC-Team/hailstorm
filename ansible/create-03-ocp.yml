@@ -23,14 +23,14 @@
     - { role: layer2_ipa_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-roles'], mode: create, certcn: 'openshift-osp.{{ hailstorm_dns_domain }}', factprefix: openshift }
     - { role: layer2_rhsso_client, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-oidc'], mode: create, oidcClientName: 'ocp-osp-master',  oidcRedirect: 'https://openshift-osp.{{ hailstorm_dns_domain }}/*', factprefix: ocpOidcClient }
     - { role: layerX_openshift_installer_on_openstack, tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-metrics', 'ose3-roles' ], mode: create }
-    - { role: layer2_ipa_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-logging-certificate'], mode: create, certcn: 'kibana.{{ ocp_apps_dns_domain }}' }
-    - { role: layerX_openshift_route_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-logging-certificate'], mode: create, route: "logging-kibana", namespace: "logging" }
-    - { role: layer2_ipa_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-metrics-certificate'], mode: create, certcn: 'hawkular-metrics.{{ ocp_apps_dns_domain }}' }
-    - { role: layerX_openshift_route_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-metrics-certificate'], mode: create, route: "hawkular-metrics", namespace: "openshift-infra" }
-    - { role: layer2_ipa_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-router-certificate'], mode: create, certcn: '{{ ocp_apps_dns_domain }}', wildcard: true, factprefix: wildcard }
-    - { role: layerX_openshift_router_wildcardcertificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-router-certificate'], mode: create }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-logging-certificate'], mode: create, certcn: 'kibana.{{ ocp_on_osp_apps_dns_domain }}' }
+    - { role: layerX_openshift_route_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-logging-certificate'], mode: create, route: "logging-kibana", namespace: "logging" }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-metrics-certificate'], mode: create, certcn: 'hawkular-metrics.{{ ocp_on_osp_apps_dns_domain }}' }
+    - { role: layerX_openshift_route_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-metrics-certificate'], mode: create, route: "hawkular-metrics", namespace: "openshift-infra" }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-router-certificate'], mode: create, certcn: '{{ ocp_on_osp_apps_dns_domain }}', wildcard: true, factprefix: wildcard }
+    - { role: layerX_openshift_router_wildcardcertificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-router-certificate'], mode: create }
 
-- hosts: ose3-osp-installer
+- hosts: ose3-osp-installer§
   remote_user: root
   gather_facts: false
   roles:
