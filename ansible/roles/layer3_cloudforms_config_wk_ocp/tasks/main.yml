@@ -1,0 +1,3 @@
+- block:
+    - include: basic_config.yml
+  when: mode=="create"

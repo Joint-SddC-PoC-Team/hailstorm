@@ -1,0 +1,65 @@
+# Setup a constant CA with cert+key from local binary folder
+# either the keys are copied when already present,
+# or they are created if not present and key creation is expliclity enabled
+# Caller needs to set
+# ca_name: name of the CA to be created
+
+- name: check if ca private key exists in remote  directory for {{ ca_name }}
+  stat: path=/root/openssl_ca/{{ ca_name }}/private/{{ ca_name }}.key.pem
+  register: remote_ca_key
+
+# when key exists in remote, we asume everything is fine and we are done:
+- debug: msg="Private key exists in remote directory for {{ ca_name }} - nothing to do here - skipping the remaining actions."
+  when: remote_ca_key.stat.exists == true
+
+- include: create_ca_dirstructure.yml
+  vars:
+    ca_dir: /root/openssl_ca/{{ ca_name }}
+  when: remote_ca_key.stat.exists == false
+
+- name: check if ca private key exists in local binary directory for {{ ca_name }}
+  local_action: stat path=binary/{{ ca_name }}.key.pem
+  register: local_ca_key
+  when: remote_ca_key.stat.exists == false
+
+# when not exist in local binary and create is not set, we are doomed:
+- fail:
+    msg: "binary/{{ ca_name }}.key.pem does not exit and create_ca is not set. Either you get the CA key and cert from the google drive (see https://mojo.redhat.com/docs/DOC-1148464) to the local binary directory. Or you re-run with -e create_ca=true to create a new ca key and cert if you really know what you are doing."
+  when: remote_ca_key.stat.exists == false and local_ca_key.stat.exists == false and mode=="create" and (create_ca is not defined or create_ca == false)
+
+# when exists in local binary folder, copy to remote host:
+- block:
+    - name: copy {{ ca_name }} key to host
+      copy:
+        src: binary/{{ ca_name }}.key.pem
+        dest: /root/openssl_ca/{{ ca_name }}/private/{{ ca_name }}.key.pem
+        mode: 400
+    - name: copy {{ ca_name }} cert to host
+      copy:
+        src: binary/{{ ca_name }}.cert.pem
+        dest: /root/openssl_ca/{{ ca_name }}/certs/{{ ca_name }}.cert.pem
+        mode: 444
+  when: remote_ca_key.stat.exists == false and local_ca_key.stat.exists == true and mode=="create"
+
+# when not exists local and create is enabled, create a new one and copy to local binary:
+- block:
+    - include: create_selfsigned_certificate.yml
+      vars:
+        ca_dir: /root/openssl_ca/{{ ca_name }}
+#        ca_name: "{{ ca_name }}"
+        ca_policy: policy_strict
+        cert_cn: "Hailstorm {{ ca_name }} CA"
+        key_bitsize: 4096
+        key_passwd: "{{ root_password }}"
+        basefilename: "{{ ca_name }}"
+    - name: copy {{ ca_name }} key to localhost
+      fetch:
+        src: /root/openssl_ca/{{ ca_name }}/private/{{ ca_name }}.key.pem
+        dest: binary/
+        flat: yes
+    - name: copy {{ ca_name }} cert to localhost
+      fetch:
+        src: /root/openssl_ca/{{ ca_name }}/certs/{{ ca_name }}.cert.pem
+        dest: binary/{{ ca_name }}.cert.pem
+        flat: yes
+  when: remote_ca_key.stat.exists == false and local_ca_key.stat.exists == false and mode=="create" and create_ca is defined and create_ca

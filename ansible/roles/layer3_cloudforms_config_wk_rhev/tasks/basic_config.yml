@@ -1,0 +1,58 @@
+- name: copy chrony configuration for RHEL7
+  template: src=chrony.j2
+     dest=/etc/chrony.conf
+     owner=root
+     group=root
+     mode=0644
+  register: chrony_conf
+
+- name: ensure chrony service is started and enabled
+  service:
+   name: chronyd
+   state: started
+   enabled: yes
+
+- name: ensure chrony is getting restarted if necessary
+  service:
+   name: chronyd
+   state: restarted
+  when: chrony_conf|changed
+
+#appliance_console_cli --fetch-key  cloudforms-db01.hailstorm6.coe.muc.redhat.com --sshlogin root --sshpassword {{ root_password }} --hostname cloudforms-db01.hailstorm6.coe.muc.redhat.com --password {{ root_password }}
+- name: Join RHEV server to the Master Region 919
+  shell: >
+    LC_CTYPE= appliance_console_cli
+    --fetch-key=cloudforms-db01.hailstorm6.coe.muc.redhat.com
+    --sshlogin=root
+    --sshpassword="{{ root_password }}" 
+    --hostname=cloudforms-db01.hailstorm6.coe.muc.redhat.com 
+    --password="{{ root_password }}"
+    creates=/var/www/miq/vmdb/log/appliance_console.log
+
+- name: wait for cfme web ui to become available
+#  wait_for: host={{ hostvars[cfmehostname.stdout].vm_nics[0].ip }} port=443 timeout=600
+  wait_for: host="{% for vm_nic in hostvars[inventory_hostname_short].vm_nics %}{% if vm_nic.netname|regex_search('(services)') %}{{ vm_nic.ip }}{% endif %}{% endfor %} }}" port=443 timeout=600
+  delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+
+- name: Create Zone RHEV
+  shell: "/var/www/miq/vmdb/bin/rails runner 'Zone.create(:name => \"RHEV\", :description => \"RHEV Zone\")'"
+
+- name: Move OSP server to OSP Zone
+  command: "/var/www/miq/vmdb/bin/rails runner 'MiqServer.my_server.set_config(:server => {:zone => \"RHEV\"})'"
+
+
+- name: perform appliance IPA integration
+  shell: >
+    LC_CTYPE= appliance_console_cli
+    --ipaserver {{ hostvars['ipa'].hostname }}
+    --ipadomain {{ hailstorm_dns_domain}}
+    --iparealm {{ hailstorm_dns_domain|upper }}
+    --ipaprincipal admin
+    --ipapassword "{{ root_password }}"
+    creates=/etc/sssd/sssd.conf
+
+- name: set internal admin password
+  shell: cd /var/www/miq/vmdb && rails r "User.find_by_userid('admin').update_attributes(:password => '{{ root_password }}')"
+  #https://access.redhat.com/solutions/801103
+
+

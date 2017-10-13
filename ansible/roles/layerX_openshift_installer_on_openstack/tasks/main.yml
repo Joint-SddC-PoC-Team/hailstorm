@@ -5,16 +5,17 @@
       tags: ["ose3-ansible"]
     - include: add_users_to_roles.yml
       tags: ["ose3-roles"]
-    - include: register_pvs.yml
-      tags: ["ose3-pv"]
+    - include: create_storageclass.yml
+      tags: ["ose3-storageclass"]
     - include: deploy_containers.yml
       tags: ["ose3-infracontainer"]
+    - include: deploy_logging.yml
+      tags: ["ose3-logging"]
+    - include: deploy_metrics.yml
+      tags: ["ose3-metrics"]
   when: mode=="create"
 
 - block:
-    - include: remove_metrics.yml
-      tags: ["ose3-metrics"]
-      when: current_lifecycle_env.openshift_version == 3.2 or current_lifecycle_env.openshift_version == 3.3 or current_lifecycle_env.openshift_version == 3.4
-    - include: remove_users_from_roles.yml
-      tags: ["ose3-roles"]
+    - include: remove_openshift.yml
+      tags: ["ose3-ansible"]
   when: mode=="destroy"

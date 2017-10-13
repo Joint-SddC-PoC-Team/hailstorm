@@ -40,6 +40,26 @@ rhevh3          ansible_host=10.116.127.15 activation_key="AK-CV-RHEV-HYPERVISOR
 [cloudforms]
 cloudforms      ansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}"
 
+#zone 919000000000001
+[cloudforms-db]
+cloudforms-db01        ansible_host=10.116.127.201 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="db" db=true extra_disks=true
+
+#zone 919000000000002
+[cloudforms-ui]
+cloudforms-ui01   ansible_host=10.116.127.202 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false
+
+#zone 919000000000003
+[cloudforms-wk-ocp]
+cloudforms-wk-ocp01   ansible_host=10.116.127.203 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-ocp" wk-ocp=true extra_disks=false
+
+#zone 919000000000004
+[cloudforms-wk-osp]
+cloudforms-wk-osp01   ansible_host=10.116.127.204 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-osp" wk-osp=true extra_disks=false
+
+#zone 919000000000005
+[cloudforms-wk-rhev]
+cloudforms-wk-rhev01   ansible_host=10.116.127.205 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-rhev" wk-rhev=true extra_disks=false
+
 [test-rhel6]
 test-rhel6      ansible_host=10.116.127.18 activation_key="AK-CV-OS-RHEL6-SERVER-{{ stage }}"
 
@@ -127,18 +147,18 @@ proxy ansible_host=10.116.127.50 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage 
 # not very happy about .50 since it is in the IP range used by undercloud provisioning, but since the VM doesn't share the network...
 
 [nuage]
-vsd1 ansible_host=10.116.120.101 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsd2 ansible_host=10.116.120.102 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsd3 ansible_host=10.116.120.103 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsc1 ansible_host=10.116.120.104 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsc2 ansible_host=10.116.120.105 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsc3 ansible_host=10.116.120.106 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsc4 ansible_host=10.116.120.107 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsd1 ansible_host=10.116.120.101 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','1 100 5222']" additional_dns="xmpp"
+vsd2 ansible_host=10.116.120.102 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','2 100 5222']" additional_dns="xmpp"
+vsd3 ansible_host=10.116.120.103 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','3 100 5222']" additional_dns="xmpp"
+c1 ansible_host=10.116.120.104 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc1"
+c2 ansible_host=10.116.120.105 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc2"
+c3 ansible_host=10.116.120.106 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc3"
+c4 ansible_host=10.116.120.107 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc4"
 elastic1 ansible_host=10.116.120.108 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
 elastic2 ansible_host=10.116.120.109 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
 elastic3 ansible_host=10.116.120.110 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsr1 ansible_host=10.116.120.111 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsr2 ansible_host=10.116.120.112 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+r1 ansible_host=10.116.120.111 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr1"
+r2 ansible_host=10.116.120.112 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr2"
 
 # virtual IPs - these will not be instantiated through Ansible (but need them for DNS records, DNAT, etc)
 [vips]
@@ -247,6 +267,11 @@ lookbusy
 dev-client
 tower
 cloudforms
+cloudforms-db
+cloudforms-ui
+cloudforms-wk-ocp
+cloudforms-wk-osp
+cloudforms-wk-rhev
 cloudforms-osp-group
 ansible-jump-host
 storage-console
@@ -280,6 +305,11 @@ storage-console
 [accessible_via_admin_network:children]
 layer2
 cloudforms
+cloudforms-db
+cloudforms-ui
+cloudforms-wk-ocp
+cloudforms-wk-osp
+cloudforms-wk-rhev
 cloudforms-osp-group
 vips
 lookbusy-rhev
@@ -326,3 +356,41 @@ infrastructure
 ose3-master1
 ose3-master2
 ose3-master3
+
+###
+# Nuage needed hosts part
+###
+[local_host]
+localhost ansible_connection=local
+
+[all_servers:vars]
+ansible_ssh_private_key_file = ~/.ssh/id_rsa
+
+[all_servers:children]
+vsds
+vscs
+vstats
+
+[vsds]
+vsd1.hailstorm4.coe.muc.redhat.com 
+vsd2.hailstorm4.coe.muc.redhat.com 
+vsd3.hailstorm4.coe.muc.redhat.com 
+
+[vscs]
+c1.hailstorm4.coe.muc.redhat.com 
+c2.hailstorm4.coe.muc.redhat.com 
+c3.hailstorm4.coe.muc.redhat.com 
+c4.hailstorm4.coe.muc.redhat.com 
+
+[vstats]
+elastic1.hailstorm4.coe.muc.redhat.com 
+elastic2.hailstorm4.coe.muc.redhat.com 
+elastic3.hailstorm4.coe.muc.redhat.com 
+
+[vsrs]
+r1.hailstorm4.coe.muc.redhat.com
+r2.hailstorm4.coe.muc.redhat.com
+
+[ansible_deployment_host]
+storm4.coe.muc.redhat.com
+>>>>>>> b34d9f971319d72c7df8c48d19112d5757f7d615

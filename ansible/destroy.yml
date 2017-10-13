@@ -197,6 +197,110 @@
       mode: destroy
       when: vm_exists is defined and vm_exists == true
 
+- hosts: cloudforms-ui
+  gather_facts: false
+  remote_user: root
+  roles: 
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: start
+    - role: layer2_rhel
+      tags: [ 'layer3', 'cf', 'rhel']
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_cloudforms_rhev_template
+      tags: [ 'layer3', 'cf', 'cf-template' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+
+- hosts: cloudforms-db
+  gather_facts: false
+  remote_user: root
+  roles: 
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: start
+    - role: layer2_rhel
+      tags: [ 'layer3', 'cf', 'rhel']
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_cloudforms_rhev_template
+      tags: [ 'layer3', 'cf', 'cf-template' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+
+- hosts: cloudforms-wk-osp
+  gather_facts: false
+  remote_user: root
+  roles: 
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: start
+    - role: layer2_rhel
+      tags: [ 'layer3', 'cf', 'rhel']
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_cloudforms_rhev_template
+      tags: [ 'layer3', 'cf', 'cf-template' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+
+- hosts: cloudforms-wk-ocp
+  gather_facts: false
+  remote_user: root
+  roles: 
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: start
+    - role: layer2_rhel
+      tags: [ 'layer3', 'cf', 'rhel']
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_cloudforms_rhev_template
+      tags: [ 'layer3', 'cf', 'cf-template' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+
+- hosts: cloudforms-wk-rhev
+  gather_facts: false
+  remote_user: root
+  roles: 
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: start
+    - role: layer2_rhel
+      tags: [ 'layer3', 'cf', 'rhel']
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_cloudforms_rhev_template
+      tags: [ 'layer3', 'cf', 'cf-template' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+
+
+
+
+
 - hosts: cloudforms-osp
   gather_facts: false
   remote_user: root
@@ -456,6 +560,30 @@
       tags: [ 'layer2','satellite', 'vm' ]
       mode: destroy
       when: destroy_satellite is defined and destroy_satellite
+
+- hosts: proxy-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer2_vms
+      tags: [ 'layer2','proxy', 'vm' ]
+      mode: start
+    - role: layer2_installhost
+      tags: [ 'layer2', 'proxy' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layerX_ipa_client
+      tags: [ 'layer2','proxy', 'ipa-client' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer2_rhel
+      tags: [ 'layer2','proxy', 'rhel' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer2_vms
+      tags: [ 'layer2','proxy', 'vm' ]
+      mode: destroy
+
 
 - hosts: layer1
   gather_facts: false
