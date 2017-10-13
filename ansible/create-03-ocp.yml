@@ -34,10 +34,10 @@
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layerX_openshift_devops_tools, tags: [layer3, 'ose3-osp', 'ose3-devops'], mode: create }
+#    - { role: layerX_openshift_devops_tools, tags: [layer3, 'ose3-osp', 'ose3-devops'], mode: create }
 
 - hosts: ose3-osp-lb
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layerX_openshift_lb, tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ], mode: create }
+#    - { role: layerX_openshift_lb, tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ], mode: create }
