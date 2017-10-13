@@ -30,7 +30,7 @@
     - { role: layer2_ipa_certificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-router-certificate'], mode: create, certcn: '{{ ocp_on_osp_apps_dns_domain }}', wildcard: true, factprefix: wildcard }
     - { role: layerX_openshift_router_wildcardcertificate, tags: ['layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-router-certificate'], mode: create }
 
-- hosts: ose3-osp-installer§
+- hosts: ose3-osp-installer
   remote_user: root
   gather_facts: false
   roles:
