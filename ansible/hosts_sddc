@@ -40,6 +40,26 @@ rhevh3          ansible_host=10.116.127.15 activation_key="AK-CV-RHEV-HYPERVISOR
 [cloudforms]
 cloudforms      ansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}"
 
+#zone 919000000000001
+[cloudforms-db]
+cloudforms-db01        ansible_host=10.116.127.201 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="db" db=true extra_disks=true
+
+#zone 919000000000002
+[cloudforms-ui]
+cloudforms-ui01   ansible_host=10.116.127.202 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false
+
+#zone 919000000000003
+[cloudforms-wk-ocp]
+cloudforms-wk-ocp01   ansible_host=10.116.127.203 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-ocp" wk-ocp=true extra_disks=false
+
+#zone 919000000000004
+[cloudforms-wk-osp]
+cloudforms-wk-osp01   ansible_host=10.116.127.204 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-osp" wk-osp=true extra_disks=false
+
+#zone 919000000000005
+[cloudforms-wk-rhev]
+cloudforms-wk-rhev01   ansible_host=10.116.127.205 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-rhev" wk-rhev=true extra_disks=false
+
 [test-rhel6]
 test-rhel6      ansible_host=10.116.127.18 activation_key="AK-CV-OS-RHEL6-SERVER-{{ stage }}"
 
@@ -207,6 +227,11 @@ lookbusy
 dev-client
 tower
 cloudforms
+cloudforms-db
+cloudforms-ui
+cloudforms-wk-ocp
+cloudforms-wk-osp
+cloudforms-wk-rhev
 cloudforms-osp
 ansible-jump-host
 storage-console
@@ -240,6 +265,11 @@ storage-console
 [accessible_via_admin_network:children]
 layer2
 cloudforms
+cloudforms-db
+cloudforms-ui
+cloudforms-wk-ocp
+cloudforms-wk-osp
+cloudforms-wk-rhev
 cloudforms-osp
 vips
 lookbusy-rhev

@@ -3,6 +3,20 @@
       #wait_for: host={{ hostvars['cloudforms'].vm_nics[0].ip }} port=443 timeout=600
       wait_for: host="{% for vm_nic in hostvars[inventory_hostname_short].vm_nics %}{% if vm_nic.netname|regex_search('(services)') %}{{ vm_nic.ip }}{% endif %}{% endfor %} }}" port=443 timeout=600
       delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+
+    - name: Check tower provider already exists
+      uri:
+        url: "https://{{ vm_nics[0].ip }}/api/providers?provider_class=provider"
+        method: "POST"
+        user: "admin"
+        password: "{{ root_password }}"
+        validate_certs: no
+        body_format: json
+        body: "{{ lookup('template', 'tower_provider.json.j2') | to_json }}"
+        status_code: 400,404,200,202
+      register: tower_provider_exists
+    - debug: var=tower_provider_exists
+
     - name: create tower provider
       uri:
         url: "https://{{ vm_nics[0].ip }}/api/providers?provider_class=provider"
@@ -13,5 +27,9 @@
         body_format: json
         body: "{{ lookup('template', 'tower_provider.json.j2') | to_json }}"
       register: tower_provider
+      until: tower_provider.status == 200
+      retries: 10
+      delay: 10
+      when: tower_provider_exists.status != 200 and tower_provider_exists.json.error.message.find("Name has already been taken") == -1  
     - debug: var=tower_provider
   when: mode=="create"
