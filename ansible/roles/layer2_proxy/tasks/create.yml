@@ -1,0 +1,60 @@
+- name: Copy certificate to the proxy server
+  copy:
+    dest: /etc/pki/tls/certs/squid.pem
+    content: "{{ proxyCert_cakey }}\n{{ proxyCert_cacert }}"
+    owner: squid
+    group: squid
+    mode: 0640
+
+
+- name: Configure squid port 3128 to use ssl
+  lineinfile:
+    path: /etc/squid/squid.conf
+    regexp: '^http_port 3128'
+    line: 'http_port 3128 ssl-bump cert=/etc/pki/tls/certs/squid.pem  generate-host-certificates=on dynamic_cert_mem_cache_size=4MB'
+  register: configure_ssl
+
+- name: Configure squid ssl_bump
+  blockinfile:
+    path: /etc/squid/squid.conf
+    insertafter: "^http_port"
+    content: |
+       sslcrtd_program /usr/lib64/squid/ssl_crtd  -s /var/lib/ssl_db -M 4MB
+       acl step1 at_step SslBump1
+       ssl_bump peek step1
+       ssl_bump bump all
+  register: configure_ssl_bump
+
+- name: Create ssl db directory for squid
+  command: /usr/lib64/squid/ssl_crtd  -c -s /var/lib/ssl_db
+  args:
+    creates: /var/lib/ssl_db/index.txt
+
+- name: Change permission to directory /var/lib/ssl_db
+  command: chown -R squid:squid /var/lib/ssl_db
+  changed_when: False
+
+- name: Set SElinux content for /var/lib/ssl_db
+  command: chcon -R -u system_u -r object_r -t squid_cache_t /var/lib/ssl_db
+  changed_when: False
+
+- name: Open firewalld port
+  firewalld:
+    service: squid
+    permanent: true
+    immediate: true
+    state: enabled
+   
+- name: Enable squid service
+  service:
+    name: squid
+    enabled: True
+    state: started
+
+- name: Restart squid if was configured
+  service:
+    name: squid
+    state: restarted
+  when: configure_ssl|changed or configure_ssl_bump|changed
+  
+   
