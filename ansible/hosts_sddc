@@ -273,10 +273,7 @@ cloudforms-ui
 cloudforms-wk-ocp
 cloudforms-wk-osp
 cloudforms-wk-rhev
-cloudforms-osp
-=======
 cloudforms-osp-group
->>>>>>> 6bdc4566fe36bdd01d15bfa188a3e2f11a0c2dd2
 ansible-jump-host
 storage-console
 
@@ -309,16 +306,12 @@ storage-console
 [accessible_via_admin_network:children]
 layer2
 cloudforms
-<<<<<<< HEAD
 cloudforms-db
 cloudforms-ui
 cloudforms-wk-ocp
 cloudforms-wk-osp
 cloudforms-wk-rhev
-cloudforms-osp
-=======
 cloudforms-osp-group
->>>>>>> 6bdc4566fe36bdd01d15bfa188a3e2f11a0c2dd2
 vips
 lookbusy-rhev
 ose3-osp
