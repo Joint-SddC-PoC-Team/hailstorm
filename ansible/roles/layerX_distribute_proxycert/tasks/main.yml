@@ -1,0 +1,18 @@
+- block:
+    # TODO: change this task to read the binary/proxy.pem file
+    - name: get proxy CA from ipa
+      command: cat /root/openssl_ca/alienca/certs/alienca.cert.pem
+      register: alienca
+      delegate_to: ipa
+
+    - name: copy proxy CA to the server
+      copy:
+        dest: /etc/pki/ca-trust/source/anchors/squid.pem
+        content: "{{ alienca.stdout }}"
+      register: copy_ca
+
+    - name: update-ca-trust
+      shell: update-ca-trust
+      when: copy_ca|changed
+
+  when: mode=="create"

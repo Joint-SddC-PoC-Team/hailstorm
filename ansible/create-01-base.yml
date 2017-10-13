@@ -139,6 +139,7 @@
     - { role: layer2_rhel, tags: [ 'layer2', 'install-host', 'rhel' ], mode: create }
     - { role: layerX_ipa_client, tags: [ 'layer2', 'install-host',  'ipa-client'], mode: create }
     - { role: layer2_installhost, tags: [ 'layer2', 'install-host' ], mode: create }
+    - { role: layerX_distribute_proxycert, tags: [ 'layer2', 'install-host', 'proxy-cert' ], mode: create }
 
 #### Infrastructure (DNS, SMTP/IMAP) ####
 
@@ -241,9 +242,9 @@
   remote_user: root
   gather_facts: false
   roles:
-    - role: layer2_vms
-      tags: [ 'layer2', 'proxy', 'vm' ]
-      mode: create
-    - role: layer2_rhel
-      tags: [ 'layer2', 'proxy', 'rhel' ]
-      mode: create
+     - { role: layer2_vms, tags: [ 'layer2', 'proxy', 'vm' ], mode: create }
+     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'proxy', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+     - { role: layer2_rhel, tags: [ 'layer2', 'proxy', 'rhel' ], mode: create }
+     - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'proxy', 'aliencatest' ], mode: alienservercert, cert_cn: "proxy.{{ hailstorm_dns_domain }}",  factprefix: proxyCert }
+     - { role: layer2_proxy, tags: [ 'layer2', 'proxy', 'proxy-config' ], mode: create }
+

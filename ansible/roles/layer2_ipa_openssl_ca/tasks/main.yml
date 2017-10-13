@@ -174,9 +174,10 @@
         - "/root/openssl_ca/alienca/private/{{ cert_cn }}.key.pem"
         - "/root/openssl_ca/alienca/certs/alienca.cert.pem"
         - "/root/openssl_ca/alienca/certs/alienca.cert.pem"
+        - "/root/openssl_ca/alienca/private/alienca.key.pem"
       register: keydata
       changed_when: false
     - name: set cert + key as facts
-      set_fact: {"{{ factprefix|default('ssl') }}_cert":"{{ keydata.results[0].stdout }}\n{{ keydata.results[2].stdout }}","{{ factprefix|default('ssl') }}_key":"{{ keydata.results[1].stdout }}","{{ factprefix|default('ssl') }}_cacert":"{{ keydata.results[3].stdout }}"}
+      set_fact: {"{{ factprefix|default('ssl') }}_cert":"{{ keydata.results[0].stdout }}\n{{ keydata.results[2].stdout }}","{{ factprefix|default('ssl') }}_key":"{{ keydata.results[1].stdout }}","{{ factprefix|default('ssl') }}_cacert":"{{ keydata.results[3].stdout }}","{{ factprefix|default('ssl') }}_cakey":"{{ keydata.results[4].stdout }}"}
   delegate_to: ipa
   when: mode=="alienservercert"

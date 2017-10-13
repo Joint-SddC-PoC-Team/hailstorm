@@ -1,0 +1,9 @@
+- block:
+    - include: create.yml
+      tags: ["proxy"]
+  when: mode=="create"
+
+- block:
+    - include: destroy.yml
+      tags: ["proxy"]
+  when: mode=="destroy"
