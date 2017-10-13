@@ -38,4 +38,4 @@ disk:
       size: 40720
 
 
-openshift_master_api_host_and_port: openshift.{{ hailstorm_dns_domain }}:443
+openshift_master_api_host_and_port: openshift-osp.{{ hailstorm_dns_domain }}:443

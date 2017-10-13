@@ -33,6 +33,10 @@
   template: src=hosts.j2 dest=/etc/ansible/hosts
   register: ansible_hosts
 
+- name: spread ipa-ca.crt in the masters group
+  shell: ansible masters -m copy -a "src=/etc/origin/master/ipa-ca.crt dest=/etc/origin/master/ipa-ca.crt"
+  when: ipa_available|success
+
 - block:
     - name: start IPTables services on installer (to prevent playbook from hanging when it enables the service)
       service: name=iptables state=started enabled=yes

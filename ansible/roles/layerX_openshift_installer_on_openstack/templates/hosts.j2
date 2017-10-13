@@ -20,10 +20,10 @@ osm_default_node_selector="region=primary"
 
 #openstack cloudprovider
 openshift_cloudprovider_kind=openstack
-openshift_cloudprovider_openstack_auth_url=https://openstack.hailstorm6.coe.muc.redhat.com:13000
+openshift_cloudprovider_openstack_auth_url=https://openstack.{{ node_hailstorm_dns_domain }}:13000/v3
 openshift_cloudprovider_openstack_username=admin
-openshift_cloudprovider_openstack_password=redhat01
-openshift_cloudprovider_openstack_tenant_name=demo-infra
+openshift_cloudprovider_openstack_password={{ root_password }}
+openshift_cloudprovider_openstack_tenant_name={{ osp_tenant }}
 openshift_cloudprovider_openstack_domain_name=hailstorm
 openshift_cloudprovider_openstack_region=regionOne
 
@@ -50,7 +50,7 @@ openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true',
 {% endif %}
 
 # disable checks
-openshift_disable_check=memory_availability,disk_availability
+openshift_disable_check=memory_availability,disk_availability,docker_storage,docker_storage_driver
 
 #openshift_use_dnsmasq=False
 openshift_master_cluster_method=native
@@ -109,10 +109,10 @@ openshift_logging_es_nodeselector={"region":"infra"}
 # host group for nodes, includes region info
 [nodes]
 {% for master in groups["ose3-osp-master"] %}
-{{ hostvars[master].hostname }} openshift_node_labels="{{ hostvars[master].openshift_node_labels }}"
+{{ hostvars[master].hostname }} openshift_hostname={{ hostvars[master].hostname_short }} openshift_node_labels="{{ hostvars[master].openshift_node_labels }}"
 {% endfor %}
 {% for node in groups["ose3-osp-node"] %}
-{{ hostvars[node].hostname }} openshift_node_labels="{{ hostvars[node].openshift_node_labels }}"
+{{ hostvars[node].hostname }} openshift_hostname={{ hostvars[node].hostname_short }} openshift_node_labels="{{ hostvars[node].openshift_node_labels }}"
 {% endfor %}
 
 # Specify load balancer host
