@@ -368,6 +368,8 @@ satellite_content_config:
         repository: "Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64"
       - product: "Red Hat Enterprise Linux Server"
         repository: "Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server"
+      - product: "EPEL-7"
+        repository: "EPEL-7"
 
   # for HANA
   # - content_view: "CV-OS-RHEL7.2-EUS-SAP"

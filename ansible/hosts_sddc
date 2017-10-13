@@ -127,9 +127,10 @@ proxy ansible_host=10.116.127.50 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage 
 # not very happy about .50 since it is in the IP range used by undercloud provisioning, but since the VM doesn't share the network...
 
 [nuage]
-vsd1 ansible_host=10.116.120.101 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsd2 ansible_host=10.116.120.102 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-vsd3 ansible_host=10.116.120.103 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+vsd1 ansible_host=10.116.120.101 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','1 100 5222']" additional_dns="xmpp"
+vsd2 ansible_host=10.116.120.102 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','2 100 5222']" additional_dns="xmpp"
+vsd3 ansible_host=10.116.120.103 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','3 100 5222']" additional_dns="xmpp"
+
 vsc1 ansible_host=10.116.120.104 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
 vsc2 ansible_host=10.116.120.105 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"
 vsc3 ansible_host=10.116.120.106 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}"

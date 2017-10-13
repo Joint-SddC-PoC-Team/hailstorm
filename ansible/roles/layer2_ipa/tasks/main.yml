@@ -7,6 +7,8 @@
       tags: ['ipa-install']
     - include: ipa-configure.yml
       tags: ['ipa-install']
+    - include: ipa-dns-zones-add.yml
+      tags: ['ipa-dns']
     - include: ipa-dns-records-add.yml
       tags: ['ipa-dns']
     - include: ipa-users-add.yml
