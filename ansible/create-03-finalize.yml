@@ -53,7 +53,6 @@
     - { role: layer3_cloudforms_rhev_provider, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-rhev' ], mode: create }
     - { role: layer3_cloudforms_openshift_provider, tags: [ 'layer3', 'cf','cf-provider', 'cf-provider-ocp' ], mode: create }
 
-<<<<<<< HEAD
 - hosts: cloudforms-db
   remote_user: root
   gather_facts: false
