@@ -1,10 +1,10 @@
-  # Check if there is a working metrics
-  - name: Check if there is a working metrics
-    shell: oc get rc -n openshift-infra | grep hawkular-metrics | awk '{print $1}'  
-    ignore_errors: yes
-    register: metrics_status
+# Check if there is a working metrics
+- name: Check if there is a working metrics
+  shell: oc get rc -n openshift-infra | grep hawkular-metrics | awk '{print $1}'  
+  ignore_errors: yes
+  register: metrics_status
 
-  # Install metrics
-  - name: Install metrics
-    shell: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_cassandra_storage_type=dynamic -e openshift_metrics_cassandra_pvc_size=10G
-    when: (Metrics_status.stdout != 'hawkular-metrics')
+# Install metrics
+- name: Install metrics
+  shell: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_cassandra_storage_type=dynamic -e openshift_metrics_cassandra_pvc_size=10G
+  when: (metrics_status.stdout != 'hawkular-metrics')
