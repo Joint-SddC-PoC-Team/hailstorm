@@ -1,17 +1,8 @@
 ---
-httpd_port: 
-  - 80
-mode: tcp
+httpd_port: 80
+haproxy_mode: http
 listenport: 80
 
 daemonname: haproxy
 balance: roundrobin
 iface: "{{ ansible_default_ipv4.interface }}"
-
-firewalld:
-  port: 8443
-  protocol: tcp
-  state: enabled
-  zone: public
-  permanent: true
-  immediate: true

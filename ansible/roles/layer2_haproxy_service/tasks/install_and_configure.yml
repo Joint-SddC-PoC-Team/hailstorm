@@ -10,6 +10,8 @@
 
 - name: Start the haproxy service
   service: name=haproxy state=started enabled=yes
+  changed_when: false
+
 
 - firewalld:
     service: http

@@ -12,7 +12,7 @@ global
     stats socket /var/lib/haproxy/stats level admin
 
 defaults
-    mode                    {{ mode }}
+    mode                    {{ haproxy_mode }}
     log                     global
     option                  httplog
     option                  dontlognull
@@ -30,10 +30,12 @@ defaults
     maxconn                 3000
 
 backend app
-    listen {{ hostvars['infrastructure'].inventory_hostname }} 0.0.0.0:{{ listenport }}
+    {% for host in groups['haproxy_frontend'] %}
+    listen {{ hostvars[host].inventory_hostname }} 0.0.0.0:{{ listenport }}
+    {% endfor %}
 
     balance     {{ balance }}
     
-    {% for host in groups['ose3-master'] %}
+    {% for host in groups['haproxy_backend'] %}
         server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].vm_nics[1].ip }}:{{ httpd_port }}
     {% endfor %}

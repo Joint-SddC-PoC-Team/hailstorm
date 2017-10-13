@@ -318,3 +318,11 @@ storage-console
 [lookbusy:children]
 lookbusy-osp
 lookbusy-rhev
+
+[haproxy_frontend]
+infrastructure
+
+[haproxy_backend]
+ose3-master1
+ose3-master2
+ose3-master3
