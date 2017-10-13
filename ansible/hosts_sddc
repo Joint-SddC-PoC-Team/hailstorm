@@ -267,7 +267,6 @@ lookbusy
 dev-client
 tower
 cloudforms
-<<<<<<< HEAD
 cloudforms-db
 cloudforms-ui
 cloudforms-wk-ocp
