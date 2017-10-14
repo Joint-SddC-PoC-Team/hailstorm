@@ -61,7 +61,7 @@
       when: current_lifecycle_env.osp_storage_backend == "ceph_ownvms"
     - role: layer1_nuage
       mode: create
-      tags: [ 'layer2', 'nuage' ]
+      tags: [ 'layer1', 'nuage' ]
 #### SATELLITE ####
 
 - hosts: satellite
@@ -248,4 +248,3 @@
      - { role: layer2_rhel, tags: [ 'layer2', 'proxy', 'rhel' ], mode: create }
      - { role: layer2_ipa_openssl_ca, tags: [ 'layer2', 'proxy', 'aliencatest' ], mode: alienservercert, cert_cn: "proxy.{{ hailstorm_dns_domain }}",  factprefix: proxyCert }
      - { role: layer2_proxy, tags: [ 'layer2', 'proxy', 'proxy-config' ], mode: create }
-

@@ -13,7 +13,7 @@
    pkg=ntp
    state=present
 
-- name: Remove NTP if installed
+- name: Remove chrony if installed
   yum:
    name=chrony
    state=absent
