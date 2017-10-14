@@ -62,10 +62,10 @@ http_proxy:
 
 external_network_config:
   guest_network_bridging_mac_prefix: "52:54:00:48:05:"
-  services_network_dnat:
-    layer1_dev: em1
-    mapping:
-      - none: none
+  # services_network_dnat:
+    # layer1_dev: guests
+    # mapping:
+    #   - none: none
       # - expose_machine: satellite
       #   on_host_prefix: 10.32.105.30/32
       #   via_network: services
