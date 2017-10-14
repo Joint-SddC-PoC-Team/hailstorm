@@ -35,10 +35,14 @@
   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }}. {{ hailstorm_dns_domain }}. --mx-rec "10 infrastructure"
   when: mx_record.stdout == ""
 
+- name: check existing SRV dns records
+  shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-find hailstorm5.coe.muc.redhat.com. | grep SRV
+  register: srv_record
+
 - name: add SRV dns record
   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }}. {{ hostvars[item].srv_dns[0] }} --srv-rec='{{ hostvars[item].srv_dns[1] }} {{ item }}'
   register: srv_dns
-  when: hostvars[item].srv_dns is defined
+  when: hostvars[item].srv_dns is defined and hostvars[item].srv_dns[1] not in srv_record.stdout
   failed_when: "'ERROR: no modifications to be performed' not in srv_dns.stderr"
   changed_when: srv_dns.rc == 0
   with_items: "{{ groups.all }}"
