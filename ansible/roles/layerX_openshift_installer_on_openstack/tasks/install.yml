@@ -33,6 +33,9 @@
   template: src=hosts.j2 dest=/etc/ansible/hosts
   register: ansible_hosts
 
+- name: ensure that /etc/origin/master exists on all masters
+  shell: ansible masters -m file -a "path=/etc/origin/master state=directory"
+
 - name: spread ipa-ca.crt in the masters group
   shell: ansible masters -m copy -a "src=/etc/origin/master/ipa-ca.crt dest=/etc/origin/master/ipa-ca.crt"
   when: ipa_available|success

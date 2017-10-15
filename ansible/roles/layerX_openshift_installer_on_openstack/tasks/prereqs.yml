@@ -2,7 +2,7 @@
 - name: find host ssh key
   command: ssh-keyscan -t ecdsa "{{ hostvars[item].hostname }}"
   register: ssh_key
-  with_items: "{{ groups['ose3'] }}"
+  with_items: "{{ groups['ose3-osp'] }}"
   failed_when: ssh_key.stdout == ''
   changed_when: false
 - name: add ssh key to known_hosts
