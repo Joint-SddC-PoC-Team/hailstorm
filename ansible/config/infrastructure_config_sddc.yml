@@ -55,7 +55,7 @@ infrastructure_network_guests:
   #COE MUC
   default_gw_host_prefix: "10.32.111.254/20"
   #vlan                   -1
-  floating_start:         "{% if infrastructure_network_master is defined %}10.32.105.160{% else %}{{ external_network_config.guest_network_osp_floating_end }}{% endif %}"
+  floating_start:         "{% if infrastructure_network_master is defined %}10.32.105.160{% else %}{{ external_network_config.guest_network_osp_floating_start }}{% endif %}"
   floating_end:           "{% if infrastructure_network_master is defined %}10.32.105.179{% else %}{{ external_network_config.guest_network_osp_floating_end }}{% endif %}"
   dns_server:             "10.32.96.1"
 

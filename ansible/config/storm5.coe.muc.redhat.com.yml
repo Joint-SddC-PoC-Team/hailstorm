@@ -62,7 +62,7 @@ http_proxy:
 
 external_network_config:
   guest_network_bridging_mac_prefix: "52:54:00:48:05:"
-  guest_network_osp_floating_end: 10.32.105.180
+  guest_network_osp_floating_start: 10.32.105.180
   guets_network_osp_floating_end: 10.32.105.199
   services_network_dnat:
     layer1_dev: guests
