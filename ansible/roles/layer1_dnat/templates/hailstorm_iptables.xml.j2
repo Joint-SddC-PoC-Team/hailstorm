@@ -3,7 +3,7 @@
   {% for network in infrastructure_networks %}
   <network name="{% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ network.netname }}">
   {% for mapping in external_network_config.services_network_dnat.mapping %}
-  {% if mapping.expose_machine is defined and network.netname == mapping.via_network %}
+  {% if mapping.expose_machine is defined and network.netname == mapping.via_network and hostvars[mapping.expose_machine] is defined %}
 
   {% for nic in hostvars[mapping.expose_machine].vm_nics %}
   {% if nic.netname == network.netname %}
