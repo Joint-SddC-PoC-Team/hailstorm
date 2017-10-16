@@ -43,6 +43,16 @@
   changed_when: False
   with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
 
+
+- name: Install cryptography=2.0 with pip because latest version fails
+  pip:
+    name=cryptography
+    state=present
+    version=2.0
+    virtualenv="/opt/ansible-{{ item }}"
+  with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
+
+
 - name: Install ansible inside the virtualenv
   pip:
     name=ansible

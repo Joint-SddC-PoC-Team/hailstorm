@@ -1,0 +1,7 @@
+- name: Ensure /var/log/journal exists
+  file: path=/var/log/journal state=directory owner=root group=systemd-journal mode=2755
+  register: config_journald
+
+- name: Restart journald
+  service: name=systemd-journald state=restarted
+  when: config_journald|changed

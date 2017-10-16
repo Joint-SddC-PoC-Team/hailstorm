@@ -19,6 +19,8 @@
       tags: ['layer1','layer1-ntp']
     - include: configure_iptables.yml
       tags: ['layer1','layer1-iptables']
+    - include: configure_journald.yml
+      tags: ['layer1','rhel-journald']
     - include: prepare_user_with_kvm_access.yml
     # export the binary dir via NFS
     - include: roles/common/tasks/prepare_nfs_export.yml

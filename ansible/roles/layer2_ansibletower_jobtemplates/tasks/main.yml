@@ -66,5 +66,5 @@
         url: "/api/v1/job_templates/"
         name: "{{ (lookup('template', item)|from_yaml).name }}"
         body: "{{ lookup('template','job_template.json.j2')|combine(lookup('template', item)|from_yaml)|combine(lookup('template','credential_id.json.j2')) }}"
-      with_items: "{% if jobtemplates.files is defined %}{{ jobtemplates.files|map(attribute='path')|list }}{% endif %}"
+      with_items: "{% if jobtemplates is defined and jobtemplates.files is defined %}{{ jobtemplates.files|map(attribute='path')|list }}{% endif %}"
   when: mode=="create"

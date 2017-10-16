@@ -35,7 +35,7 @@ lifecycle_environments:
     cloudforms_ova_appliance: cfme-rhevm-5.8.1.5-1.x86_64.rhevm.ova
     use_install_host: True
     ansible_use_version: 2.3.2.0
-    ansible_available_versions: [2.2.2.0,2.4.0.0]
+    ansible_available_versions: [2.2.2.0,2.4.0.0,2.2.1.0]
 
     #cloudforms_version: 5.7
     #cloudforms_ova_appliance: cfme-rhevm-5.7.1.3-1.x86_64.rhevm.ova
