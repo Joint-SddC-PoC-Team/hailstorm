@@ -275,29 +275,53 @@ external_network_config:
           - from_port: 13000
             to_port: 13000
             proto: tcp
+          # gnocci
+          - from_port: 13041
+            to_port: 13041
+            proto: tcp
+          # placement
+          - from_port: 13778
+            to_port: 13778
+            proto: tcp
+          # cinder
+          - from_port: 13776
+            to_port: 13776
+            proto: tcp
+          # aodh
+          - from_port: 13042
+            to_port: 13042
+            proto: tcp
+          # glance
+          - from_port: 13292
+            to_port: 13292
+            proto: tcp
+          # ceilometer
+          - from_port: 13777
+            to_port: 13777
+            proto: tcp
+          # heat-cfn
+          - from_port: 13776
+            to_port: 13776
+            proto: tcp
           # heat
           - from_port: 13004
             to_port: 13004
-            proto: tcp
-          # heat-cfn
-          - from_port: 13005
-            to_port: 13005
-            proto: tcp
-          # ironic
-          - from_port: 13385
-            to_port: 13385
-            proto: tcp
-          # mistral
-          - from_port: 13989
-            to_port: 13989
             proto: tcp
           # swift
           - from_port: 13808
             to_port: 13808
             proto: tcp
-          # zaqar-websocket
-          - from_port: 9000
-            to_port: 9000
+          # nova
+          - from_port: 13774
+            to_port: 13774
+            proto: tcp
+          # panko
+          - from_port: 13779
+            to_port: 13779
+            proto: tcp
+          # neutron
+          - from_port: 13696
+            to_port: 13696
             proto: tcp
       - expose_machine: tower
         on_host_prefix: 10.32.105.8/32
