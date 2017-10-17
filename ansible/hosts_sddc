@@ -37,8 +37,8 @@ rhevh2          ansible_host=10.116.127.14 activation_key="AK-CV-RHEV-HYPERVISOR
 rhevh3          ansible_host=10.116.127.15 activation_key="AK-CV-RHEV-HYPERVISOR-{{ stage }}"
 
 # the CloudForms management engine
-[cloudforms]
-cloudforms      ansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}"
+#[cloudforms]
+#cloudforms      ansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}"
 
 #zone 919000000000001
 [cloudforms-db]
@@ -304,7 +304,7 @@ storage-console
 # and the ssh proxy command used to communicate with all layer2/3 hosts
 [accessible_via_admin_network:children]
 layer2
-cloudforms
+#cloudforms
 cloudforms-db
 cloudforms-ui
 cloudforms-wk-ocp
