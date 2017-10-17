@@ -29,6 +29,9 @@ disk:
       mountpoint: /home
       size: 2048
 
+vm_secgroups:
+    - ocp_lb
+
 repos:
   - rhel-7-server-rpms
 

@@ -56,3 +56,6 @@ cns_disk_files:
     size: 60
     format: qcow2
     dev: /dev/vde
+
+vm_secgroups:
+  - ocp_node

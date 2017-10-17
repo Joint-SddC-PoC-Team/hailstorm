@@ -22,6 +22,7 @@ satellite_version:    "{% if infrastructure_network_master is defined %}6.2{% el
 stage:                "{% if infrastructure_network_master is defined %}DEV{% else %}{{ node_stage }}{% endif %}"
 ocp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
 ocp_on_osp_apps_dns_domain: "apps-osp.{{ hailstorm_dns_domain }}"
+ocp_tenant: "demo-infra"
 
 
 # services is an external network to access all public services (accept for storage that has its own net), so this can be seen as a carved out part of OpenStacks br-ex for the public services
