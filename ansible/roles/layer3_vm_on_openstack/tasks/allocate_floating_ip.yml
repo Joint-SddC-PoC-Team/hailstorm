@@ -24,6 +24,28 @@
     # - debug: var=temp_internal_network_ip
 
     - block:
+        - name: check if DNS for the floating IP was already registered
+          shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-find  {{ node_hailstorm_dns_domain }} --name={{ inventory_hostname_short }}
+          register: dnsrecord
+          become_user: root
+          become: True
+          delegate_to: ipa
+          failed_when: "dnsrecord.rc != 0 and 'Number of entries returned 0' not in dnsrecord.stdout_lines"
+
+        - set_fact: dns_floating_ip="{{ dnsrecord.stdout_lines[2].split(' ')[4] }}"
+          when: dnsrecord.rc == 0
+
+        - name: check if floating IP already exists
+          shell: >
+            . ~/overcloudrc_v3_hailstorm &&
+            OS_TENANT_NAME={{ osp_tenant }}
+            OS_PROJECT_NAME={{ osp_tenant }}
+            OS_PASSWORD={{ root_password }}
+            openstack ip floating  show {{ dns_floating_ip }} -f json
+          register: floating_ip_exists
+          ignore_errors: True
+          when: dnsrecord.rc == 0
+        
         - name: create floating IP
           shell: >
             . ~/overcloudrc_v3_hailstorm &&
@@ -32,6 +54,25 @@
             OS_PASSWORD={{ root_password }}
             openstack ip floating create {{ infrastructure_network_guests.netname }} -f json
           register: floating_ip_results
+          when: dnsrecord.rc != 0
+
+        - name: create floating IP using DNS ip
+          shell: >
+            . ~/overcloudrc_v3_hailstorm &&
+            OS_TENANT_NAME={{ osp_tenant }}
+            OS_PROJECT_NAME={{ osp_tenant }}
+            OS_PASSWORD={{ root_password }}
+            openstack ip floating create --floating-ip-address {{ dns_floating_ip }} {{ infrastructure_network_guests.netname }} -f json
+          register: floating_ip_results_dns
+          when: dnsrecord.rc == 0 and floating_ip_exists|failed
+
+
+
+        - name: register DNS for the floating IP 
+          shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ node_hailstorm_dns_domain }} {{ inventory_hostname_short }} --a-rec={{ (floating_ip_results.stdout | from_json).floating_ip_address }}
+          become_user: root
+          become: True
+          when: dnsrecord.rc != 0
 
         # - debug: var=floating_ip_results
         # - debug: msg="{{ floating_ip_results.stdout|from_json }}"
@@ -40,6 +81,7 @@
         - name: determine new floating IP
           set_fact:
             floating_ip: '{% if current_lifecycle_env.openstack_version < 10 %}{{ floating_ip_results.stdout | from_json | selectattr("Field","match","^ip$") | map(attribute="Value") | first }}{% else %}{{ (floating_ip_results.stdout | from_json).floating_ip_address }}{% endif %}'
+          when: dnsrecord.rc != 0
 
         - name: determine port
           shell: >
@@ -60,6 +102,18 @@
             OS_PROJECT_NAME={{ osp_tenant }}
             OS_PASSWORD={{ root_password }}
             neutron floatingip-associate {{ (floating_ip_results.stdout|from_json).id }} {{ temp_port }}
+          when: dnsrecord.rc != 0
+
+        - name: associate floating IP (using IP got from DNS)
+          shell: >
+            . ~/overcloudrc_v3_hailstorm &&
+            OS_TENANT_NAME={{ osp_tenant }}
+            OS_PROJECT_NAME={{ osp_tenant }}
+            OS_PASSWORD={{ root_password }}
+            openstack server add floating ip {{ inventory_hostname_short }} {{ dns_floating_ip }}
+          when: dnsrecord.rc == 0
+
+
       when: temp_floating_ip == ''
 
     - set_fact:
