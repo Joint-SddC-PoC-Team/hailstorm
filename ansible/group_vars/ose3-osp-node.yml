@@ -58,4 +58,4 @@ cns_disk_files:
     dev: /dev/vde
 
 vm_secgroups:
-  - ocp_node
+  - ocp_appnode

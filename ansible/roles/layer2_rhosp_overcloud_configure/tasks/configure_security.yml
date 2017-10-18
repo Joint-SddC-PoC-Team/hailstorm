@@ -129,10 +129,7 @@
         # add lb security group in OpenShift project
         - name: get lb security group info
           shell: >
-            . ~/overcloudrc_v3_hailstorm &&
-            OS_TENANT_NAME={{ osp_tenant }}
-            OS_PROJECT_NAME={{ osp_tenant }}
-            OS_PASSWORD={{ root_password }}
+            . ~/overcloudrc_v3 &&
             for uuid in `openstack security group list --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} -c ID -c Name -f value|grep ocp_lb|awk '{print $1}'`; do
             openstack security group show -c id -c project_id -f yaml $uuid;
             done | awk 'BEGIN { print "[" } /^id: /{ if (id != "") print ","; id=$2} /project_id: /{ print "{\"id\":\"" id "\",\"project_id\":\"" $2 "\"}" } END { print "]" }'
@@ -141,10 +138,7 @@
         - debug: var=security_group_info
         - name: add security group lb if it does not exist, and its rules
           shell: >
-            . ~/overcloudrc_v3_hailstorm &&
-            OS_TENANT_NAME={{ osp_tenant }}
-            OS_PROJECT_NAME={{ osp_tenant }}
-            OS_PASSWORD={{ root_password }}
+            . ~/overcloudrc_v3 &&
             openstack security group create --project {{ ocp_tenant }} ocp_lb &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto icmp ocp_lb &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 22 ocp_lb &&
@@ -153,42 +147,10 @@
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_lb        
           when: (security_group_info.stdout == '[\n]')  
 
-        # add master security group in OpenShift project
-        - name: get master security group info
-          shell: >
-            . ~/overcloudrc_v3_hailstorm &&
-            OS_TENANT_NAME={{ osp_tenant }}
-            OS_PROJECT_NAME={{ osp_tenant }}
-            OS_PASSWORD={{ root_password }}
-            for uuid in `openstack security group list --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} -c ID -c Name -f value|grep ocp_master|awk '{print $1}'`; do
-            openstack security group show -c id -c project_id -f yaml $uuid;
-            done | awk 'BEGIN { print "[" } /^id: /{ if (id != "") print ","; id=$2} /project_id: /{ print "{\"id\":\"" id "\",\"project_id\":\"" $2 "\"}" } END { print "]" }'
-          register: security_group_info
-          changed_when: false
-        - debug: var=security_group_info
-        - name: add security group master if it does not exist, and its rules
-          shell: >
-            . ~/overcloudrc_v3_hailstorm &&
-            OS_TENANT_NAME={{ osp_tenant }}
-            OS_PROJECT_NAME={{ osp_tenant }}
-            OS_PASSWORD={{ root_password }}
-            openstack security group create --project {{ ocp_tenant }} ocp_master &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 8443 ocp_master &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_master &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 2379:2380 --src-group ocp_master ocp_master &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 8053 --src-group ocp_node ocp_master &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto udp --dst-port 8053 --src-group ocp_node ocp_master &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 24224 --src-group ocp_node ocp_master &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto udp --dst-port 24224 --src-group ocp_node ocp_master
-          when: (security_group_info.stdout == '[\n]')
-
         # add appnode security group in OpenShift project
         - name: get appnode security group info
           shell: >
-            . ~/overcloudrc_v3_hailstorm &&
-            OS_TENANT_NAME={{ osp_tenant }}
-            OS_PROJECT_NAME={{ osp_tenant }}
-            OS_PASSWORD={{ root_password }}
+            . ~/overcloudrc_v3 &&
             for uuid in `openstack security group list --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} -c ID -c Name -f value|grep ocp_appnode|awk '{print $1}'`; do
             openstack security group show -c id -c project_id -f yaml $uuid;
             done | awk 'BEGIN { print "[" } /^id: /{ if (id != "") print ","; id=$2} /project_id: /{ print "{\"id\":\"" id "\",\"project_id\":\"" $2 "\"}" } END { print "]" }'
@@ -197,20 +159,42 @@
         - debug: var=security_group_info
         - name: add security group ocp_appnode if it does not exist, and its rules
           shell: >
-            . ~/overcloudrc_v3_hailstorm &&
-            OS_TENANT_NAME={{ osp_tenant }}
-            OS_PROJECT_NAME={{ osp_tenant }}
-            OS_PASSWORD={{ root_password }}
+            . ~/overcloudrc_v3 &&
             openstack security group create --project {{ ocp_tenant }} ocp_appnode &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto icmp ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 22 ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 80 ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_appnode &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 9200 ocp_appnode &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 9300 ocp_appnode && 
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 22 --src-group ocp_bastion ocp_appnode &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 22 --src-group ocp_appnode ocp_appnode &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 10250 --src-group ocp_appnode ocp_appnode &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto udp --dst-port 4789 --src-group ocp_appnode ocp_appnode
           when: (security_group_info.stdout == '[\n]')
 
-      when: current_lifecycle_env.openstack_version >= 11
+        # add master security group in OpenShift project
+        - name: get master security group info
+          shell: >
+            . ~/overcloudrc_v3 &&
+            for uuid in `openstack security group list --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} -c ID -c Name -f value|grep ocp_master|awk '{print $1}'`; do
+            openstack security group show -c id -c project_id -f yaml $uuid;
+            done | awk 'BEGIN { print "[" } /^id: /{ if (id != "") print ","; id=$2} /project_id: /{ print "{\"id\":\"" id "\",\"project_id\":\"" $2 "\"}" } END { print "]" }'
+          register: security_group_info
+          changed_when: false
+        - debug: var=security_group_info
+        - name: add security group master if it does not exist, and its rules
+          shell: >
+            . ~/overcloudrc_v3 &&
+            openstack security group create --project {{ ocp_tenant }} ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 8443 ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 22 ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 2379:2380 --src-group ocp_master ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 8053 --src-group ocp_appnode ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto udp --dst-port 8053 --src-group ocp_appnode ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 24224 --src-group ocp_appnode ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto udp --dst-port 24224 --src-group ocp_appnode ocp_master
+          when: (security_group_info.stdout == '[\n]')
+
+      when: current_lifecycle_env.openstack_version >= 10
   become: yes
   become_user: "{{ rhosp_stack_user }}"

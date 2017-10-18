@@ -1,4 +1,4 @@
 - block:
     - include: configure_security.yml
-      tags: ['overcloud-config-security']
+      tags: ['overcloud-security']
   when: mode=="create"
