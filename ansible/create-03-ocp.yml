@@ -4,6 +4,7 @@
   remote_user: root
   gather_facts: false
   roles:
+    - { role: layer2_rhosp_overcloud_security, tags: [ 'layer3', 'ose3-osp', 'secgroups' ], mode: create }
     - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'ose3-osp', 'vm' ], mode: create }
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer3', 'ose3-osp', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer3', 'ose3-osp', 'rhel' ], mode: create }
