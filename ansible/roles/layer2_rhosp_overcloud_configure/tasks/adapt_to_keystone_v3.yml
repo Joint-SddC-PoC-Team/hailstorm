@@ -98,5 +98,18 @@
         - internal
         - public
 
+    - name: grant admin domain user to default domain
+      shell: >
+        . ~/overcloudrc_v3 &&
+         openstack role add --domain default --user $(openstack user list --domain hailstorm|grep " admin "|awk '{print $2}') admin
+
+    - name: grant admin domain user to hailstorm domain
+      shell: >
+        . ~/overcloudrc_v3 &&
+         openstack role add --domain hailstorm --user $(openstack user list --domain hailstorm|grep " {{ item }} "|awk '{print $2}') admin
+      with_items:
+        - admin
+        - "{{ osp_admin_user }}"
+
   become: yes
   become_user: "{{ rhosp_stack_user }}"

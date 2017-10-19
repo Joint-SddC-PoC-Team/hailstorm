@@ -1,95 +1,54 @@
 - block:
-    - name: find role ids
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack role list -f json
-      register: role_ids
-      changed_when: false
-      failed_when: role_ids.stdout == ""
+    - name: get domain user ids
+      os_keystone_domain_facts:
+        auth: "{{ os_auth_hailstorm }}"
+        validate_certs: False
 
-    - name: store role ids as fact
-      set_fact:
-        admin_role_id: "{{ role_ids.stdout|from_json|selectattr('Name','match','^admin$')|map(attribute='ID')|first }}"
-        member_role_id: "{{ role_ids.stdout|from_json|selectattr('Name','match','^_member_$')|map(attribute='ID')|first }}"
+    - set_fact: hailstorm_id="{{ openstack_domains|selectattr("name", "match", "^hailstorm$")|map(attribute='id')|join("") }}"
+    - name: assign admin role for projects to default domain admin
+      os_user_role:
+        auth: "{{ os_auth_hailstorm }}"
+        domain:  "{{ hailstorm_id }}"
+        user: admin
+        project: "{{ item }}"
+        role: admin
+        validate_certs: False
+      with_items:  "{{ osp_projects }}"
 
-    - name: find project ids
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack project list --domain {{ osp_domain_name }} -f json
-      changed_when: false
-      failed_when: project_ids.stdout == ""
-      register: project_ids
-
-    - name: get existing role assignments for projects
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack role assignment list --project {{ project_ids.stdout|from_json|selectattr('Name','match','^' + item + '$')|map(attribute='ID')|first }} -f json
-      register: role_assignments_proj
-      with_items: "{{ osp_projects }}"
-      changed_when: false
-
-    - name: get existing role assignments for domain
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack role assignment list --domain {{ osp_domain_name }} --column User -f value
-      register: role_assignments_dom
-      changed_when: false
-
-    - name: get default domain admin user id
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack user show admin --domain default |
-        awk '/ id/ { print $4 }'
-      register: default_dom_admin_user
-      changed_when: false
-      failed_when: default_dom_admin_user.stdout == ""
 
     - name: assign admin role for projects to default domain admin
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack role add --user {{ default_dom_admin_user.stdout }} --project {{ item.item }} {{ admin_role_id }}
-      when: (item.stdout|from_json|selectattr('User','match','^' + default_dom_admin_user.stdout + '$')|selectattr('Role','match','^' + admin_role_id + '$')|list|length) == 0
-      with_items: "{{ role_assignments_proj.results }}"
+      os_user_role:
+        auth: "{{ os_auth_hailstorm }}"
+        domain:  "{{ hailstorm_id }}"
+        user: admin
+        project: "{{ item }}"
+        role: admin
+        validate_certs: False
+      with_items:  "{{ osp_projects }}"
 
-    - name: get domain user ids
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack user list -f json --domain {{ osp_domain_name }}
-      register: dom_user_ids
-      changed_when: false
-      failed_when: dom_user_ids.stdout == ""
 
-    - name: assign admin users to domain
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack role add --user {{ item.ID }} --domain {{ osp_domain_name }} {{ admin_role_id }}
-      when: item.Name in osp_admin_user and item.ID not in role_assignments_dom.stdout_lines
-      with_items: "{% if dom_user_ids.stdout is defined %}{{ dom_user_ids.stdout|from_json }}{% else %}[]{% endif %}"
 
     - name: assign admin users to projects
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack role add --user {{ item.0.ID }} --project {{ item.1.item }} {{ admin_role_id }}
-      when: item.0.Name in osp_admin_user and (item.1.stdout|from_json|selectattr('User','match','^' + item.0.ID + '$')|selectattr('Role','match','^' + admin_role_id + '$')|list|length == 0)
-      # when: >
-      #   role_assignments_proj|flatten|
-      #   selectattr('User','match','^' + dom_user_ids.stdout|from_json|selectattr('Name','match','^' + item.1 + '$')|map(attribute='ID')|first +'$' )|
-      #   selectattr('Role','match','^' + admin_role_id + '$')|
-      #   selectattr('Project','match','^' + project_ids.stdout|from_json|selectattr('Name','match','^' + item.1 + '$') + '$')|
-      #   list|length == 0
+      os_user_role:
+        auth: "{{ os_auth_hailstorm }}"
+        user: "{{ item[1] }}" 
+        project: "{{ item[0] }}" 
+        role: admin
+        validate_certs: False
       with_nested:
-        - "{% if dom_user_ids.stdout is defined %}{{ dom_user_ids.stdout|from_json }}{% else %}[]{% endif %}"
-        - "{{ role_assignments_proj.results }}"
-      #- "{{ osp_admin_user }}"
-      #- "{{ osp_projects }}"
+        -  "{{ osp_projects }}"
+        -  "{{ osp_admin_user }}"
+     
 
     - name: assign member users to projects
-      shell: >
-        . ~/overcloudrc_v3 &&
-        openstack role add --user {{ item.0.ID }} --project {{ item.1.item }} {{ member_role_id }}
-      when: item.0.Name in osp_member_user and (item.1.stdout|from_json|selectattr('User','match','^' + item.0.ID + '$')|selectattr('Role','match','^' + member_role_id + '$')|list|length == 0)
+      os_user_role:
+        auth: "{{ os_auth_hailstorm }}"
+        user: "{{ item[1] }}" 
+        project: "{{ item[0] }}" 
+        role: _member_
+        validate_certs: False
       with_nested:
-        - "{% if dom_user_ids.stdout is defined %}{{ dom_user_ids.stdout|from_json }}{% else %}[]{% endif %}"
-        - "{{ role_assignments_proj.results }}"
-  become: yes
-  become_user: "{{ rhosp_stack_user }}"
+        -  "{{ osp_projects }}"
+        -  "{{ osp_member_user }}"
+  delegate_to: localhost  
+ 
