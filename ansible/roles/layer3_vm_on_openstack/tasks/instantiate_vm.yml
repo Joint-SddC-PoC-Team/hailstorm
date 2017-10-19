@@ -10,6 +10,7 @@
         userdata:  "{{ lookup('file','/tmp/{{ osp_tenant }}_{{ inventory_hostname_short }}_userdata.txt') }}"
         image:  "{{ osp_image }}"
         flavor: "{{ osp_flavor }}"
+        terminate_volume: True
         nics: >
           [ {% for network in vm_nics %}
                 {'net-name': '{{ network.netname|regex_replace('rhosp_','') }}' }

@@ -68,11 +68,11 @@
     #   when: mode=="create"
 
     - block:
-        - include: set_floating_ip_as_fact.yml
+#        - include: set_floating_ip_as_fact.yml
 #        - include: remove_volumes.yml
 #          when: vm_exists
-        - include: remove_floating_ip.yml
-          when: vm_exists
+#        - include: remove_floating_ip.yml
+#          when: vm_exists
         - include: terminate_vm.yml
           when: vm_exists
       when: mode=="destroy"

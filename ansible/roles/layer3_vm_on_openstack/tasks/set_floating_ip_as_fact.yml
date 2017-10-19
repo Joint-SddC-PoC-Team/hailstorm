@@ -8,7 +8,7 @@
 
 - name: save vm existence as fact
   set_fact:
-    vm_exists: "{{ openstack_servers|length > 0 }}"
+    vm_exists: "{{ openstack_servers|list|length > 0 }}"
 
 # if ansible_host is not explicitly set in the inventory, it contains the inventory hostname
 - name: save floating IP as fact ansible_host and set ansible_ssh_common_args
