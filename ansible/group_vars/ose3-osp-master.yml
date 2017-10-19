@@ -37,5 +37,8 @@ disk:
       mountpoint: /var
       size: 40720
 
+vm_secgroups:
+  - ocp_master
+  - ocp_appnode
 
 openshift_master_api_host_and_port: openshift-osp.{{ hailstorm_dns_domain }}:443

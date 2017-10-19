@@ -1,0 +1,200 @@
+- block:
+    - name: get project IDs
+      shell: >
+        . ~/overcloudrc_v3 &&
+        openstack project list -f json
+      register: projects
+      changed_when: false
+
+    - block:
+        - name: get openstack client major version
+          shell: >
+            . ~/overcloudrc_v3 &&
+            openstack --version 2>&1 | awk '{ print substr($2,1,1) }'
+          register: openstack_client_version
+          failed_when: openstack_client_version.stdout==""
+          changed_when: false
+
+        - name: get default security group info
+          shell: >
+            . ~/overcloudrc_v3 &&
+            echo "[";openstack security group list -f json {% if openstack_client_version.stdout == '1' %}--all-projects{% endif %}|grep -B4 -A1 default;echo "]"
+          changed_when: false
+          failed_when: security_group_info.stdout==""
+          register: security_group_info
+
+        - name: get existing security group rules
+          shell: >
+            . ~/overcloudrc_v3 &&
+            openstack security group rule list {{ security_group_info.stdout | from_json | selectattr("Project","match", "^(" + item + "|" +  projects.stdout | from_json | selectattr("Name","match","^" + item + "$") | map(attribute="ID") | join('|') + ")$" ) | map(attribute="ID") | first }}
+          with_items: "{{ osp_projects }}"
+          register: existing_security_group_rules
+          changed_when: false
+      #  - debug: var=existing_security_group_rules
+
+        - name: configure default security group to allow ssh + icmp
+          shell: >
+            . ~/overcloudrc_v3 &&
+            export OS_TENANT_NAME={{ item.0.item }} &&
+            export OS_PROJECT_DOMAIN_NAME={{ osp_domain_name }} &&
+            openstack security group rule create --proto {{ item.1.protocol }}{% if item.1.port_range|default("") != "" %} --dst-port {{ item.1.port_range }}{% endif %} {{ security_group_info.stdout | from_json | selectattr("Project","match", "(" + item.0.item + "|" +  projects.stdout | from_json | selectattr("Name","match","^" + item.0.item + "$") | map(attribute="ID") | join('|') + ")" ) | map(attribute="ID") | first }}
+          # changed when clause because of error: The conditional check <when portion> failed. The error was: Invalid conditional detected: invalid syntax (<unknown>, line 1)
+          #when: (item.0.stdout_lines | select("search", item.1.protocol ) {% if item.1.port_range is defined %}| select("search", item.1.port_range) {% endif %} | list | length) == 0
+          when: (item.0.stdout_lines | select("search", item.1.protocol ) | select("search", item.1.port_range) | list | length) == 0
+          with_nested:
+            - "{{ existing_security_group_rules.results }}"
+            -
+              - protocol: icmp
+                port_range: ""
+              - protocol: tcp
+                port_range: "22:22"
+      when: current_lifecycle_env.openstack_version < 11
+
+    - block:
+        - debug: var=projects
+        # extend the default security groups for icmp+ssh access
+        - name: get default security group info
+          shell: >
+            . ~/overcloudrc_v3 &&
+            for uuid in `openstack security group list -c ID -c Name -f value|grep default|awk '{print $1}'`; do
+            openstack security group show -c id -c project_id -f yaml $uuid;
+            done | awk 'BEGIN { print "[" } /^id: /{ if (id != "") print ","; id=$2} /project_id: /{ print "{\"id\":\"" id "\",\"project_id\":\"" $2 "\"}" } END { print "]" }'
+          register: security_group_info2
+          changed_when: false
+        - debug: var=security_group_info2
+        - name: get existing security group rules
+          shell:
+            . ~/overcloudrc_v3 &&
+            openstack security group rule list {{ security_group_info2.stdout|from_json|selectattr('project_id','match','^(' +  projects.stdout | from_json | selectattr("Name","match","^" + item + "$") | map(attribute="ID") | join('|') + ')$') | map(attribute='id') | first }}
+          with_items: "{{ osp_projects }}"
+          register: existing_security_group_rules2
+          changed_when: false
+        #- debug: var=existing_security_group_rules2
+        - name: configure default security group to allow ssh + icmp
+          shell: >
+            . ~/overcloudrc_v3 &&
+            openstack security group rule create --project {{ item.0.item }} --project-domain {{ osp_domain_name }} --proto {{ item.1.protocol }}{% if item.1.port_range|default("") != "" %} --dst-port {{ item.1.port_range }}{% endif %} {{ security_group_info2.stdout|from_json|selectattr('project_id','match','^(' +  projects.stdout | from_json | selectattr("Name","match","^" + item.0.item + "$") | map(attribute="ID") | join('|') + ')$') | map(attribute='id') | first }}
+          # changed when clause because of error: The conditional check <when portion> failed. The error was: Invalid conditional detected: invalid syntax (<unknown>, line 1)
+          #when: (item.0.stdout_lines | select("search", item.1.protocol ) {% if item.1.port_range is defined %}| select("search", item.1.port_range) {% endif %} | list | length) == 0
+          when: (item.0.stdout_lines | select("search", item.1.protocol ) | select("search", item.1.port_range) | list | length) == 0
+          with_nested:
+            - "{{ existing_security_group_rules2.results }}"
+            -
+              - protocol: icmp
+                port_range: ""
+              - protocol: tcp
+                port_range: "22:22"
+
+        # add or extend a webserver security group in project demo-infra for http+https traffic
+        - name: get webserver security group info
+          shell: >
+            . ~/overcloudrc_v3 &&
+            for uuid in `openstack security group list --project demo-infra --project-domain {{ osp_domain_name }} -c ID -c Name -f value|grep webserver|awk '{print $1}'`; do
+            openstack security group show -c id -c project_id -f yaml $uuid;
+            done | awk 'BEGIN { print "[" } /^id: /{ if (id != "") print ","; id=$2} /project_id: /{ print "{\"id\":\"" id "\",\"project_id\":\"" $2 "\"}" } END { print "]" }'
+          register: security_group_info2
+          changed_when: false
+        - debug: var=security_group_info2
+        - name: add security group webserver if it does not exist
+          shell: >
+            . ~/overcloudrc_v3 &&
+            openstack security group create --project demo-infra webserver &&
+            openstack security group rule create --project demo-infra --project-domain {{ osp_domain_name }} --proto tcp --dst-port "80:80" webserver &&
+            openstack security group rule create --project demo-infra --project-domain {{ osp_domain_name }} --proto tcp --dst-port "443:443" webserver
+          when: (security_group_info2.stdout == '[\n]')
+        - name: get existing security group rules
+          shell:
+            . ~/overcloudrc_v3 &&
+            openstack security group rule list {{ item.id }}
+          when: item.id is defined
+          with_items: "{{ security_group_info2.stdout|from_yaml }}"
+          register: existing_security_group_rules2
+          changed_when: false
+        #- debug: var=existing_security_group_rules2
+        - name: configure webserver security group to allow http + https
+          shell: >
+            . ~/overcloudrc_v3 &&
+            openstack security group rule create --project {{ item.0.item }} --project-domain {{ osp_domain_name }} --proto {{ item.1.protocol }}{% if item.1.port_range|default("") != "" %} --dst-port {{ item.1.port_range }}{% endif %} {{ security_group_info2.stdout|from_json|selectattr('project_id','match','^(' +  projects.stdout | from_json | selectattr("Name","match","^" + item.0.item + "$") | map(attribute="ID") | join('|') + ')$') | map(attribute='id') | first }}
+          # changed when clause because of error: The conditional check <when portion> failed. The error was: Invalid conditional detected: invalid syntax (<unknown>, line 1)
+          #when: (item.0.stdout_lines | select("search", item.1.protocol ) {% if item.1.port_range is defined %}| select("search", item.1.port_range) {% endif %} | list | length) == 0
+          when: (existing_security_group_rules2 is defined) and (item.0.stdout_lines is defined) and (item.0.stdout_lines | select("search", item.1.protocol ) | select("search", item.1.port_range) | list | length) == 0
+          with_nested:
+            - "{{ existing_security_group_rules2.results }}"
+            -
+              - protocol: tcp
+                port_range: "80:80"
+              - protocol: tcp
+                port_range: "443:443"
+
+        # add lb security group in OpenShift project
+        - name: get lb security group info
+          shell: >
+            . ~/overcloudrc_v3 &&
+            for uuid in `openstack security group list --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} -c ID -c Name -f value|grep ocp_lb|awk '{print $1}'`; do
+            openstack security group show -c id -c project_id -f yaml $uuid;
+            done | awk 'BEGIN { print "[" } /^id: /{ if (id != "") print ","; id=$2} /project_id: /{ print "{\"id\":\"" id "\",\"project_id\":\"" $2 "\"}" } END { print "]" }'
+          register: security_group_info
+          changed_when: false
+        - debug: var=security_group_info
+        - name: add security group lb if it does not exist, and its rules
+          shell: >
+            . ~/overcloudrc_v3 &&
+            openstack security group create --project {{ ocp_tenant }} ocp_lb &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto icmp ocp_lb &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 22 ocp_lb &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 80 ocp_lb &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 8443 ocp_lb &&    
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_lb        
+          when: (security_group_info.stdout == '[\n]')  
+
+        # add appnode security group in OpenShift project
+        - name: get appnode security group info
+          shell: >
+            . ~/overcloudrc_v3 &&
+            for uuid in `openstack security group list --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} -c ID -c Name -f value|grep ocp_appnode|awk '{print $1}'`; do
+            openstack security group show -c id -c project_id -f yaml $uuid;
+            done | awk 'BEGIN { print "[" } /^id: /{ if (id != "") print ","; id=$2} /project_id: /{ print "{\"id\":\"" id "\",\"project_id\":\"" $2 "\"}" } END { print "]" }'
+          register: security_group_info
+          changed_when: false
+        - debug: var=security_group_info
+        - name: add security group ocp_appnode if it does not exist, and its rules
+          shell: >
+            . ~/overcloudrc_v3 &&
+            openstack security group create --project {{ ocp_tenant }} ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto icmp ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 22 ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 80 ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 9200 ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 9300 ocp_appnode && 
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 10250 --src-group ocp_appnode ocp_appnode &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto udp --dst-port 4789 --src-group ocp_appnode ocp_appnode
+          when: (security_group_info.stdout == '[\n]')
+
+        # add master security group in OpenShift project
+        - name: get master security group info
+          shell: >
+            . ~/overcloudrc_v3 &&
+            for uuid in `openstack security group list --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} -c ID -c Name -f value|grep ocp_master|awk '{print $1}'`; do
+            openstack security group show -c id -c project_id -f yaml $uuid;
+            done | awk 'BEGIN { print "[" } /^id: /{ if (id != "") print ","; id=$2} /project_id: /{ print "{\"id\":\"" id "\",\"project_id\":\"" $2 "\"}" } END { print "]" }'
+          register: security_group_info
+          changed_when: false
+        - debug: var=security_group_info
+        - name: add security group master if it does not exist, and its rules
+          shell: >
+            . ~/overcloudrc_v3 &&
+            openstack security group create --project {{ ocp_tenant }} ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 8443 ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 22 ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 2379:2380 --src-group ocp_master ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 8053 --src-group ocp_appnode ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto udp --dst-port 8053 --src-group ocp_appnode ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 24224 --src-group ocp_appnode ocp_master &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto udp --dst-port 24224 --src-group ocp_appnode ocp_master
+          when: (security_group_info.stdout == '[\n]')
+
+      when: current_lifecycle_env.openstack_version >= 10
+  become: yes
+  become_user: "{{ rhosp_stack_user }}"
