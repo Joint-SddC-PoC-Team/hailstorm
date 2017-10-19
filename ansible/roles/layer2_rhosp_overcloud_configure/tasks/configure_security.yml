@@ -1,17 +1,45 @@
 - block:
+
+    - name: create security group default-project for each project
+      os_security_group:
+        auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
+        name: "default-{{ item }}"
+        validate_certs: False
+      with_items: "{{ osp_projects }}"
+
+    - name: configure basic rule for new default-project sg
+      os_security_group_rule:
+        auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
+        security_group: "default-{{ item }}"
+        remote_group: "default-{{ item }}"
+        validate_certs: False
+      with_items: "{{ osp_projects }}"
+
+    - name: configure basic rule for new default-project sg (IPv6)
+      os_security_group_rule:
+        auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
+        security_group: "default-{{ item }}"
+        remote_group: "default-{{ item }}"
+        ethertype: IPv6
+        validate_certs: False
+      with_items: "{{ osp_projects }}"
+
+
+
     - name: configure default security group to allow ssh 
       os_security_group_rule:
         auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
-        security_group: default
+        security_group: "default-{{item}}"
         protocol: "tcp"
         port_range_min: 22
         port_range_max: 22
         validate_certs: False
       with_items: "{{ osp_projects }}"
+
     - name: configure default security group to allow icmp
       os_security_group_rule:
         auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
-        security_group: default
+        security_group: "default-{{item}}"
         protocol: "icmp"
         validate_certs: False
       with_items: "{{ osp_projects }}"
@@ -25,7 +53,7 @@
     - name: allow HTTP in webserver security group
       os_security_group_rule:
         auth: "{{ os_auth_hailstorm_demo_infra }}"
-        security_group: webserver 
+        security_group: webserver
         protocol: "tcp"
         port_range_min: 80
         port_range_max: 80
@@ -39,7 +67,6 @@
         port_range_min: 443
         port_range_max: 443
         validate_certs: False
-
 
 
   delegate_to: localhost
