@@ -1,42 +1,25 @@
 - block:
-  - name: read instance data
-    shell: >
-      . ~/overcloudrc_v3_hailstorm &&
-      OS_TENANT_NAME={{ osp_tenant }}
-      OS_PROJECT_NAME={{ osp_tenant }}
-      OS_PASSWORD={{ root_password }}
-      openstack server show -f json {{ inventory_hostname_short }}
-    register: instance_data2
-    failed_when: instance_data2.stdout == ""
-    changed_when: false
+  - name: create additional volumes
+    os_volume:
+      auth:  "{{ vars['os_auth_hailstorm_' + osp_tenant.replace('-','_')] }}"
+      size: "{{ (item.0/1024/1024/1024)|int|abs }}"
+      display_name:  "{{ inventory_hostname_short }}-{{ item.1 }}"
+      validate_certs: False
+    when: (item.0 != None) and (item.1 != None)
+    with_together:
+      - "{{ vm_additional_disks|default([]) }}"
+      - ['vdb','vdc','vdd']
 
-  - block:
-    - name: create additional volumes
-      shell: >
-        . ~/overcloudrc_v3_hailstorm &&
-        OS_TENANT_NAME={{ osp_tenant }}
-        OS_PROJECT_NAME={{ osp_tenant }}
-        OS_PASSWORD={{ root_password }}
-        openstack volume create --size {{ (item.0/1024/1024/1024)|int|abs }} {{ inventory_hostname_short }}-{{ item.1 }} | grep "^| id " | cut -d\| -f3 | awk '{print $1}'
-      register: vm_additional_volumes_ids
-      when: (item.0 != None) and (item.1 != None)
-      with_together:
-        - "{{ vm_additional_disks|default([]) }}"
-        - ['vdb','vdc','vdd']
-    - debug: var=vm_additional_volumes_ids
+  - name: attach additional volumes
+    os_server_volume:
+      auth:  "{{ vars['os_auth_hailstorm_' + osp_tenant.replace('-','_')] }}"
+      server: "{{ inventory_hostname_short }}"
+      volume: "{{ inventory_hostname_short }}-{{ item.1 }}"
+      validate_certs: False
+      device: "/dev/{{ item.1 }}"
+    when: (item.0 != None) and (item.1 != None)
+    with_together:
+      - "{{ vm_additional_disks|default([]) }}"
+      - ['vdb','vdc','vdd']
 
-    - name: attach additional volumes
-      shell: >
-        . ~/overcloudrc_v3_hailstorm &&
-        OS_TENANT_NAME={{ osp_tenant }}
-        OS_PROJECT_NAME={{ osp_tenant }}
-        OS_PASSWORD={{ root_password }}
-        openstack server add volume {{ inventory_hostname_short }} {{ item.stdout }}
-      when: (item.stdout is defined)
-      with_items: "{{ vm_additional_volumes_ids.results }}"
-
-    when: ((instance_data2.stdout | from_json )["volumes_attached"]) == ""
-
-  become: yes
-  become_user: "{{ hostvars['rhosp-director'].rhosp_stack_user }}"
-  delegate_to: rhosp-director
+  delegate_to: localhost

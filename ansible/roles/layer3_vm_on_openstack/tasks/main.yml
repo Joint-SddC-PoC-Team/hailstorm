@@ -5,6 +5,29 @@
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
 
 - block:
+    - set_fact:
+        os_auth_hailstorm:
+          auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
+          domain_name: hailstorm 
+          user_domain_name: hailstorm 
+          project_domain_name: hailstorm
+          username: "admin"
+          password: "{{ root_password }}"
+    - set_fact:
+        os_auth_hailstorm_{{ item|replace("-","_") }}:
+          auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
+          project_name: "{{ item }}"
+          tenant_name: "{{ item }}"
+          domain_name: hailstorm 
+          user_domain_name: hailstorm 
+          project_domain_name: hailstorm
+          username: "admin"
+          password: "{{ root_password }}"
+      with_items:
+        - "{{ osp_projects }}"
+        - admin
+
+
     - block:
        - include: instantiate_vm.yml
        - include: allocate_floating_ip.yml
