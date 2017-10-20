@@ -18,7 +18,10 @@
   {% endfor %}
   {% endif %}
   {% endfor %}
-
+  {% if network.forward_mode|default('none') == 'none' %}
+  {# add rule to allow DNAT replys to reach requesting IP #}
+  <rule>FORWARD -t filter -i services -j ACCEPT</rule>
+  {% endif %}
   </network>
   {% endfor %}
 </hs:iptables>

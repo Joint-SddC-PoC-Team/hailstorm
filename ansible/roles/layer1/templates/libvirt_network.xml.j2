@@ -5,7 +5,7 @@
   {# if a bridging configuration is present for the host and we are not creating the master networks #}
   {% if ((node_bridge_config|default({},true))[item.netname]|default({},true)).nic is defined and not temp_master_network|default(false,true) %}
   <forward mode="bridge"/>
-  {% elif item.forward_mode|default(false,true) %}
+  {% elif item.forward_mode|default("none",true) != "none" %}
   <forward mode="{{ item.forward_mode }}"/>
   {% endif %}
 
