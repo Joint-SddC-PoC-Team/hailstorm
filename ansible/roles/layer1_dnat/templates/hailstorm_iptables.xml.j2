@@ -19,7 +19,7 @@
   {% endif %}
   {% endfor %}
 
-  {% if network.forward_mode == 'nat' && node_network_forward_mode|default('') == 'none' %}
+  {% if network.forward_mode == 'nat' and node_network_forward_mode|default('') == 'none' %}
   {# allow only install-host to reach outside world, since it needs to be able to connect to the layer1 host(s) #}
   <rule>FORWARD -t filter -i {% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ network.bridge }} -s {{ network.default_gw_host_prefix }} -j REJECT</rule>
   <rule>FORWARD -t filter -i {% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ network.bridge }} -s {{ network.default_gw_host_prefix }} -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT</rule>
