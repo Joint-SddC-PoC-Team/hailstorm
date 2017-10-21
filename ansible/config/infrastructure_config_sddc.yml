@@ -7,6 +7,7 @@
 infrastructure_delegate_host_used_to_test_if_layer2_host_is_available: "{{ infrastructure_network_master|default('layer1') }}"
 infrastructure_delegate_nfs_server: "layer1"
 infrastructure_delegate_kvm_host: "layer1"
+#infrastructure_delegate_kvm_host: {% for host in groups['sddc'] %}{% if hostvars[host] is defined and hostvars[host].vmgroup is defined and inventory_hostname_short in groups[hostvars[host].vmgroup] %}host{% endif %}{% endfor%}
 infrastructure_delegate_rhel7_host_used_to_perform_xpath_select_on_curl_results: "layer1"
 infrastructure_delegate_local_content_host: "layer1"
 infrastructure_delegate_kickstart_nfs_server: "{{ infrastructure_network_master|default('layer1') }}"
@@ -30,7 +31,7 @@ ocp_tenant: "demo-infra"
 infrastructure_network_services:
   netname: 'services'
   bridge: 'services'
-  forward_mode: '{{ node_network_forward_mode|default("nat") }}'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.120.1/24
   vlan:                   2813
   osp_undercloud_start:   10.116.120.30
@@ -76,7 +77,7 @@ infrastructure_network_admin:
   # in SDDC we have here only 10.116.127.140-179 free
   netname: 'admin'
   bridge: 'admin'
-  forward_mode: '{{ node_network_forward_mode|default("nat") }}'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.127.254/24
   vlan:       2823
   dhcp_start: 10.116.127.140
@@ -92,7 +93,7 @@ infrastructure_network_admin:
 infrastructure_network_internal_api:
   netname: 'internal_api'
   bridge: 'internal_api'
-  forward_mode: '{{ node_network_forward_mode|default("nat") }}'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.123.1/24
   vlan:       2814
   osp_overcloud_start: 10.116.123.81
@@ -103,7 +104,7 @@ infrastructure_network_internal_api:
 infrastructure_network_tenant:
   netname: 'tenant'
   bridge: 'tenant'
-  forward_mode: '{{ node_network_forward_mode|default("nat") }}'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.124.1/24
   vlan:       2815
   osp_overcloud_start: 10.116.124.81
@@ -116,7 +117,7 @@ infrastructure_network_tenant:
 infrastructure_network_storage:
   netname: 'storage'
   bridge: 'storage'
-  forward_mode: '{{ node_network_forward_mode|default("nat") }}'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.125.1/24
   vlan:       2816
   osp_overcloud_start: 10.116.125.81
@@ -129,7 +130,7 @@ infrastructure_network_storage:
 infrastructure_network_storage_mgmt:
   netname: 'storage_mgmt'
   bridge: 'storage_mgmt'
-  forward_mode: '{{ node_network_forward_mode|default("nat") }}'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.126.1/24
   vlan:       2817
   osp_overcloud_start: 10.116.126.81
@@ -140,7 +141,7 @@ infrastructure_network_storage_mgmt:
 infrastructure_network_rhosp_provisioning:
   netname: 'rhosp_provisioning'
   bridge: 'provisioning'
-  forward_mode: '{{ node_network_forward_mode|default("nat") }}'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.122.1/24
 #  vlan: 1
   undercloud_dhcp_start:  10.116.122.43
@@ -163,7 +164,7 @@ infrastructure_network_rhosp_provisioning:
 infrastructure_network_provider1:
   netname: 'provider1'
   bridge: 'provider1'
-  forward_mode: '{{ node_network_forward_mode|default("nat") }}'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.111.17/28
   vlan:       2803
   floating_start:         10.116.111.18
@@ -174,7 +175,7 @@ infrastructure_network_provider1:
 infrastructure_network_provider2:
   netname: 'provider2'
   bridge: 'provider2'
-  forward_mode: '{{ node_network_forward_mode|default("nat") }}'
+  forward_mode: 'nat'
   default_gw_host_prefix: 10.116.111.49/28
   vlan:       2804
   floating_start:         10.116.111.50

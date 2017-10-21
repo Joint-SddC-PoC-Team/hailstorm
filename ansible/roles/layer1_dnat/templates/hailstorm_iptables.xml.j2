@@ -18,9 +18,14 @@
   {% endfor %}
   {% endif %}
   {% endfor %}
-  {% if network.forward_mode|default('none') == 'none' %}
-  {# add rule to allow DNAT replys to reach requesting IP #}
-  <rule>FORWARD -t filter -i services -j ACCEPT</rule>
+
+  {% if network.forward_mode == 'nat' && node_network_forward_mode|default('') == 'none' %}
+  {# allow only install-host to reach outside world, since it needs to be able to connect to the layer1 host(s) #}
+  <rule>FORWARD -t filter -i {% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ network.bridge }} -s {{ network.default_gw_host_prefix }} -j REJECT</rule>
+  <rule>FORWARD -t filter -i {% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ network.bridge }} -s {{ network.default_gw_host_prefix }} -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT</rule>
+  {% if network.netname in (hostvars['install-host'].vm_nics|map(attribute='netname')|list) %}
+  <rule>FORWARD -t filter -i {% if layer1_ansible_host == infrastructure_network_master|default("") %}x{% endif %}{{ network.bridge }} -s {{ (hostvars['install-host'].vm_nics|selectattr('netname','match','^' + network.netname + '$')|first).ip }} -j ACCEPT</rule>
+  {% endif %}
   {% endif %}
   </network>
   {% endfor %}
