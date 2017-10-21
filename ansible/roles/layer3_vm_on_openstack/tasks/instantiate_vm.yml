@@ -1,23 +1,49 @@
 - block:
-    - name: create userdata file
-      template: "src=cloud-config.txt.j2 dest=/tmp/{{ osp_tenant }}_{{ inventory_hostname_short }}_userdata.txt"
+    # - name: create userdata file
+    #   template: "src=cloud-config.txt.j2 dest=/tmp/{{ osp_tenant }}_{{ inventory_hostname_short }}_userdata.txt"
+
+    - name: ensure that ports and IPs are present
+      delegate_to: localhost
+      os_port:
+        auth: "{{ vars['os_auth_hailstorm_' + osp_tenant.replace('-','_')] }}"
+        name: "{{ inventory_hostname_short }}-{{ item.netname }}"
+        network: "{{ item.netname|regex_replace('rhosp_','') }}"
+        fixed_ips:
+          - ip_address: "{{ item.ip }}"
+        mac_address: "{{ item.mac }}"
+        validate_certs: False
+      with_items: "{{ vm_nics }}"
+      when: item.ip != ""
+      register: temp_ports
 
     - name: instantiate image
       delegate_to: localhost
       os_server:
         auth: "{{ vars['os_auth_hailstorm_' + osp_tenant.replace('-','_')] }}"
         name: "{{ inventory_hostname_short }}"
-        userdata:  "{{ lookup('file','/tmp/{{ osp_tenant }}_{{ inventory_hostname_short }}_userdata.txt') }}"
+        #userdata:  "{{ lookup('file','/tmp/{{ osp_tenant }}_{{ inventory_hostname_short }}_userdata.txt') }}"
+        userdata:  "{{ lookup('template','cloud-config.txt.j2') }}"
         image:  "{{ osp_image }}"
         flavor: "{{ osp_flavor }}"
         terminate_volume: True
+        # nics: >
+        #   [ {% for network in vm_nics %}
+        #         {'net-name': '{{ network.netname|regex_replace('rhosp_','') }}' }
+        #     {% if not loop.last %},{% endif %}
+        #     {% endfor %} ]
         nics: >
-          [ {% for network in vm_nics %}
-                {'net-name': '{{ network.netname|regex_replace('rhosp_','') }}' }
-            {% if not loop.last %},{% endif %}
-            {% endfor %} ]
+          [ {% for port_result in temp_ports.results %}
+          {% if port_result|skipped %}
+          { "net-name":"{{ port_result.item.netname|regex_replace('rhosp_','') }}" }
+          {% else %}
+          { "port-id":"{{ port_result.id }}" }
+          {% endif %}
+          {% if not loop.last %},{% endif %}
+          {% endfor %} ]
         auto_ip: False
+        config_drive: True
         security_groups: "{% if vm_secgroups is defined and vm_secgroups %}{{  secgroup in vm_secgroups|default([])|join(',') }}{% else %}default-{{osp_tenant}}{% endif %}"
+        #security_groups: "{{ ((vm_secgroups|default([]))+['default-' + osp_tenant]) }}"
         availability_zone: "nova"
         validate_certs: False
 
