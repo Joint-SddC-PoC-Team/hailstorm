@@ -48,3 +48,16 @@
         validate_certs: False
 
   delegate_to: localhost
+
+
+# - name: add security group to server (stopgap measure to address HSRACKDEV-517)
+#   shell: >
+#     . ~/overcloudrc_v3 &&
+#     export OS_TENANT_NAME={{ osp_tenant }} &&
+#     export OS_PROJECT_NAME={{ osp_tenant }} &&
+#     export OS_PROJECT_DOMAIN_NAME={{ osp_domain_name }} &&
+#     openstack server add security group {{ inventory_hostname_short }} {{ item }}
+#   with_items: "{{ vm_secgroups|default(['default-' + osp_tenant]) }}"
+#   delegate_to: rhosp-director
+#   become: yes
+#   become_user: "{{ hostvars['rhosp-director'].rhosp_stack_user }}"
