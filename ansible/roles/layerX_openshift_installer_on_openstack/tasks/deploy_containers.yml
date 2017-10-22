@@ -30,7 +30,8 @@
   with_items:
     - name: docker-registry
       size: 5Gi
-      accessmode: ReadWriteMany
+      accessmode: ReadWriteOnce
+      #TODO - change back to ReadWriteMany when other storage classes are avialable
   when: "'docker-registry' not in pvc.stdout"
 
 - name: add pvc to registry
