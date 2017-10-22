@@ -18,18 +18,18 @@
         allocation_pool_start: "{{ infrastructure_network_services.floating_start }}"
         allocation_pool_end: "{{ infrastructure_network_services.floating_end }}"
         gateway_ip: "{{ infrastructure_network_services.default_gw_host_prefix | ipaddr('address') }}"
-        network_name: services 
+        network_name: services
         cidr:  "{{ infrastructure_network_services.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_services.default_gw_host_prefix | ipaddr('prefix') }}"
         validate_certs: False
 
     - name: create guests aka external aka public network (in admin project)
       os_network:
         auth: "{{ os_auth_hailstorm }}"
-        name: guests 
+        name: guests
         project: admin
         external: true
         provider_network_type: flat
-        provider_physical_network: guests 
+        provider_physical_network: guests
         validate_certs: False
     - name: create services subnet (in admin project)
       os_subnet:
@@ -40,19 +40,19 @@
         allocation_pool_start: "{{ infrastructure_network_guests.floating_start }}"
         allocation_pool_end: "{{ infrastructure_network_guests.floating_end }}"
         gateway_ip: "{{ infrastructure_network_guests.default_gw_host_prefix | ipaddr('address') }}"
-        network_name: guests 
+        network_name: guests
         cidr:  "{{ infrastructure_network_guests.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_guests.default_gw_host_prefix | ipaddr('prefix') }}"
         validate_certs: False
 
     - name: create admin network (in admin project)
       os_network:
         auth: "{{ os_auth_hailstorm }}"
-        name: admin 
+        name: admin
         project: admin
         shared: True
         external: true
         provider_network_type: flat
-        provider_physical_network: admin 
+        provider_physical_network: admin
         validate_certs: False
     - name: create admin  subnet (in admin project)
       os_subnet:
@@ -63,19 +63,19 @@
         allocation_pool_start: "{{ infrastructure_network_admin.floating_start }}"
         allocation_pool_end: "{{ infrastructure_network_admin.floating_end }}"
         gateway_ip: "{{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('address') }}"
-        network_name: admin 
+        network_name: admin
         cidr:  "{{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('prefix') }}"
         validate_certs: False
 
     - name: create provisioning network (in admin project)
       os_network:
         auth: "{{ os_auth_hailstorm }}"
-        name: provisioning 
+        name: provisioning
         project: admin
         shared: True
         external: true
         provider_network_type: flat
-        provider_physical_network: provisioning 
+        provider_physical_network: provisioning
         validate_certs: False
     - name: create provisioning  subnet (in admin project)
       os_subnet:
@@ -86,18 +86,18 @@
         allocation_pool_start: "{{ infrastructure_network_rhosp_provisioning.floating_start }}"
         allocation_pool_end: "{{ infrastructure_network_rhosp_provisioning.floating_end }}"
         gateway_ip: "{{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix | ipaddr('address') }}"
-        network_name: provisioning 
+        network_name: provisioning
         cidr:  "{{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix | ipaddr('prefix') }}"
         validate_certs: False
 
     - name: create provider1 network (in admin project)
       os_network:
         auth: "{{ os_auth_hailstorm }}"
-        name: provider1 
+        name: provider1
         project: admin
         external: true
         provider_network_type: flat
-        provider_physical_network: provider1 
+        provider_physical_network: provider1
         validate_certs: False
     - name: create provider1  subnet (in admin project)
       os_subnet:
@@ -108,18 +108,18 @@
         allocation_pool_start: "{{ infrastructure_network_provider1.floating_start }}"
         allocation_pool_end: "{{ infrastructure_network_provider1.floating_end }}"
         gateway_ip: "{{ infrastructure_network_provider1.default_gw_host_prefix | ipaddr('address') }}"
-        network_name: provider1 
+        network_name: provider1
         cidr:  "{{ infrastructure_network_provider1.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_provider1.default_gw_host_prefix | ipaddr('prefix') }}"
         validate_certs: False
 
     - name: create provider2 network (in admin project)
       os_network:
         auth: "{{ os_auth_hailstorm }}"
-        name: provider2 
+        name: provider2
         project: admin
         external: true
         provider_network_type: flat
-        provider_physical_network: provider2 
+        provider_physical_network: provider2
         validate_certs: False
     - name: create provider2  subnet (in admin project)
       os_subnet:
@@ -130,24 +130,24 @@
         allocation_pool_start: "{{ infrastructure_network_provider2.floating_start }}"
         allocation_pool_end: "{{ infrastructure_network_provider2.floating_end }}"
         gateway_ip: "{{ infrastructure_network_provider2.default_gw_host_prefix | ipaddr('address') }}"
-        network_name: provider2 
+        network_name: provider2
         cidr:  "{{ infrastructure_network_provider2.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_provider2.default_gw_host_prefix | ipaddr('prefix') }}"
         validate_certs: False
 
     - name: create internal network
       os_network:
         auth: "{{ os_auth_hailstorm }}"
-        name: "internal_{{ item }}"
-        project: "{{ item }}"
+        name: "internal_{{ item.name }}"
+        project: "{{ item.name }}"
         validate_certs: False
       with_items: "{{ osp_projects }}"
     - name: create internal sub-network
       os_subnet:
         auth: "{{ os_auth_hailstorm }}"
-        name: "sub_internal_{{ item }}"
-        network_name: "internal_{{ item }}"
-        project: "{{ item }}"
-        enable_dhcp: True 
+        name: "sub_internal_{{ item.name }}"
+        network_name: "internal_{{ item.name }}"
+        project: "{{ item.name }}"
+        enable_dhcp: True
         dns_nameservers: "{{ infrastructure_network_guests.dns_server }}"
         gateway_ip: 172.20.0.1
         cidr:  "172.20.0.0/16"
@@ -157,15 +157,15 @@
     - name: create routers
       os_router:
         auth: "{{ os_auth_hailstorm }}"
-        name: "router_internal_{{ item }}"
-        project: "{{ item }}"
-        network: guests       
+        name: "router_internal_{{ item.name }}"
+        project: "{{ item.name }}"
+        network: guests
         interfaces:
-          - "sub_internal_{{ item }}"
+          - "sub_internal_{{ item.name }}"
         validate_certs: False
       register: create_router
       failed_when: "create_router|failed and 'Router already has a port on subnet' not in create_router.msg"
       with_items: "{{ osp_projects }}"
-                       
-                       
-  delegate_to: localhost 
+
+
+  delegate_to: localhost

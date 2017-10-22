@@ -2,34 +2,34 @@
 
     - name: create security group default-project for each project
       os_security_group:
-        auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
-        name: "default-{{ item }}"
+        auth: "{{ vars['os_auth_hailstorm_' + item.name.replace('-','_')] }}"
+        name: "default-{{ item.name }}"
         validate_certs: False
       with_items: "{{ osp_projects }}"
 
     - name: configure basic rule for new default-project sg
       os_security_group_rule:
-        auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
-        security_group: "default-{{ item }}"
-        remote_group: "default-{{ item }}"
+        auth: "{{ vars['os_auth_hailstorm_' + item.name.replace('-','_')] }}"
+        security_group: "default-{{ item.name }}"
+        remote_group: "default-{{ item.name }}"
         validate_certs: False
       with_items: "{{ osp_projects }}"
 
     - name: configure basic rule for new default-project sg (IPv6)
       os_security_group_rule:
-        auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
-        security_group: "default-{{ item }}"
-        remote_group: "default-{{ item }}"
+        auth: "{{ vars['os_auth_hailstorm_' + item.name.replace('-','_')] }}"
+        security_group: "default-{{ item.name }}"
+        remote_group: "default-{{ item.name }}"
         ethertype: IPv6
         validate_certs: False
       with_items: "{{ osp_projects }}"
 
 
 
-    - name: configure default security group to allow ssh 
+    - name: configure default security group to allow ssh
       os_security_group_rule:
-        auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
-        security_group: "default-{{item}}"
+        auth: "{{ vars['os_auth_hailstorm_' + item.name.replace('-','_')] }}"
+        security_group: "default-{{ item.name }}"
         protocol: "tcp"
         port_range_min: 22
         port_range_max: 22
@@ -38,8 +38,8 @@
 
     - name: configure default security group to allow icmp
       os_security_group_rule:
-        auth: "{{ vars['os_auth_hailstorm_' + item.replace('-','_')] }}"
-        security_group: "default-{{item}}"
+        auth: "{{ vars['os_auth_hailstorm_' + item.name.replace('-','_')] }}"
+        security_group: "default-{{ item.name }}"
         protocol: "icmp"
         validate_certs: False
       with_items: "{{ osp_projects }}"
@@ -88,9 +88,9 @@
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto icmp ocp_lb &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 22 ocp_lb &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 80 ocp_lb &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 8443 ocp_lb &&    
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_lb        
-          when: (security_group_info.stdout == '[\n]')  
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 8443 ocp_lb &&
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_lb
+          when: (security_group_info.stdout == '[\n]')
 
         # add appnode security group in OpenShift project
         - name: get appnode security group info
@@ -111,7 +111,7 @@
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 80 ocp_appnode &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 443 ocp_appnode &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 9200 ocp_appnode &&
-            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 9300 ocp_appnode && 
+            openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 9300 ocp_appnode &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto tcp --dst-port 10250 --src-group ocp_appnode ocp_appnode &&
             openstack security group rule create --project {{ ocp_tenant }} --project-domain {{ osp_domain_name }} --ingress --proto udp --dst-port 4789 --src-group ocp_appnode ocp_appnode
           when: (security_group_info.stdout == '[\n]')

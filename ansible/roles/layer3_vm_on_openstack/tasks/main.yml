@@ -8,24 +8,24 @@
     - set_fact:
         os_auth_hailstorm:
           auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
-          domain_name: hailstorm 
-          user_domain_name: hailstorm 
+          domain_name: hailstorm
+          user_domain_name: hailstorm
           project_domain_name: hailstorm
           username: "admin"
           password: "{{ root_password }}"
     - set_fact:
-        os_auth_hailstorm_{{ item|replace("-","_") }}:
+        os_auth_hailstorm_{{ item.name|replace("-","_") }}:
           auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
-          project_name: "{{ item }}"
-          tenant_name: "{{ item }}"
-          domain_name: hailstorm 
-          user_domain_name: hailstorm 
+          project_name: "{{ item.name }}"
+          tenant_name: "{{ item.name }}"
+          domain_name: hailstorm
+          user_domain_name: hailstorm
           project_domain_name: hailstorm
           username: "admin"
           password: "{{ root_password }}"
       with_items:
         - "{{ osp_projects }}"
-        - admin
+        - { name: admin }
 
 
     - block:

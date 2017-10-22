@@ -738,9 +738,15 @@ ipa_group:
     pwpolicy: --maxlife=20000 --minlife=0 --history=0 --maxfail=0 --priority=0
 
 osp_domain_name: hailstorm
+
+# quota definition according to the variables defined here: http://docs.ansible.com/ansible/latest/os_quota_module.html
 osp_projects:
-  - demo-vms
-  - demo-infra
+  - name: demo-vms
+  - name: demo-infra
+    quota:
+      cores: 100
+      volumes: 50
+      ram: 102400
 osp_admin_user:
   - cfme-bind-user
   - admin

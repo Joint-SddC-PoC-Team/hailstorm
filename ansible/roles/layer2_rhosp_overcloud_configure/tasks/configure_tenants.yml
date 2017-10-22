@@ -1,10 +1,33 @@
+
+- name: dubidu
+  debug:
+    msg: >
+      {{ item.quota|combine({
+        'auth': hostvars["rhosp-director"]["os_auth_hailstorm_" + item.name|replace("-","_")],
+        'validate_certs': 'False'
+      }) }}
+  with_items: "{{osp_projects}}"
+  when: item.quota|default(false,true)
+
+
 - name: create tenants
   os_project:
     auth: "{{ os_auth_hailstorm }}"
     state: present
-    name: "{{ item }}" 
+    name: "{{ item.name }}"
     domain_id: hailstorm
     enabled: True
     validate_certs: False
   with_items: "{{ osp_projects }}"
   delegate_to: localhost
+
+- name: set tenant quota
+  os_quota: >
+    {{ item.quota|combine({
+      'auth': hostvars["rhosp-director"]["os_auth_hailstorm_" + item.name|replace("-","_")],
+      'validate_certs': 'False',
+      'name': item.name
+    }) }}
+  delegate_to: localhost
+  when: item.quota|default(false,true)
+  with_items: "{{ osp_projects }}"

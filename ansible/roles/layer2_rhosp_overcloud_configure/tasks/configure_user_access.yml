@@ -10,7 +10,7 @@
         auth: "{{ os_auth_hailstorm }}"
         domain:  "{{ hailstorm_id }}"
         user: admin
-        project: "{{ item }}"
+        project: "{{ item.name }}"
         role: admin
         validate_certs: False
       with_items:  "{{ osp_projects }}"
@@ -21,7 +21,7 @@
         auth: "{{ os_auth_hailstorm }}"
         domain:  "{{ hailstorm_id }}"
         user: admin
-        project: "{{ item }}"
+        project: "{{ item.name }}"
         role: admin
         validate_certs: False
       with_items:  "{{ osp_projects }}"
@@ -31,24 +31,23 @@
     - name: assign admin users to projects
       os_user_role:
         auth: "{{ os_auth_hailstorm }}"
-        user: "{{ item[1] }}" 
-        project: "{{ item[0] }}" 
+        user: "{{ item[1] }}"
+        project: "{{ item[0].name }}"
         role: admin
         validate_certs: False
       with_nested:
         -  "{{ osp_projects }}"
         -  "{{ osp_admin_user }}"
-     
+
 
     - name: assign member users to projects
       os_user_role:
         auth: "{{ os_auth_hailstorm }}"
-        user: "{{ item[1] }}" 
-        project: "{{ item[0] }}" 
+        user: "{{ item[1] }}"
+        project: "{{ item[0].name }}"
         role: _member_
         validate_certs: False
       with_nested:
         -  "{{ osp_projects }}"
         -  "{{ osp_member_user }}"
-  delegate_to: localhost  
- 
+  delegate_to: localhost

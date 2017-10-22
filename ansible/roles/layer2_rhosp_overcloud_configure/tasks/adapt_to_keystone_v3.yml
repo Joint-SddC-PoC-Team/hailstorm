@@ -29,7 +29,7 @@
           regexp: "^export OS_PROJECT_DOMAIN_NAME"
         - line: "export OS_USER_DOMAIN_NAME={{ osp_domain_name }}"
           regexp: "^export OS_USER_DOMAIN_NAME"
-        - line: "export OS_TENANT_NAME={{ osp_projects[0] }}"
+        - line: "export OS_TENANT_NAME={{ osp_projects[0].name }}"
           regexp: "^export OS_TENANT_NAME"
         - line: "export OS_PASSWORD={{ root_password }}"
           regexp: "^export OS_PASSWORD"
