@@ -115,9 +115,24 @@ external_network_config:
           - from_port: 80
             to_port: 80
             proto: tcp
+          - from_port: 88
+            to_port: 88
+            proto: tcp
+          - from_port: 389
+            to_port: 389
+            proto: tcp
           - from_port: 443
             to_port: 443
             proto: tcp
+          - from_port: 464
+            to_port: 464
+            proto: tcp
+          - from_port: 464
+            to_port: 464
+            proto: udp
+          - from_port: 123
+            to_port: 123
+            proto: udp
       - expose_machine: infrastructure
         on_host_prefix: 10.32.105.27/32
         via_network: services
