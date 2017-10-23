@@ -1,0 +1,18 @@
+---
+#### install-host
+- hosts: install-host
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer2_nuage
+      tags: [ 'layer2', 'nuage' ]
+      mode: create
+
+#### director
+#- hosts: rhosp-director
+#  remote_user: root
+#  gather_facts: false
+#  roles:
+#    - role: layer2_rhosp_overcloud_configure_nuage
+#      tags: ['layer2', 'nuage', 'rhosp', 'overcloud', 'overcloud-configure']
+#      mode: create

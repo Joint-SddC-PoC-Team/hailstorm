@@ -1,0 +1,15 @@
+        - name: check for copy of nuage binaries already performed
+          stat: path="~{{ nuage_user }}/{{ file }}"
+          register: dest_has_nuage_binaries
+
+        - name: check for copy of nuage binaries available on the source host
+          stat: path="{{ nfs_nuage_binary_dir }}/{{ file }}"
+          register: src_has_nuage_binaries
+          delegate_to: "{{ layer1_ansible_host }}"
+
+        - name: copy over nuage binaries and licenses from layer1 host (where it has to be copied to beforehand!)
+          shell: rsync -e "ssh -i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no" -aviPHAXS root@{{ layer1_ansible_host }}:{{ nfs_nuage_binary_dir }}/{{ file }} .
+          delegate_to: "{{ inventory_hostname }}"
+          become: yes
+          become_user: "{{ nuage_user }}"
+          when: dest_has_nuage_binaries.stat.exists == False and src_has_nuage_binaries.stat.exists

@@ -19,9 +19,14 @@
   yum: name="{{ item }}" state=present
   with_items:
     - python2-pip
+    - python-devel.x86_64
+    - sshpass
     - python-virtualenv
     - libffi-devel
     - openssl-devel
+    - pytz
+    - unzip
+    - '@development'
 
 - name: Install ansible from pip
   pip:
