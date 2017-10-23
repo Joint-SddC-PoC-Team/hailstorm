@@ -1,0 +1,12 @@
+- block:
+    - include: prepare_nuage.yml
+      tags: ["nuage_prepare"]
+    - include: install_nuage.yml
+      tags: ["nuage_install"]
+
+  when: mode=="create"
+
+- block:
+    - include: destroy_nuage.yml
+      tags: ["nuage_destroy"]
+  when: mode=="destroy"

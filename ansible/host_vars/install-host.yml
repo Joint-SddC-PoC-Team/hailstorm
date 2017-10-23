@@ -4,7 +4,7 @@ vcpu: 2
 
 disk:
   path: "{{ inventory_hostname_short }}.qcow2"
-  size: 30
+  size: 100
   format: qcow2
   # partition_table:
   #   lvmpv: 29500
@@ -27,7 +27,7 @@ disk:
     - name: home
       fstype: "{{ fstype }}"
       mountpoint: /home
-      size: 2048
+      size: 70000
 
 pool_regex: "{{ rhel_subscription_pool_regex }}"
 repos:
@@ -47,3 +47,8 @@ packages:
   - python-devel
   - tmux
   - rsync
+  - vim
+
+nuage_user: "nuage"
+# directory under ansible/binary, where the nuage binaries are stored
+nuage_metro_bins: "nuage"

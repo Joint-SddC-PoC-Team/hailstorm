@@ -1,0 +1,12 @@
+# docu: https://github.com/nuagenetworks/nuage-ospdirector/wiki/Nuage-OSP-Director-11-integration-with-ML2
+# script: https://github.com/nuagenetworks/nuage-ospdirector/blob/ML2-SRIOV/image-patching/stopgap-script/nuage_overcloud_full_patch_w_ml2.sh
+- name: create tenants
+#  os_project:
+#    auth: "{{ os_auth_hailstorm }}"
+#    state: present
+#    name: "{{ item }}" 
+#    domain_id: hailstorm
+#    enabled: True
+#    validate_certs: False
+#  with_items: "{{ osp_projects }}"
+#  delegate_to: localhost
