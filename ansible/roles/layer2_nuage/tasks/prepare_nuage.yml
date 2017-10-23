@@ -1,0 +1,181 @@
+- name: create nuage user
+  user:
+    name: "{{ nuage_user }}"
+    state: present
+    comment: Nuage installation user
+    generate_ssh_key: yes
+
+- name: Get authorized key just generated for nuage user as variable
+  shell: cat ~{{ nuage_user }}/.ssh/id_rsa.pub
+  register: nuage_ssh_pubkey
+
+- name: Set authorized key for root
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ nuage_ssh_pubkey.stdout }}"
+
+- name: remove known_hosts
+  file:
+    path: "~{{ nuage_user }}/.ssh/know_hosts"
+    state: absent
+
+- name: make sudoers file for nuage user
+  shell: echo "{{ nuage_user }} ALL=(root) NOPASSWD:ALL" | tee /etc/sudoers.d/{{ nuage_user }}
+
+- name: set default password
+  shell: echo {{ root_password }} | passwd --stdin {{ nuage_user }}
+
+- name: check for share directory
+  stat: path="~{{ nuage_user }}/share"
+  register: has_nushare_dir
+
+- name: create share directory
+  file:
+    path: "~{{ nuage_user }}/share"
+    state: directory
+    mode: 0700
+    owner: "{{ nuage_user }}"
+    group: "{{ nuage_user }}"
+  when: has_nushare_dir.stat.exists == False
+
+- name: make fstab entry to allow to mount binaries from layer1 host (mainly to copy back changes or backups for convenience)
+  mount:
+    path: "~{{ nuage_user }}/share"
+    src: "{{ infrastructure_network_storage.default_gw_host_prefix | ipaddr('address') }}:{{ nfs_nuage_binary_dir }}"
+    fstype: nfs
+    opts: ro,noauto
+    state: present
+
+- name: check for {{ nuage_metro_bins }} directory
+  stat: path="~{{ nuage_user }}/{{ nuage_metro_bins }}"
+  register: has_nubin_dir
+
+- name: create share directory
+  file:
+    path: "~{{ nuage_user }}/{{ nuage_metro_bins }}"
+    state: directory
+    mode: 0700
+    owner: "{{ nuage_user }}"
+    group: "{{ nuage_user }}"
+  when: has_nubin_dir.stat.exists == False
+
+- name: copy over needed hailstorm parts
+  synchronize:
+    src: "{{ item }}"
+    dest: "~{{ nuage_user }}/{{ nuage_metro_bins }}"
+    use_ssh_args: yes
+  with_items:
+    - binary/{{ hailstorm_ssh_priv_key_file }}
+    - binary/{{ hailstorm_ssh_priv_key_file }}.pub
+    - ansible_ssh_config
+#    - hosts_sddc
+#    - config
+
+- name: correct ownership
+  file:
+    path: "~{{ nuage_user }}"
+    owner: "{{ nuage_user }}"
+    group: "{{ nuage_user }}"
+    recurse: yes
+
+- name: make binary link
+  file:
+    state: link
+    src: "~{{ nuage_user }}/"
+    dest: "~{{ nuage_user }}/binary"
+
+# there are 2 ways to get the binaries:
+# (1) copy over from the ansible/binary/{{ nuage_metro_bins }} directory of the user running this playbook
+- name: install nuage-metro bins
+  synchronize:
+    src: "../../../binary/{{ nuage_metro_bins }}"
+    dest: "~{{ nuage_user }}"
+    use_ssh_args: yes
+- name: move the bins to ~
+  shell: mv ~{{ nuage_user }}/{{ nuage_metro_bins }}/* ~{{ nuage_user }} && rmdir ~{{ nuage_user }}/{{ nuage_metro_bins }}
+
+# (2) copy over everything that is missing from the {{ layer1_ansible_host }}
+- include: copy_nuage_bins.yml file={{item}}
+  with_items:
+    - nuage-metro-latest.tar.gz
+    - binaries
+    - licenses
+
+- name: correct ownership again
+  file:
+    path: "~{{ nuage_user }}"
+    owner: "{{ nuage_user }}"
+    group: "{{ nuage_user }}"
+    recurse: yes
+
+- block:
+    - name: unpack nuage-metro installer
+      unarchive:
+        remote_src: yes
+        src: "nuage-metro-latest.tar.gz"
+        dest: "~"
+
+    - name: mv some files to the nuage-metro installer directory
+      shell: mv "{{ item }}" nuage-metro
+      with_items:
+        - binary
+        - ansible_ssh_config
+
+    - name: Install pip modules
+      pip:
+        name: "{{item}}"
+        state: present
+        virtualenv: "~/ansible-2.2.1.0"
+        virtualenv_python: python2.7
+      with_items:
+        - enum
+        - netaddr
+        - ipaddr
+        - pexpect
+        - vspk
+        - pyvmomi 
+
+    - name: Upgrade pip modules
+      pip:
+        name: "{{item}}"
+        state: latest
+        virtualenv: "~/ansible-2.2.1.0"
+      with_items:
+        - pip
+        - virtualenv
+        - virtualenvwrapper
+        - pytz
+        - setuptools
+
+    - name: Install shade
+      pip:
+        name: "{{item}}"
+        state: present
+        virtualenv: "~/ansible-2.2.1.0"
+      with_items:
+        - ansible==2.2.1.0
+        - shade
+        - netmiko
+
+    - name: create nuage config
+      vars:
+        vsd_fqdn_global: "xmpp.{{ hailstorm_dns_domain }}"
+      template:
+        src: templates/ha_build_vars.yml.j2
+        dest: nuage-metro/ha_build_vars.yml
+        mode: 0644
+
+    - name: create hosts_sddc for nuage
+      template:
+        src: ../../../hosts_sddc
+        dest: nuage-metro/hosts_sddc
+        mode: 0644
+
+    - name: delete broken VIP in hosts_sddc (Attention! VIP in hosts_sddc seems to be broken anyway)
+      lineinfile:
+        path: nuage-metro/hosts_sddc
+        state: absent
+        regexp: '^undercloud-public ansible_host='
+  become: yes
+  become_user: "{{ nuage_user }}"

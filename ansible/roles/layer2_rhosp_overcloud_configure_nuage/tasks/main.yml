@@ -1,0 +1,38 @@
+- block:
+    - name: Get admin password for overcloud from mistral
+      shell: source ~/stackrc && mistral environment-get -f value overcloud| awk '3<=NR' | head -n -3|jq ".passwords.AdminPassword"|tr -d '"'
+      register: overcloud_password
+      become_user: "{{ rhosp_stack_user }}"
+      changed_when: False
+
+    - set_fact:
+        os_auth_hailstorm:
+          auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
+#          project_name: demo-infra 
+#          tenant_name: admin
+          domain_name: hailstorm 
+          user_domain_name: hailstorm 
+          project_domain_name: hailstorm
+          username: "admin"
+          password: "{{ root_password }}"
+      tags: ['overcloud-config-tenants','overcloud-config-users','overcloud-config-security','overcloud-create-flavors']
+    - set_fact:
+        os_auth_hailstorm_{{ item|replace("-","_") }}:
+          auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
+          project_name: "{{ item }}"
+          tenant_name: "{{ item }}"
+          domain_name: hailstorm 
+          user_domain_name: hailstorm 
+          project_domain_name: hailstorm
+          username: "admin"
+          password: "{{ root_password }}"
+      with_items:
+        - "{{ osp_projects }}"
+        - admin
+      tags: ['overcloud-config-tenants','overcloud-config-users','overcloud-config-security','overcloud-create-flavors']
+
+
+
+    - include: configure_nuage.yml
+      tags: ['overcloud-config-nuage']
+  when: mode=="create"

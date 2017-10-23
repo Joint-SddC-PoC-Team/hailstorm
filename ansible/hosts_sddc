@@ -357,39 +357,3 @@ ose3-master1
 ose3-master2
 ose3-master3
 
-###
-# Nuage needed hosts part
-###
-[local_host]
-localhost ansible_connection=local
-
-[all_servers:vars]
-ansible_ssh_private_key_file = ~/.ssh/id_rsa
-
-[all_servers:children]
-vsds
-vscs
-vstats
-
-[vsds]
-vsd1.hailstorm4.coe.muc.redhat.com
-vsd2.hailstorm4.coe.muc.redhat.com
-vsd3.hailstorm4.coe.muc.redhat.com
-
-[vscs]
-c1.hailstorm4.coe.muc.redhat.com
-c2.hailstorm4.coe.muc.redhat.com
-c3.hailstorm4.coe.muc.redhat.com
-c4.hailstorm4.coe.muc.redhat.com
-
-[vstats]
-elastic1.hailstorm4.coe.muc.redhat.com
-elastic2.hailstorm4.coe.muc.redhat.com
-elastic3.hailstorm4.coe.muc.redhat.com
-
-[vsrs]
-r1.hailstorm4.coe.muc.redhat.com
-r2.hailstorm4.coe.muc.redhat.com
-
-[ansible_deployment_host]
-storm4.coe.muc.redhat.com

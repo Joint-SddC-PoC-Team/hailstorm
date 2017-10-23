@@ -1,0 +1,7 @@
+- name: Destroy all nuage VMs
+  shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" destroy_everything.yml
+  become: yes
+  become_user: "{{ nuage_user }}"
+
+# or simply do
+# for n in destroy undefine; do for i in c1.hailstorm4.coe.muc.redhat.com c2.hailstorm4.coe.muc.redhat.com c3.hailstorm4.coe.muc.redhat.com c4.hailstorm4.coe.muc.redhat.com r1.hailstorm4.coe.muc.redhat.com r2.hailstorm4.coe.muc.redhat.com elastic1.hailstorm4.coe.muc.redhat.com elastic2.hailstorm4.coe.muc.redhat.com elastic3.hailstorm4.coe.muc.redhat.com vsd1.hailstorm4.coe.muc.redhat.com vsd2.hailstorm4.coe.muc.redhat.com vsd3.hailstorm4.coe.muc.redhat.com; do virsh $n $i; done; done
