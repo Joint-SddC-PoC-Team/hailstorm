@@ -1,7 +1,7 @@
 - name: Copy certificate to the proxy server
   copy:
     dest: /etc/pki/tls/certs/squid.pem
-    content: "{{ proxyCert_cakey }}\n{{ proxyCert_cacert }}"
+    content: "{{ lookup('file','binary/alienca.cert.pem') }}\n{{ lookup('file','binary/alienca.key.pem') }}"
     owner: squid
     group: squid
     mode: 0640
@@ -18,12 +18,42 @@
   blockinfile:
     path: /etc/squid/squid.conf
     insertafter: "^http_port"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK ssl_bump"
     content: |
        sslcrtd_program /usr/lib64/squid/ssl_crtd  -s /var/lib/ssl_db -M 4MB
        acl step1 at_step SslBump1
        ssl_bump peek step1
        ssl_bump bump all
   register: configure_ssl_bump
+
+- name: Configure squid for LDAP authentication
+  blockinfile:
+    path: /etc/squid/squid.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK auth"
+    insertafter: "^acl CONNECT method CONNECT"
+    content: |
+      auth_param basic program /usr/lib64/squid/basic_ldap_auth -v 3 -b "cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}" -f uid=%s {{ hostvars['ipa'].vm_nics[0].ip }}
+      auth_param basic children 5
+      auth_param basic realm Web-Proxy
+      auth_param basic credentialsttl 1 minute
+      acl auth proxy_auth REQUIRED
+  register: configure_ldap
+
+- name: Disable full access from the localnet
+  lineinfile:
+    path: /etc/squid/squid.conf
+    regexp: "#?http_access allow localnet"
+    line: "#http_access allow localnet"
+- name: Allow only users authenticated
+  blockinfile:
+    path: /etc/squid/squid.conf
+    insertbefore: "^http_access deny all"
+    content: |
+       http_access allow auth
+
+
+
+
 
 - name: Create ssl db directory for squid
   command: /usr/lib64/squid/ssl_crtd  -c -s /var/lib/ssl_db
@@ -55,6 +85,6 @@
   service:
     name: squid
     state: restarted
-  when: configure_ssl|changed or configure_ssl_bump|changed
+  when: configure_ssl|changed or configure_ssl_bump|changed or configure_ldap|changed
   
    
