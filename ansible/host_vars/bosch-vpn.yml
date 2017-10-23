@@ -30,3 +30,8 @@ disk:
 pool_regex: "{{ rhel_subscription_pool_regex }}"
 repos:
   - rhel-7-server-rpms
+  - rhel-7-server-rh-common-rpms
+  - rhel-7-server-optional-rpms
+  - rhel-7-server-supplementary-rpms
+
+packages: gnome-desktop3,pango-devel
