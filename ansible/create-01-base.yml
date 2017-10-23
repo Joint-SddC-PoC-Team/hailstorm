@@ -75,12 +75,13 @@
 # Moved into mail Satellite Sync role.
 #    - { role: layer2_satellite_external_repo, tags: [ 'external_repo' ], mode: create }
 
-# - hosts: test-rhel
-#   remote_user: root
-#   gather_facts: false
-#   roles:
-#     - { role: layer2_vms, tags: [ 'layer2', 'satellite', 'vm', 'test-rhel' ], mode: create }
-#     - { role: layer2_rhel, tags: [ 'layer2', 'satellite', 'rhel', 'test-rhel' ], mode: create }
+- hosts: bosch-vpn-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer2_vms, tags: [ 'layer2', 'bosch-vpn', 'vm'], mode: create }
+    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'bosch-vpn', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+    - { role: layer2_rhel, tags: [ 'layer2', 'bosch-vpn', 'rhel' ], mode: create }
 
 #### IPA ####
 
@@ -221,23 +222,23 @@
 # install packages defined in groups/newgroup.yml and
 # register IPA client
 # ansible-playbook -i hosts -e @config/infrastructure_config.yml -e @config/hailstorm_config.yml -e @config/storm3.coe.muc.redhat.com.yml create-01-base.yml --tags nuage
-- hosts: nuage
-  remote_user: root
-  gather_facts: false
-  roles:
-    - role: layer2_vms
-      tags: [ 'layer2', 'nuage', 'vm' ]
-      mode: create
-    - role: layer2_rhel_reconfigure_dns
-      tags: [ 'layer2', 'nuage', 'dns' ]
-      mode: create
-      nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}"
-    - role: layer2_rhel
-      tags: [ 'layer2', 'nuage', 'rhel' ]
-      mode: create
-    - role: layerX_ipa_client
-      tags: [ 'layer2', 'nuage',  'ipa-client']
-      mode: create
+# - hosts: nuage
+#   remote_user: root
+#   gather_facts: false
+#   roles:
+#     - role: layer2_vms
+#       tags: [ 'layer2', 'nuage', 'vm' ]
+#       mode: create
+#     - role: layer2_rhel_reconfigure_dns
+#       tags: [ 'layer2', 'nuage', 'dns' ]
+#       mode: create
+#       nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}"
+#     - role: layer2_rhel
+#       tags: [ 'layer2', 'nuage', 'rhel' ]
+#       mode: create
+#     - role: layerX_ipa_client
+#       tags: [ 'layer2', 'nuage',  'ipa-client']
+#       mode: create
 
 - hosts: proxy-group
   remote_user: root

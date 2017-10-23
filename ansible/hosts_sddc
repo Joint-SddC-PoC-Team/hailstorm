@@ -60,11 +60,11 @@ cloudforms-wk-osp01   ansible_host=10.116.127.204 activation_key="AK-CV-CLOUDFOR
 [cloudforms-wk-rhev]
 cloudforms-wk-rhev01   ansible_host=10.116.127.205 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-rhev" wk-rhev=true extra_disks=false
 
-[test-rhel6]
-test-rhel6      ansible_host=10.116.127.18 activation_key="AK-CV-OS-RHEL6-SERVER-{{ stage }}"
+#[test-rhel6]
+#test-rhel6      ansible_host=10.116.127.18 activation_key="AK-CV-OS-RHEL6-SERVER-{{ stage }}"
 
-[test-rhel7]
-test-rhel7      ansible_host=10.116.127.19 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+[bosch-vpn-group]
+bosch-vpn      ansible_host=10.116.127.19 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
 #[ose3-master]
 #ose3-master1    ansible_host=10.116.127.20 openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOSE3-{{ stage }}"
@@ -188,11 +188,6 @@ localhost              ansible_connection=local openshift_master_api_host_and_po
 [virt-who]
 infrastructure
 
-# some test nodes to test subscription with satellite
-[test-rhel:children]
-test-rhel6
-test-rhel7
-
 # the list of groups that make up RHEV
 [rhev:children]
 rhevm
@@ -259,7 +254,6 @@ satellite
 rhevh
 #ose3
 ose3-osp
-test-rhel7
 ipa
 infrastructure
 efk
@@ -275,11 +269,12 @@ cloudforms-wk-rhev
 cloudforms-osp-group
 ansible-jump-host
 storage-console
+bosch-vpn-group
 
 # All layer2 node groups that are installed with RHEL6
 [rhel6:children]
 #rhevm #group assignment (rhel6 or rhel7) now done via role
-test-rhel6
+#test-rhel6
 
 # everything on layer2
 [layer2:children]
@@ -291,14 +286,13 @@ nuage
 satellite
 rhev
 rhosp-all
-test-rhel6
-test-rhel7
 ipa
 infrastructure
 efk
 dev-client
 tower
 storage-console
+bosch-vpn-group
 
 # to let it participate in the calculation of ansible_host
 # and the ssh proxy command used to communicate with all layer2/3 hosts
@@ -314,6 +308,7 @@ cloudforms-osp-group
 vips
 lookbusy-rhev
 ose3-osp
+bosch-vpn-group
 
 [accessible_via_floating_ip:children]
 ansible-jump-host
@@ -334,7 +329,6 @@ install-host
 rh-sso
 nuage
 satellite
-test-rhel
 infrastructure
 ipa
 #ose3
@@ -344,6 +338,7 @@ lookbusy-rhev
 dev-client
 tower
 storage-console
+bosch-vpn-group
 
 [lookbusy:children]
 lookbusy-osp
@@ -356,4 +351,3 @@ infrastructure
 ose3-master1
 ose3-master2
 ose3-master3
-
