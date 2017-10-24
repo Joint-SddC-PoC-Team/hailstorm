@@ -35,10 +35,12 @@
 
     - include: adapt_to_keystone_v3.yml
       tags: ['overcloud-config-keystone']
-    - include: configure_tenants.yml
-      tags: ['overcloud-config-tenants']
+    - include: create_tenants.yml
+      tags: ['overcloud-create-tenants']
     - include: configure_user_access.yml
       tags: ['overcloud-config-users']
+    - include: configure_tenants.yml
+      tags: ['overcloud-config-tenants']
     - include: configure_neutron.yml
       tags: ['overcloud-config-neutron']
       when: current_lifecycle_env.openstack_version <= 10

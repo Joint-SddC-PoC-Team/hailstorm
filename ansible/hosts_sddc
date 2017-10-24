@@ -248,7 +248,6 @@ ose3-osp-master1
 proxy-group
 install-host
 rh-sso
-nuage
 rhosp-all
 satellite
 rhevh

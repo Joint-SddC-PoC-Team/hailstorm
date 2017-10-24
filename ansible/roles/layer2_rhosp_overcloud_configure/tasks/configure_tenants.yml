@@ -1,14 +1,3 @@
-- name: create tenants
-  os_project:
-    auth: "{{ os_auth_hailstorm }}"
-    state: present
-    name: "{{ item.name }}"
-    domain_id: hailstorm
-    enabled: True
-    validate_certs: False
-  with_items: "{{ osp_projects }}"
-  delegate_to: localhost
-
 - name: set tenant quota
   os_quota: >
     {{ item.quota|combine({

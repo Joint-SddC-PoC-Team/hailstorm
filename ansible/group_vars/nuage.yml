@@ -30,3 +30,6 @@ disk:
 
 packages: git,python
 pool_regex: "{{ rhel_subscription_pool_regex }}"
+
+skip_create: true
+skip_install: true
