@@ -10,9 +10,24 @@
 - name: add layer1 root ssh pub key to vm
   authorized_key: user=root key={{ layer1_ssh_pub_key.stdout }}
 
-- name: copy anyconnect client from layer1 host
-  command: scp -o StrictHostKeyChecking=no {{ cisco_binary_directory }}/anyconnect-predeploy-linux-64-4.1.02011-k9.tar.gz root@{{ vm_nics[0].ip }}:/tmp/ creates=/tmp/anyconnect-predeploy-linux-64-4.1.02011-k9.tar.gz
+- name: copy anyconnect client files from layer1 host
+  command: scp -r -o StrictHostKeyChecking=no {{ cisco_binary_directory }}/{{ item }} root@{{ vm_nics[0].ip }}:/tmp/ creates=/tmp/{{ item }}
   delegate_to: "{{ infrastructure_delegate_local_content_host }}"
+  with_items:
+    - anyconnect-predeploy-linux-64-4.1.02011-k9.tar.gz
+    - bosch-cisco-vpn-client-4.3-installed.tar
+    - pangox-compat-0.0.2-2.el7.x86_64.rpm
+    - pangox-compat-devel-0.0.2-2.el7.x86_64.rpm
+    - dotmozilla
+
+- name: install /root/.mozilla
+  command: mv /tmp/dotmozilla /root/.mozilla creates=/root/.mozilla
+
+- name: install pango rpms
+  yum: state=present name=/tmp/{{ item }}
+  with_items:
+    - pangox-compat-0.0.2-2.el7.x86_64.rpm
+    - pangox-compat-devel-0.0.2-2.el7.x86_64.rpm
 
 - name: unpack cisco anyconnect client
   unarchive: copy=no src=/tmp/anyconnect-predeploy-linux-64-4.1.02011-k9.tar.gz dest=/tmp
@@ -21,7 +36,13 @@
   file: path=/tmp/anyconnect-4.1.02011/vpn/license.txt state=absent
 
 - name: run installer
-  shell: cd /tmp/anyconnect-4.1.02011/vpn && ./vpn_install.sh creates=/opt/cisco/anyconnect
+  shell: cd /tmp/anyconnect-4.1.02011/vpn && ./vpn_install.sh creates=/opt/cisco
+
+- name: rename /opt/cisco to /opt/cisco4.1
+  command: mv /opt/cisco /opt/cisco4.1 creates=/opt/cisco4.1
+
+- name: unpack cisco anyconnect client 4.3
+  unarchive: copy=no src=/tmp/bosch-cisco-vpn-client-4.3-installed.tar dest=/opt
 
 - name: copy SSL_Robert_Bosch_GmbH_0612.xml to /opt/cisco/anyconnect/profile
   command: scp -o StrictHostKeyChecking=no /var/hailstorm/cisco_binary/SSL_Robert_Bosch_GmbH_0612.xml root@{{ vm_nics[0].ip }}:/opt/cisco/anyconnect/profile
