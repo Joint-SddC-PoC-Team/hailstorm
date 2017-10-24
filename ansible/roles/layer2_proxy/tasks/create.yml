@@ -26,13 +26,29 @@
        ssl_bump bump all
   register: configure_ssl_bump
 
+- yum: Install passlib to use htpasswd modfule
+  yum:
+    name: python-passlib
+    state: present
+    enablerepo: rhel-7-server-extras-rpms 
+
+- htpasswd:
+    path: /etc/squid/htpasswd
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    owner: squid
+    group: squid
+    mode: 0640
+  with_items:
+    - "{{ proxy_users }}"
+
 - name: Configure squid for LDAP authentication
   blockinfile:
     path: /etc/squid/squid.conf
     marker: "# {mark} ANSIBLE MANAGED BLOCK auth"
     insertafter: "^acl CONNECT method CONNECT"
     content: |
-      auth_param basic program /usr/lib64/squid/basic_ldap_auth -v 3 -b "cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}" -f uid=%s {{ hostvars['ipa'].vm_nics[0].ip }}
+      auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/htpasswd
       auth_param basic children 5
       auth_param basic realm Web-Proxy
       auth_param basic credentialsttl 1 minute

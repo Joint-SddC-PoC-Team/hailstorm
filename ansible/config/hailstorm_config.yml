@@ -754,3 +754,6 @@ osp_member_user:
   - consumer
   - developer
   - approver
+
+proxy_users:
+  - { "name": "satellite", "password": "redhat01" }
