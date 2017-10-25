@@ -850,5 +850,18 @@ osp_member_user:
   - developer
   - approver
 
+osp_host_aggregates:
+  - name: DEV
+    availability_zone: development
+    hosts:
+     - overcloud-compute-0.localdomain
+    
+  - name: PROD
+    availability_zone: production
+    hosts:
+     - overcloud-compute-1.localdomain
+     - overcloud-compute-2.localdomain
+     - overcloud-compute-3.localdomain
+
 proxy_users:
   - { "name": "satellite", "password": "redhat01" }
