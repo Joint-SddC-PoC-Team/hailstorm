@@ -34,4 +34,4 @@ repos:
   - rhel-7-server-optional-rpms
   - rhel-7-server-supplementary-rpms
 
-packages: gnome-desktop3,pango-devel
+packages: gnome-desktop3,pango-devel,tmux,screen,rsync
