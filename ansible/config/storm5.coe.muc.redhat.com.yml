@@ -71,7 +71,7 @@ external_network_config:
     layer1_dev: guests
     mapping:
       - expose_machine: satellite
-        on_host_prefix: 10.32.105.235/32
+        on_host_prefix: 10.32.105.70/32
         via_network: services
         ports:
           - from_port: 80
@@ -104,7 +104,7 @@ external_network_config:
             to_port: 9090
             proto: tcp
       - expose_machine: ipa
-        on_host_prefix: 10.32.105.236/32
+        on_host_prefix: 10.32.105.71/32
         via_network: services
         ports:
           - from_port: 22
@@ -132,7 +132,7 @@ external_network_config:
             to_port: 123
             proto: udp
       - expose_machine: infrastructure
-        on_host_prefix: 10.32.105.237/32
+        on_host_prefix: 10.32.105.72/32
         via_network: services
         ports:
           - from_port: 22
@@ -157,7 +157,7 @@ external_network_config:
             to_port: 465
             proto: tcp
       - expose_machine: rhevm
-        on_host_prefix: 10.32.105.238/32
+        on_host_prefix: 10.32.105.73/32
         via_network: services
         ports:
           - from_port: 22
@@ -173,7 +173,7 @@ external_network_config:
             to_port: 6100
             proto: tcp
       - expose_machine: cloudforms
-        on_host_prefix: 10.32.105.239/32
+        on_host_prefix: 10.32.105.74/32
         via_network: services
         ports:
           - from_port: 22
@@ -186,7 +186,7 @@ external_network_config:
             to_port: 443
             proto: tcp
       - expose_machine: ose3-lb
-        on_host_prefix: 10.32.105.240/32
+        on_host_prefix: 10.32.105.75/32
         via_network: services
         ports:
           - from_port: 22
@@ -202,7 +202,7 @@ external_network_config:
             to_port: 8443
             proto: tcp
       - expose_machine: ose3-infranode1
-        on_host_prefix: 10.32.105.241/32
+        on_host_prefix: 10.32.105.76/32
         via_network: services
         ports:
           - from_port: 22
@@ -215,7 +215,7 @@ external_network_config:
             to_port: 443
             proto: tcp
       - expose_machine: efk
-        on_host_prefix: 10.32.105.242/32
+        on_host_prefix: 10.32.105.77/32
         via_network: services
         ports:
           - from_port: 22
@@ -231,14 +231,14 @@ external_network_config:
             to_port: 9200
             proto: tcp
       - expose_machine: rhosp-director
-        on_host_prefix: 10.32.105.243/32
+        on_host_prefix: 10.32.105.78/32
         via_network: rhosp_provisioning
         ports:
           - from_port: 22
             to_port: 22
             proto: tcp
       - expose_machine: undercloud-public
-        on_host_prefix: 10.32.105.243/32
+        on_host_prefix: 10.32.105.78/32
         via_network: rhosp_provisioning
         ports:
           # webui
@@ -270,7 +270,7 @@ external_network_config:
             to_port: 9000
             proto: tcp
       - expose_machine: openstack
-        on_host_prefix: 10.32.105.244/32
+        on_host_prefix: 10.32.105.79/32
         via_network: services
         ports:
           - from_port: 80
@@ -340,7 +340,7 @@ external_network_config:
             to_port: 13696
             proto: tcp
       - expose_machine: tower
-        on_host_prefix: 10.32.105.245/32
+        on_host_prefix: 10.32.105.80/32
         via_network: services
         ports:
           - from_port: 80
@@ -353,7 +353,7 @@ external_network_config:
             to_port: 22
             proto: tcp
       - expose_machine: rh-sso
-        on_host_prefix: 10.32.105.246/32
+        on_host_prefix: 10.32.105.81/32
         via_network: services
         ports:
           - from_port: 8443
@@ -366,55 +366,55 @@ external_network_config:
       # cloudforms-osp is special in the sense that we will not have the needed vm_nics configuration for DNAT
       # from the start as it is created dynamically within OSP; by using the tag cfme_on_osp the vm_nics can be
       # created for IPA/DNS and DNAT settings after creation of the cloudforms-osp VM
-      - expose_machine: cloudforms-osp
-        on_host_prefix: 10.32.105.247/32
-        via_network: services
-        ports:
-          - from_port: 22
-            to_port: 22
-            proto: tcp
-          - from_port: 80
-            to_port: 80
-            proto: tcp
-          - from_port: 443
-            to_port: 443
-            proto: tcp
+      # - expose_machine: cloudforms-osp
+      #   on_host_prefix: 10.32.105.83/32
+      #   via_network: services
+      #   ports:
+      #     - from_port: 22
+      #       to_port: 22
+      #       proto: tcp
+      #     - from_port: 80
+      #       to_port: 80
+      #       proto: tcp
+      #     - from_port: 443
+      #       to_port: 443
+      #       proto: tcp
       - expose_machine: install-host
-        on_host_prefix: 10.32.105.248/32
+        on_host_prefix: 10.32.105.82/32
         via_network: services
         ports:
           - from_port: 22
             to_port: 22
             proto: tcp
-      - expose_machine: ose3-osp-lb
-        on_host_prefix: 10.32.105.249/32
-        via_network: services
-        ports:
-          - from_port: 22
-            to_port: 22
-            proto: tcp
-          - from_port: 80
-            to_port: 80
-            proto: tcp
-          - from_port: 443
-            to_port: 443
-            proto: tcp
-          - from_port: 8443
-            to_port: 8443
-            proto: tcp
-      - expose_machine: ose3-osp-infranode1
-        on_host_prefix: 10.32.105.250/32
-        via_network: services
-        ports:
-          - from_port: 22
-            to_port: 22
-            proto: tcp
-          - from_port: 80
-            to_port: 80
-            proto: tcp
-          - from_port: 443
-            to_port: 443
-            proto: tcp
+      # - expose_machine: ose3-osp-lb
+      #   on_host_prefix: 10.32.105.249/32
+      #   via_network: services
+      #   ports:
+      #     - from_port: 22
+      #       to_port: 22
+      #       proto: tcp
+      #     - from_port: 80
+      #       to_port: 80
+      #       proto: tcp
+      #     - from_port: 443
+      #       to_port: 443
+      #       proto: tcp
+      #     - from_port: 8443
+      #       to_port: 8443
+      #       proto: tcp
+      # - expose_machine: ose3-osp-infranode1
+      #   on_host_prefix: 10.32.105.250/32
+      #   via_network: services
+      #   ports:
+      #     - from_port: 22
+      #       to_port: 22
+      #       proto: tcp
+      #     - from_port: 80
+      #       to_port: 80
+      #       proto: tcp
+      #     - from_port: 443
+      #       to_port: 443
+      #       proto: tcp
 
 nic_bonding:
 #   - name: <bonddevice>
