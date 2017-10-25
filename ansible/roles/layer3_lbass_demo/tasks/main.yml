@@ -1,0 +1,11 @@
+- block:
+    - include: create.yml
+      tags: ["lbaas-demo"]
+  when: mode=="create"
+
+
+- block:
+    - include: destroy.yml
+      tags: ["lbaas-demo"]
+  when: mode=="destroy"
+

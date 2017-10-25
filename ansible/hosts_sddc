@@ -170,6 +170,12 @@ undercloud-admin  ansible_host=10.116.124.41 nic_attachments="[ {{ infrastructur
 [lookbusy-osp]
 lookbusy-osp    activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
 
+# layer 3 openstack
+[lbaas-demo-osp-group]
+lbaas-demo-osp1 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
+lbaas-demo-osp2 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
+
+
 [cloudforms-osp-group]
 cloudforms-osp ansible_host=10.116.127.121 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
 cloudforms-osp-2 ansible_host=10.116.127.122 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
@@ -312,6 +318,7 @@ bosch-vpn-group
 [accessible_via_floating_ip:children]
 ansible-jump-host
 lookbusy-osp
+lbaas-demo-osp-group
 
 [accessible_via_services_network:children]
 nuage
@@ -341,6 +348,7 @@ bosch-vpn-group
 
 [lookbusy:children]
 lookbusy-osp
+lbaas-demo-osp-group
 lookbusy-rhev
 
 [haproxy_frontend]

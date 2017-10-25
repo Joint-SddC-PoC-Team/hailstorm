@@ -1,0 +1,5 @@
+- block:
+    - include: configure_lbaas.yml
+      tags: ['overcloud-config-lbaas']
+  when: mode=="create"
+

@@ -66,10 +66,20 @@
     virtualenv="/opt/ansible-{{ item }}"
   with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
 
-- name: Install pip packages to be able to use ansible modules (shade, nailgun)
+- name: Install pip packages to be able to use ansible modules inside virtualenv
   pip:
     name="{{ item }}"
     state=present
   with_items:
     - shade
     - nailgun
+    - vspk
+
+- name: Install pip packages to be able to use ansible modules inside virtualenv
+  pip:
+    name="{{ item[0] }}"
+    virtualenv="/opt/ansible-{{ item[1] }}"
+    state=latest
+  with_nested:
+    - ['pip', 'shade', 'nailgun', 'vspk']
+    - "{{current_lifecycle_env.ansible_available_versions}}"

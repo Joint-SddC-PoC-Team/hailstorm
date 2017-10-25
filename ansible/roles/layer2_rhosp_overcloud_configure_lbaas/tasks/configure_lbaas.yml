@@ -1,0 +1,64 @@
+# https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/11/html-single/networking_guide/#sec-lbaas
+- name: Install HAproxy
+  yum: 
+    name: haproxy
+    state: present
+
+- name: Add the LBaaS tables to the neutron database
+  shell:  neutron-db-manage --subproject neutron-lbaas --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head
+
+- name: Change the service provider in neutron_lbaas.conf
+  lineinfile:
+    path: /etc/neutron/neutron_lbaas.conf
+    line: "service_provider=LOADBALANCERV2:Haproxy:neutron_lbaas.drivers.haproxy.plugin_driver.HaproxyOnHostPluginDriver:default"
+    insertafter: "^#service_provider"
+
+- name: configre LBaaS v2 plugin in service_plugins under neutron.conf
+  lineinfile:
+    path: /etc/neutron/neutron.conf
+    line: "service_plugins=router,qos,trunk,neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2"
+    regexp: "^service_plugins"
+
+- name: Enable Automatic Failover
+  lineinfile:
+    path: /etc/neutron/neutron_lbaas.conf
+    line: "allow_automatic_lbaas_agent_failover=True"
+    insertafter: "^#allow_automatic_lbaas_agent_failover"
+
+ 
+
+- name: Configure lbaas_agent.ini
+  lineinfile:
+    path: /etc/neutron/lbaas_agent.ini
+    line: "ovs_use_veth = False"
+    insertafter: "^#ovs_use_veth"
+
+- name: Configure lbaas_agent.ini
+  lineinfile:
+    path: /etc/neutron/lbaas_agent.ini
+    line: "interface_driver =neutron.agent.linux.interface.OVSInterfaceDriver"
+    insertafter: "^#interface_driver"
+
+- name: Configure services_lbaas.conf
+  lineinfile:
+    path: /etc/neutron/services_lbaas.conf
+    line: "user_group = haproxy"
+    insertafter: '^\[haproxy\]'
+
+#- name: Disable neutron-lbaas-agent.service
+#  systemd:
+#    name: neutron-lbaas-agent
+#    state: stopped
+#    enabled: False
+#    masked: True
+
+- name: Enable and start neutron-lbaasv2-agent
+  systemd:
+    name: neutron-lbaasv2-agent
+    state: started
+    enabled: True
+
+- name: Restart neutron-server
+  service:
+    name: neutron-server
+    state: restarted

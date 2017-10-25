@@ -69,3 +69,13 @@
     - role: layer2_rhosp_overcloud_configure
       tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-configure']
       mode: create
+
+- hosts: rhosp-control
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer2_rhosp_overcloud_configure_lbaas
+      tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-controller']
+      mode: create
+
+

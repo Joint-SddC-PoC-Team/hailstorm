@@ -21,6 +21,17 @@
     - { role: layer2_rhel, tags: [ 'layer3', 'lookbusy', 'lookbusy-osp', 'rhel'], mode: create }
     - { role: layer3_lookbusy, tags: [ 'layer3', 'lookbusy', 'lookbusy-osp' ], mode: create }
 
+
+- hosts: lbaas-demo-osp-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'lbaas-demo', 'lbaas-demo-osp', 'vm'], mode: create }
+    - { role: layer2_rhel, tags: [ 'layer3', 'lbaas-demo', 'lbaas-demo-osp', 'rhel'], mode: create }
+    - { role: layer3_lbass_demo, tags: [ 'layer3', 'lbaas-demo', 'lbaas-demo-osp' ], mode: create }
+
+
+
 - hosts: rhosp-director
   remote_user: root
   gather_facts: false

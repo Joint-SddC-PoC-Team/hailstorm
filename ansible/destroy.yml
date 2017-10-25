@@ -95,6 +95,24 @@
       mode: destroy
       when: vm_exists is defined and vm_exists == true
 
+- hosts: lbaas-demo-osp-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3','lbaas-demo-osp','lbaas-demo' ]
+      mode: readfacts
+    - role: layer2_rhel
+      tags: [ 'layer3','lbaas-demo-osp','lbaas-demo', 'rhel' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3','lbaas-demo-osp','lbaas-demo', 'vm' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+
+
+
 
 - hosts: efk
   gather_facts: false
