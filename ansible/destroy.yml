@@ -110,9 +110,10 @@
       tags: [ 'layer3','lbaas-demo-osp','lbaas-demo', 'vm' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
-
-
-
+    - role: layer3_lbass_demo
+      tags: [ 'layer3','lbaas-demo-osp','lbaas-demo', 'vm' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
 
 - hosts: efk
   gather_facts: false
