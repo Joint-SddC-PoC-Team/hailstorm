@@ -153,7 +153,8 @@
     - { role: layer2_vms, tags: [ 'layer2', 'infrastructure', 'vm' ], mode: create }
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'infrastructure', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer2', 'infrastructure', 'rhel' ], mode: create }
-    - { role: layer2_infrastructure, tags: [ 'layer2', 'infrastructure' ], mode: create }
+    - { role: layer2_dnat_dns, tags: [ 'layer2', 'infrastructure', 'dnat' ], mode: create }
+    - { role: layer2_smtp_imap, tags: [ 'layer2', 'infrastructure', 'smtp'], mode: create }
     - { role: layer2_tdagent, tags: [ 'layer2', 'tdagent', 'infrastructure'], mode: create }
     - { role: layer2_haproxy_service, tags: [ 'haproxy_setup' ], mode: create }
 

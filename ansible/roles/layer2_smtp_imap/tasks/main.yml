@@ -1,0 +1,4 @@
+- block:
+    - include: configure_smtp.yml
+    - include: configure_imap.yml
+  when: mode=="create"
