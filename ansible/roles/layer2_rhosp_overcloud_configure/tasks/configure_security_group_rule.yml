@@ -1,0 +1,9 @@
+- name: Configure security group rules
+  os_security_group_rule: >
+    {{ item|combine({
+      'auth': vars["os_auth_hailstorm_" + outer_item.name|replace("-","_")],
+      'validate_certs': 'False',
+      'security_group': inner_item
+    }) }}
+  delegate_to: localhost
+  with_items: "{{ outer_item.security_groups[inner_item]['rules'] }}"

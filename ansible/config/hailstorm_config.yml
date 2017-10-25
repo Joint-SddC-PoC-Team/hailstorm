@@ -747,6 +747,101 @@ osp_projects:
       cores: 100
       volumes: 50
       ram: 102400
+    security_groups:
+      ocp_lb:
+        description: OCP load balancer
+        rules:
+          - protocol: icmp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 80
+            port_range_max: 80
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 443
+            port_range_max: 443
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 22
+            port_range_max: 22
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 8443
+            port_range_max: 8443
+            remote_ip_prefix: 0.0.0.0/0
+ 
+      ocp_appnode:
+        description: OCP App node
+        rules:
+          - protocol: icmp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 80
+            port_range_max: 80
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 443
+            port_range_max: 443
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 22
+            port_range_max: 22
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 9200
+            port_range_max: 9200
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 9300
+            port_range_max: 9300
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 10250
+            port_range_max: 10250
+            remote_group: ocp_appnode
+          - protocol: udp
+            port_range_min: 4789
+            port_range_max: 4789
+            remote_group: ocp_appnode
+
+ 
+      ocp_master:
+        description: OCP master
+        rules:
+          - protocol: tcp
+            port_range_min: 8443
+            port_range_max: 8443
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 443
+            port_range_max: 443
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 22
+            port_range_max: 22
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 2379
+            port_range_max: 2380 
+            remote_group: ocp_master
+          - protocol: tcp
+            port_range_min: 8053
+            port_range_max: 8053
+            remote_group: ocp_appnode
+          - protocol: udp 
+            port_range_min: 8053
+            port_range_max: 8053
+            remote_group: ocp_appnode
+          - protocol: tcp
+            port_range_min: 24224
+            port_range_max: 24224
+            remote_group: ocp_appnode
+          - protocol: udp 
+            port_range_min: 24224
+            port_range_max: 24224
+            remote_group: ocp_appnode
+       
+
 osp_admin_user:
   - cfme-bind-user
   - admin

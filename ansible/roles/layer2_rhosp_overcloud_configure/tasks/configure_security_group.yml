@@ -1,0 +1,15 @@
+- name: Creating securities group for "{{ outer_item.name }}"
+  os_security_group:
+     auth: "{{ vars['os_auth_hailstorm_' + outer_item.name.replace('-','_')] }}"
+     name: "{{ item }}"
+     description: "{{ outer_item.security_groups[item].description|default('') }}"
+     validate_certs: False
+  with_items: "{{ outer_item.security_groups }}"
+
+- name: Creating securities groups rules for each security group
+  include: configure_security_group_rule.yml
+  with_items: "{{ outer_item.security_groups }}"
+  loop_control:
+     loop_var: inner_item
+
+
