@@ -1,0 +1,14 @@
+- block:
+    - name: Configure rsyslog
+      lineinfile: 
+        path: /etc/rsyslog.conf 
+        line: "*.* @{{ hostvars[item].vm_nics[0].ip }}:514"
+        insertafter: "#### RULES ####"
+      register: configure_syslog
+      when: '"syslog" in item'
+      with_items: "{{ groups['infrastructure-group'] }}"
+    - name: Restart rsyslog
+      service: name=rsyslog state=restarted
+      when: configure_syslog|changed
+  when: mode=="create"
+

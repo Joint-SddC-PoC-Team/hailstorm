@@ -1,0 +1,5 @@
+packages: wget,httpd
+pool_regex: "{{ rhel_subscription_pool_regex }}"
+vm_secgroups:
+  - default-demo-infra
+  - webserver

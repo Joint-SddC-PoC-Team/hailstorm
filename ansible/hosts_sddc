@@ -47,6 +47,7 @@ cloudforms-db01        ansible_host=10.116.127.201 activation_key="AK-CV-CLOUDFO
 #zone 919000000000002
 [cloudforms-ui]
 cloudforms-ui01   ansible_host=10.116.127.202 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false
+cloudforms ansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false
 
 #zone 919000000000003
 [cloudforms-wk-ocp]
@@ -97,8 +98,9 @@ ose3-osp-lb         Xansible_host=10.116.127.136 activation_key="AK-CV-OS-RHEL7-
 efk             ansible_host=10.116.127.28 activation_key="AK-CV-RHOSP-{{ stage }}"
 
 # the Infrastructure server (DNS, SMTP/IMAP)
-[infrastructure]
-infrastructure  ansible_host=10.116.127.29 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" additional_dns="imap,smtp"
+[infrastructure-group]
+infrastructure  ansible_host=10.116.127.29 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" additional_dns="imap,smtp,ntp" roles=["dnat","smtp","haproxy","ntp"]
+syslog		ansible_host=10.116.127.9 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" roles=["syslog"]
 
 # The single system where osp-director will be installed to
 [rhosp-director]
@@ -260,7 +262,7 @@ rhevh
 #ose3
 ose3-osp
 ipa
-infrastructure
+infrastructure-group
 efk
 lookbusy
 dev-client
@@ -292,7 +294,7 @@ satellite
 rhev
 rhosp-all
 ipa
-infrastructure
+infrastructure-group
 efk
 dev-client
 tower
@@ -335,7 +337,7 @@ install-host
 rh-sso
 nuage
 satellite
-infrastructure
+infrastructure-group
 ipa
 #ose3
 efk

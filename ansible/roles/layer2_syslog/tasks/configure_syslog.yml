@@ -1,0 +1,29 @@
+- name: Provides UDP syslog reception
+  blockinfile:
+    path: /etc/rsyslog.conf
+    backup: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK UDP"
+    insertafter: "#### MODULES ####"
+    block: |
+      $ModLoad imudp
+      $UDPServerRun 514
+  register: udp_configured
+
+- name: Provides TCP syslog reception
+  blockinfile:
+    path: /etc/rsyslog.conf
+    backup: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK TCP"
+    insertafter: "#### MODULES ####"
+    block: |
+      $ModLoad imtcp
+      $InputTCPServerRun 514
+  register: tcp_configured
+
+- name: ensure rsyslog is started & enabled
+  service: name=rsyslog state=started enabled=yes
+
+
+- name: restart rsyslog if configuration was changed
+  service: name=rsyslog state=restarted enabled=yes
+  when: tcp_configured|changed or udp_configured|changed

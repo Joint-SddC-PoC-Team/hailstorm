@@ -29,55 +29,26 @@ disk:
 
 repos:
   - rhel-7-server-rpms
-packages: bind,dovecot,postfix
+packages: rsyslog
 pool_regex: "{{ rhel_subscription_pool_regex }}"
 
 catch_all_user: catchall
 
 firewalld_rules:
- - DNStcp:
-   port: 53
+ - SYSLOGtcp:
+   port: 514
    protocol: tcp
    state: enabled
    zone: public
    permanent: true
    immediate: true
- - DNSudp:
-   port: 53
+ - SYSLOGudp:
+   port: 514
    protocol: udp
    state: enabled
    zone: public
    permanent: true
    immediate: true
- - SMTP:
-   port: 25
-   protocol: tcp
-   state: enabled
-   zone: public
-   permanent: true
-   immediate: true
- - IMAP:
-   port: 143
-   protocol: tcp
-   state: enabled
-   zone: public
-   permanent: true
-   immediate: true
- - IMAPSSL:
-   port: 993
-   protocol: tcp
-   state: enabled
-   zone: public
-   permanent: true
-   immediate: true
- - NTPudp:
-   port: 123
-   protocol: udp
-   state: enabled
-   zone: public
-   permanent: true
-   immediate: true
-
 
 tdagent_configs:
  - tag: syslog.messages
