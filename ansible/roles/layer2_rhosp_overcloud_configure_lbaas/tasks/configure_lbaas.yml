@@ -12,18 +12,21 @@
     path: /etc/neutron/neutron_lbaas.conf
     line: "service_provider=LOADBALANCERV2:Haproxy:neutron_lbaas.drivers.haproxy.plugin_driver.HaproxyOnHostPluginDriver:default"
     insertafter: "^#service_provider"
+  notify: restart_neutron
 
 - name: configre LBaaS v2 plugin in service_plugins under neutron.conf
   lineinfile:
     path: /etc/neutron/neutron.conf
     line: "service_plugins=router,qos,trunk,neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2"
     regexp: "^service_plugins"
+  notify: restart_neutron
 
 - name: Enable Automatic Failover
   lineinfile:
     path: /etc/neutron/neutron_lbaas.conf
     line: "allow_automatic_lbaas_agent_failover=True"
     insertafter: "^#allow_automatic_lbaas_agent_failover"
+  notify: restart_neutron
 
  
 
@@ -32,18 +35,21 @@
     path: /etc/neutron/lbaas_agent.ini
     line: "ovs_use_veth = False"
     insertafter: "^#ovs_use_veth"
+  notify: restart_neutron
 
 - name: Configure lbaas_agent.ini
   lineinfile:
     path: /etc/neutron/lbaas_agent.ini
     line: "interface_driver =neutron.agent.linux.interface.OVSInterfaceDriver"
     insertafter: "^#interface_driver"
+  notify: restart_neutron
 
 - name: Configure services_lbaas.conf
   lineinfile:
     path: /etc/neutron/services_lbaas.conf
     line: "user_group = haproxy"
     insertafter: '^\[haproxy\]'
+  notify: restart_neutron
 
 #- name: Disable neutron-lbaas-agent.service
 #  systemd:
@@ -58,7 +64,5 @@
     state: started
     enabled: True
 
-- name: Restart neutron-server
-  service:
-    name: neutron-server
-    state: restarted
+- name: Flush handlers  
+  meta: flush_handlers

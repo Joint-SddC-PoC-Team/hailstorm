@@ -47,6 +47,7 @@ cloudforms-db01        ansible_host=10.116.127.201 activation_key="AK-CV-CLOUDFO
 #zone 919000000000002
 [cloudforms-ui]
 cloudforms-ui01   ansible_host=10.116.127.202 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false
+cloudforms ansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false
 
 #zone 919000000000003
 [cloudforms-wk-ocp]
