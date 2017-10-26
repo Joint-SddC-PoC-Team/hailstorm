@@ -1,0 +1,17 @@
+- name: install ntp
+  yum: name=ntp state=latest
+
+- name: copy ntp configuration
+  template: src=ntp.j2
+     dest=/etc/ntp.conf
+     owner=root
+     group=root
+     mode=0644
+  register: ntp_config
+
+
+- name: enable ntp service
+  service: name=ntpd enabled=yes state=started
+- name: start ntp service
+  service: name=ntpd state=restarted
+  when: ntp_config|changed

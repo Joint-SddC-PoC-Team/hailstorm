@@ -1,0 +1,3 @@
+- block:
+    - include: configure_ntp.yml
+  when: mode=="create"
