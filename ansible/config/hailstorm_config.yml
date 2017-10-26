@@ -871,7 +871,7 @@ osp_host_aggregates:
      - overcloud-compute-0.localdomain
     
   - name: PROD
-    availability_zone: production
+    availability_zone: nova
     hosts:
      - overcloud-compute-1.localdomain
      - overcloud-compute-2.localdomain
