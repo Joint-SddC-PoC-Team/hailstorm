@@ -471,9 +471,6 @@
     - role: layer2_vms
       tags: [ 'layer2','infrastructure', 'vm' ]
       mode: start
-    - role: layer2_infrastructure
-      tags: [ 'layer2', 'infrastructure' ]
-      mode: destroy
     - role: layer2_rhel
       tags: [ 'layer2','infrastructure', 'rhel' ]
       mode: destroy
