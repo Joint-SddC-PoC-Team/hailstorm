@@ -196,11 +196,21 @@ epel_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 cfme_rhconsulting_scripts_repo: https://github.com/rhtconsulting/cfme-rhconsulting-scripts.git
 
 satellite_external_repos:
-  gpgkey_url: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
-  gpgkey_name: RPM-GPG-KEY-EPEL-7
-  product_name: EPEL-7
-  repo_name: EPEL-7
-  repository_url: https://dl.fedoraproject.org/pub/epel/7/x86_64/
+  - gpgkey_url: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+    gpgkey_name: RPM-GPG-KEY-EPEL-7
+    product_name: EPEL-7
+    repo_name: EPEL-7
+    repository_url: https://dl.fedoraproject.org/pub/epel/7/x86_64/
+  - gpgkey_url: https://packages.treasuredata.com/GPG-KEY-td-agent
+    gpgkey_name: RPM-GPG-KEY-TDAGENT
+    product_name: td-agent
+    repo_name: td-agent
+    repository_url: https://packages.treasuredata.com/2/redhat/7/x86_64/
+  - gpgkey_url: http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7
+    gpgkey_name: RPM-GPG-KEY-CentOS-7
+    product_name: CentOS-7
+    repo_name: CentOS-7 OpsTools
+    repository_url: https://ftp.fau.de/centos/7/opstools/x86_64/
 
 satellite_product_config:
   - product: "Red Hat Enterprise Linux Server"
@@ -761,7 +771,7 @@ osp_projects:
             port_range_min: 443
             port_range_max: 443
             remote_ip_prefix: 0.0.0.0/0
- 
+
       ocp_lb:
         description: OCP load balancer
         rules:
@@ -783,7 +793,7 @@ osp_projects:
             port_range_min: 8443
             port_range_max: 8443
             remote_ip_prefix: 0.0.0.0/0
- 
+
       ocp_appnode:
         description: OCP App node
         rules:
@@ -818,7 +828,7 @@ osp_projects:
             port_range_max: 4789
             remote_group: ocp_appnode
 
- 
+
       ocp_master:
         description: OCP master
         rules:
@@ -836,13 +846,13 @@ osp_projects:
             remote_ip_prefix: 0.0.0.0/0
           - protocol: tcp
             port_range_min: 2379
-            port_range_max: 2380 
+            port_range_max: 2380
             remote_group: ocp_master
           - protocol: tcp
             port_range_min: 8053
             port_range_max: 8053
             remote_group: ocp_appnode
-          - protocol: udp 
+          - protocol: udp
             port_range_min: 8053
             port_range_max: 8053
             remote_group: ocp_appnode
@@ -850,11 +860,11 @@ osp_projects:
             port_range_min: 24224
             port_range_max: 24224
             remote_group: ocp_appnode
-          - protocol: udp 
+          - protocol: udp
             port_range_min: 24224
             port_range_max: 24224
             remote_group: ocp_appnode
-       
+
 
 osp_admin_user:
   - cfme-bind-user
@@ -869,7 +879,7 @@ osp_host_aggregates:
     availability_zone: development
     hosts:
      - overcloud-compute-0.localdomain
-    
+
   - name: PROD
     availability_zone: nova
     hosts:

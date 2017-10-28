@@ -4,7 +4,7 @@
     - include: import_manifest.yml
       tags: ['manifest','satellite-manifest']
     - include: add_external_repo_and_sync.yml
-      tags: [ 'sync', 'satellite-sync' ]
+      tags: [ 'sync', 'satellite-external-repos' ]
     - include: enable_repo_and_sync.yml
       tags: ['sync','satellite-sync']
     - include: wait-for-sync-tasks.yml
