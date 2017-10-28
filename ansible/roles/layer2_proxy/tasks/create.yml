@@ -26,11 +26,11 @@
        ssl_bump bump all
   register: configure_ssl_bump
 
-- yum: Install passlib to use htpasswd modfule
+- name: Install passlib to use htpasswd modfule
   yum:
     name: python-passlib
     state: present
-    enablerepo: rhel-7-server-extras-rpms 
+    enablerepo: rhel-7-server-extras-rpms
 
 - htpasswd:
     path: /etc/squid/htpasswd
@@ -90,7 +90,7 @@
     permanent: true
     immediate: true
     state: enabled
-   
+
 - name: Enable squid service
   service:
     name: squid
@@ -102,5 +102,3 @@
     name: squid
     state: restarted
   when: configure_ssl|changed or configure_ssl_bump|changed or configure_ldap|changed
-  
-   
