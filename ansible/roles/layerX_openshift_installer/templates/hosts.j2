@@ -28,7 +28,7 @@ osm_default_node_selector="region=primary"
 # elseif IPA is availe, we use the LDAP Auth Provider
 # else we use AllowAll as fallback:
 #}
-openshift_master_identity_providers=[{'name':'oidc_rhsso', 'challenge':'false', 'login':'true', 'mappingMethod':'add', 'kind': 'OpenIDIdentityProvider', 'clientID': 'ocp-master', 'clientSecret':'{{ ocpOidcClientSecret }}', 'ca': 'ipa-ca.crt', 'urls': {'authorize': 'https://rh-sso.{{ hailstorm_dns_domain }}:8443/auth/realms/infra/protocol/openid-connect/auth', 'token':'https://rh-sso.{{ hailstorm_dns_domain }}:8443/auth/realms/infra/protocol/openid-connect/token', 'userInfo':'https://rh-sso.{{ hailstorm_dns_domain }}:8443/auth/realms/infra/protocol/openid-connect/userinfo'}, 'claims': { 'id':['sub'], 'preferredUsername':['preferred_username'], 'name':['name'], 'email':['email'] }}]
+openshift_master_identity_providers=[{'name':'oidc_rhsso', 'challenge':'false', 'login':'true', 'mappingMethod':'add', 'kind': 'OpenIDIdentityProvider', 'clientID': 'ocp-master', 'clientSecret':'{{ ocpOidcClientSecret }}', 'ca': 'ipa-ca.crt', 'urls': {'authorize': 'https://sso.{{ hailstorm_dns_domain }}:8443/auth/realms/infra/protocol/openid-connect/auth', 'token':'https://sso.{{ hailstorm_dns_domain }}:8443/auth/realms/infra/protocol/openid-connect/token', 'userInfo':'https://sso.{{ hailstorm_dns_domain }}:8443/auth/realms/infra/protocol/openid-connect/userinfo'}, 'claims': { 'id':['sub'], 'preferredUsername':['preferred_username'], 'name':['name'], 'email':['email'] }}]
 {# openshift_master_ldap_ca_file causes the file to be copied to all master nodes /etc/origin/master dirs #}
 openshift_master_ldap_ca_file=/etc/origin/master/ipa-ca.crt
 {% elif ipa_available|success and certificate|success %}
