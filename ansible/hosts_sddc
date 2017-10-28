@@ -65,7 +65,7 @@ cloudforms-wk-rhev01   ansible_host=10.116.127.205 activation_key="AK-CV-CLOUDFO
 #test-rhel6      ansible_host=10.116.127.18 activation_key="AK-CV-OS-RHEL6-SERVER-{{ stage }}"
 
 [bosch-vpn-group]
-bosch-vpn       ansible_host=10.116.127.19 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+bosch-vpn       l1host="layer1" ansible_host=10.116.127.19 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
 #[ose3-master]
 #ose3-master1    ansible_host=10.116.127.20 openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOSE3-{{ stage }}"
