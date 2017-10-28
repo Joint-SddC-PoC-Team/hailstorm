@@ -6,8 +6,7 @@
 
 infrastructure_delegate_host_used_to_test_if_layer2_host_is_available: "{{ infrastructure_network_master|default('layer1') }}"
 infrastructure_delegate_nfs_server: "layer1"
-infrastructure_delegate_kvm_host: "layer1"
-#infrastructure_delegate_kvm_host: {% for host in groups['sddc'] %}{% if hostvars[host] is defined and hostvars[host].vmgroup is defined and inventory_hostname_short in groups[hostvars[host].vmgroup] %}host{% endif %}{% endfor%}
+infrastructure_delegate_kvm_host: "{{ l1host|default(layer1_ansible_host) }}"
 infrastructure_delegate_rhel7_host_used_to_perform_xpath_select_on_curl_results: "layer1"
 infrastructure_delegate_local_content_host: "layer1"
 infrastructure_delegate_kickstart_nfs_server: "{{ infrastructure_network_master|default('layer1') }}"
