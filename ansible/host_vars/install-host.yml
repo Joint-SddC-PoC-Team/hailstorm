@@ -14,7 +14,7 @@ disk:
 
   physvols:
     boot: 500
-    rhel: 29500
+    rhel: 99500
   logvols:
     - name: swap
       fstype: swap

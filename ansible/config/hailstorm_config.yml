@@ -135,14 +135,14 @@ current_lifecycle_env: "{{ lifecycle_environments|selectattr('name','match','^'+
 
 # RED HAT SUBSCRIPTIONS
 satellite_subscription_pool_regex: "^(Red Hat Satellite Employee Subscription|Red Hat Satellite)$"
-rhel_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Enterprise Linux Server, Standard.*)$"
-rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure)$"
+rhel_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Enterprise Linux Server, Standard.*|EPEL-7|CentOS-7|td-agent)$"
+rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure|td-agent)$"
 #sap_subscription_pool_regex: "^(Employee SKU|Red Hat Enterprise Linux Server for SAP HANA.*)$"
-rhev_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Virtualization.*|Red Hat Enterprise Linux Server, Standard.*)$"
-rhosp_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat (Enterprise Linux )?OpenStack Platform.*)$"
-ose_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform.*|Red Hat Gluster Storage.*)$"
-cloudforms_subscription_pool_regex: "^(CloudForms Employee Subscription|Red Hat Cloud Suite.*|Red Hat OpenStack Platform.*)$"
-ceph_subscription_pool_regex: "^(Employee SKU|Red Hat Ceph Storage.*|Red Hat OpenStack Platform.*)$"
+rhev_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Virtualization.*|Red Hat Enterprise Linux Server, Standard.*|td-agent)$"
+rhosp_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat (Enterprise Linux )?OpenStack Platform.*|td-agent)$"
+ose_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform.*|Red Hat Gluster Storage.*|td-agent)$"
+cloudforms_subscription_pool_regex: "^(CloudForms Employee Subscription|Red Hat Cloud Suite.*|Red Hat OpenStack Platform.*|td-agent)$"
+ceph_subscription_pool_regex: "^(Employee SKU|Red Hat Ceph Storage.*|Red Hat OpenStack Platform.*|td-agent)$"
 
 # REPOSITORIES
 rhosp_undercloud_repos:
@@ -209,8 +209,12 @@ satellite_external_repos:
   - gpgkey_url: http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7
     gpgkey_name: RPM-GPG-KEY-CentOS-7
     product_name: CentOS-7
-    repo_name: CentOS-7 OpsTools
+    repo_name: opstools
     repository_url: https://ftp.fau.de/centos/7/opstools/x86_64/
+
+satellite_repo_name_epel: "{{ hostvars['satellite'].organization_id }}_EPEL-7_EPEL-7"
+satellite_repo_name_tdagent: "{{ hostvars['satellite'].organization_id }}_td-agent_td-agent"
+satellite_repo_name_opstools: "{{ hostvars['satellite'].organization_id }}_CentOS-7_opstools"
 
 satellite_product_config:
   - product: "Red Hat Enterprise Linux Server"
