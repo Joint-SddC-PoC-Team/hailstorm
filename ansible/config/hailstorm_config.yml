@@ -186,9 +186,9 @@ ose3_repos:
   - '{% if current_lifecycle_env.ocp_use_cns and current_lifecycle_env.openshift_version == 3.5 %}rh-gluster-3-for-rhel-7-server-rpms{% endif %}'
 ose3_additional_packages: docker
 
-tdagent_rpm:
-  "7": https://packages.treasuredata.com/2/redhat/7/x86_64/td-agent-2.2.0-0.x86_64.rpm
-  "6": https://packages.treasuredata.com/2/redhat/6/x86_64/td-agent-2.2.0-0.x86_64.rpm
+# tdagent_rpm:
+#   "7": https://packages.treasuredata.com/2/redhat/7/x86_64/td-agent-2.2.0-0.x86_64.rpm
+#   "6": https://packages.treasuredata.com/2/redhat/6/x86_64/td-agent-2.2.0-0.x86_64.rpm
 
 epel_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 #epel_rpm: http://ftp.tu-chemnitz.de/pub/linux/fedora-epel/epel-release-latest-7.noarch.rpm

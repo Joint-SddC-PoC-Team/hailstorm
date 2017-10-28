@@ -104,7 +104,7 @@
   #    tags: [ 'layer2','satellite' ]
   roles:
    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'satellite', 'dns', 'satellite-dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-   - { role: layer2_tdagent, tags: [ 'layer2', 'satellite', 'tdagent', 'satellite-tdagent' ], mode: create }
+#   - { role: layer2_tdagent, tags: [ 'layer2', 'satellite', 'tdagent', 'satellite-tdagent' ], mode: create }
 #   - { role: layer2_ipa_certificate, tags: ['layer2', 'satellite', 'satellite_cert'], mode: create }
 #   - { role: layer2_satellite_certificate, tags: ['layer2', 'satellite', 'satellite_cert'], mode: create }
 
