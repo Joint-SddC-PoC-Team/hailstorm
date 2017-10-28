@@ -75,15 +75,6 @@
     - { role: layer2_rhel, tags: [ 'layer2','satellite', 'rhel','satellite-rhel' ], mode: create }
     - { role: layer2_satellite, tags: [ 'layer2','satellite' ], mode: create }
 
-- hosts: bosch-vpn-group
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_vms, tags: [ 'layer2', 'bosch-vpn', 'vm'], mode: create }
-    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'bosch-vpn', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-    - { role: layer2_rhel, tags: [ 'layer2', 'bosch-vpn', 'rhel' ], mode: create }
-    - { role: layer2_cisco_anyconnect_client, tags: [ 'layer2', 'bosch-vpn', 'anyconnect' ], mode: create }
-
 #### IPA ####
 
 - hosts: ipa
@@ -123,14 +114,6 @@
 #   roles:
 #     - { role: layer2_rhel, tags: [ 'layer2', 'ipa', 'satellite_cert' ], mode: refreshcert }
 
-# - hosts: test-rhel
-#   remote_user: root
-#   gather_facts: false
-#   roles:
-#     - { role: layer2_vms, tags: [ 'layer2', 'test-rhel', 'vm' ], mode: create }
-#    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'satellite', 'test-rhel', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-#    - { role: layer2_tdagent, tags: [ 'layer2', 'satellite', 'test-rhel', 'tdagent' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-
 #### install-host
 # ansible-playbook -i hosts -e @config/infrastructure_config.yml -e @config/hailstorm_config.yml -e @config/storm3.coe.muc.redhat.com.yml create-01-base.yml --tags install-host
 - hosts: install-host
@@ -168,6 +151,18 @@
   gather_facts: false
   roles:
     - { role: layer2_virtwho, tags: [ 'layer2', 'virtwho' ], mode: create }
+
+#### BOSCH VPN Client
+
+- hosts: bosch-vpn-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer2_vms, tags: [ 'layer2', 'bosch-vpn', 'vm'], mode: create }
+    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'bosch-vpn', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+    - { role: layer2_rhel, tags: [ 'layer2', 'bosch-vpn', 'rhel' ], mode: create }
+    - { role: layer2_cisco_anyconnect_client, tags: [ 'layer2', 'bosch-vpn', 'anyconnect' ], mode: create }
+
 
 
 #### CEPH
