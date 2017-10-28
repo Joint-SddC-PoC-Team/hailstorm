@@ -142,7 +142,7 @@ storage-console ansible_host=10.116.127.9 activation_key="AK-CV-CEPH-{{ stage }}
 install-host ansible_host=10.116.127.6 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
 [rh-sso]
-rh-sso ansible_host=10.116.127.7 activation_key="AK-CV-RH-SSO-{{ stage }}"
+rh-sso ansible_host=10.116.127.7 activation_key="AK-CV-RH-SSO-{{ stage }}" additional_dns="sso"
 
 [proxy-group]
 proxy ansible_host=10.116.127.50 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
