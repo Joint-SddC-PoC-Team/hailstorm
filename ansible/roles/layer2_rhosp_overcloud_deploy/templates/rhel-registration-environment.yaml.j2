@@ -1,6 +1,6 @@
 resource_registry:
-#  OS::TripleO::NodeExtraConfig: /usr/share/openstack-tripleo-heat-templates/extraconfig/pre_deploy/rhel-registration/rhel-registration.yaml
-  OS::TripleO::NodeExtraConfig: rhel-registration.yaml
+  OS::TripleO::NodeExtraConfig: /usr/share/openstack-tripleo-heat-templates/extraconfig/pre_deploy/rhel-registration/rhel-registration.yaml
+#  OS::TripleO::NodeExtraConfig: rhel-registration.yaml
 
 # Note this can be specified either in the call
 # to heat stack-create via an additional -e option
@@ -25,3 +25,7 @@ parameter_defaults:
   rhel_reg_type: ""
   rhel_reg_method: "satellite"
   rhel_reg_sat_repo: "rhel-7-server-satellite-tools-{{ satellite_version }}-rpms"
+  rhel_reg_http_proxy_host: ""
+  rhel_reg_http_proxy_port: ""
+  rhel_reg_http_proxy_username: ""
+  rhel_reg_http_proxy_password: ""

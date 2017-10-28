@@ -22,8 +22,8 @@
           - firstboot-config-setrootpw.sh
           - firstboot-config-prep-ceph-disks.sh
           - rhel-registration-environment.yaml
-          - rhel-registration.yaml
-          - rhel-registration.sh
+          #- rhel-registration.yaml
+          #- rhel-registration.sh
           - timezone-environment.yaml
           - hostname-map-environment.yaml
           - schedulerhints-environment.yaml
@@ -61,8 +61,8 @@
           - firstboot-config-setrootpw.sh
           - firstboot-config-prep-ceph-disks.sh
           - rhel-registration-environment.yaml
-          - rhel-registration.yaml
-          - rhel-registration.sh
+          #- rhel-registration.yaml
+          #- rhel-registration.sh
           - timezone-environment.yaml
           - hostname-map-environment.yaml
           - schedulerhints-environment.yaml
