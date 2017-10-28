@@ -23,8 +23,8 @@ hailstorm_dns_domain: "{% if infrastructure_network_master is defined %}hailstor
 disable_registration_against_satellite: "{% if infrastructure_network_master is defined %}False{% else %}{{ node_disable_registration_against_satellite }}{% endif %}"
 satellite_version:    "{% if infrastructure_network_master is defined %}6.2{% else %}{{ node_satellite_version }}{% endif %}"
 stage:                "{% if infrastructure_network_master is defined %}DEV{% else %}{{ node_stage }}{% endif %}"
-ocp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
-ocp_on_osp_apps_dns_domain: "apps-osp.{{ hailstorm_dns_domain }}"
+#ocp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
+ocp_on_osp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
 ocp_tenant: "demo-infra"
 
 
