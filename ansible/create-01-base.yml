@@ -56,6 +56,9 @@
       tags: [ 'layer1', 'dnat', 'layer1-dnat' ]
       mode: create
       when: infrastructure_network_master is not defined or infrastructure_network_master == layer1_ansible_host
+    - role: layer1_etc_hosts
+      mode: create
+      tags: [ 'layer1', 'layer1-etc-hosts' ]
     - role: layer1_ceph_inventory
       tags: [ 'layer2', 'ceph', 'ipa' ]
       when: current_lifecycle_env.osp_storage_backend == "ceph_ownvms"

@@ -1,0 +1,19 @@
+- block:
+    - name: create /etc/hosts entries
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ (hostvars[item].vm_nics|selectattr('netname','match','^services$')|first).ip }} {{ item }} {{ item }}.{{ hailstorm_dns_domain }}{% for name in (hostvars[item].additional_dns|default('')).split(',') %}{% if name != '' and name[0] != '*' %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endif %}{% endfor %}"
+        regexp: "{{ (hostvars[item].vm_nics|selectattr('netname','match','^services$')|first).ip }} {{ item }} {{ item }}\\.{{ hailstorm_dns_domain }}.*$"
+      when: (hostvars[item].vm_nics|selectattr('netname','match','^services$')|first).ip
+      with_items: "{{ groups['layer2'] }}"
+  when: mode=="create"
+
+- block:
+    - name: create /etc/hosts entries
+      lineinfile:
+        dest: /etc/hosts
+        state: absent
+        regexp: "{{ (hostvars[item].vm_nics|selectattr('netname','match','^services$')|first).ip }} {{ item }} {{ item }}\\.{{ hailstorm_dns_domain }}.*$"
+      when: (hostvars[item].vm_nics|selectattr('netname','match','^services$')|first).ip
+      with_items: "{{ groups['layer2'] }}"
+  when: mode=="destroy"
