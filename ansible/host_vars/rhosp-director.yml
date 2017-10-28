@@ -30,11 +30,11 @@ disk:
 hostname_override: director
 
 nic_attachments:
-  - "{{ infrastructure_network_rhosp_provisioning }}"
+  - "{{ infrastructure_network_provisioning }}"
   - "{{ infrastructure_network_services }}"
   - "{{ infrastructure_network_admin }}"
   - "{{ infrastructure_network_storage }}"
-default_route_via: "{{ infrastructure_network_rhosp_provisioning }}"
+default_route_via: "{{ infrastructure_network_provisioning }}"
 name_service_via: "{{ infrastructure_network_services }}"
 
 pool_regex: "{{ rhosp_subscription_pool_regex }}"

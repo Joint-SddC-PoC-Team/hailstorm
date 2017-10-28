@@ -10,7 +10,7 @@
   when: undercloud_conf.changed
 
 - name: ensure that provisioning network route has default route configured
-  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-br-ctlplane line="GATEWAY=\"{{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix|ipaddr('address') }}\""
+  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-br-ctlplane line="GATEWAY=\"{{ infrastructure_network_provisioning.default_gw_host_prefix|ipaddr('address') }}\""
   register: ifcfg_br_ctlplane
 
 - block:

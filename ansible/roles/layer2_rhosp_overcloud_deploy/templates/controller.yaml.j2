@@ -218,11 +218,11 @@ resources:
                   name: nic8
                   # force the MAC address of the bridge to this interface
                   primary: true
-{% if infrastructure_network_provider1 is defined %}
+{% if infrastructure_network_bgp1 is defined %}
             -
-              # HAILSTORM: this one is Provider1 network
+              # HAILSTORM: this one is bgp1 network
               type: ovs_bridge
-              name: br-provider1
+              name: br-bgp1
               use_dhcp: false
               members:
                 -
@@ -231,11 +231,11 @@ resources:
                   # force the MAC address of the bridge to this interface
                   primary: true
 {% endif %}
-{% if infrastructure_network_provider2 is defined %}
+{% if infrastructure_network_bgp2 is defined %}
             -
-              # HAILSTORM: this one is Provider2 network
+              # HAILSTORM: this one is bgp2 network
               type: ovs_bridge
-              name: br-provider2
+              name: br-bgp2
               use_dhcp: false
               members:
                 -

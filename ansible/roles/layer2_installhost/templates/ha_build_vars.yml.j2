@@ -207,7 +207,7 @@ myvsrs:
       mgmt_netmask_prefix: "{{ (hostvars['r1'].vm_nics[0].ip ~ '/' ~ hostvars['r1'].vm_nics[0].netmask) | ipaddr('prefix') }}",
       mgmt_static_route_list: [ 192.168.1.0/24 ],
       mgmt_to_hv_bridge: "{{ hostvars['r1'].nic_attachments[0].bridge }}",
-      ports_to_hv_bridges: ['tenant', 'guests', 'provider1', 'provider2'],
+      ports_to_hv_bridges: ['tenant', 'guests', 'bgp1', 'bgp2'],
       license_file: '/home/{{ nuage_user }}/licenses/NOKIA_BOSCH_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
       deploy_cfg_file: '/home/{{ nuage_user }}/vsr/config1.txt'}
   - { hostname: "{{ hostvars['r2'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
@@ -218,7 +218,7 @@ myvsrs:
       mgmt_netmask_prefix: "{{ (hostvars['r2'].vm_nics[0].ip ~ '/' ~ hostvars['r2'].vm_nics[0].netmask) | ipaddr('prefix') }}",
       mgmt_static_route_list: [ 192.168.1.0/24 ],
       mgmt_to_hv_bridge: "{{ hostvars['r2'].nic_attachments[0].bridge }}",
-      ports_to_hv_bridges: ['tenant', 'guests', 'provider1', 'provider2'],
+      ports_to_hv_bridges: ['tenant', 'guests', 'bgp1', 'bgp2'],
       license_file: '/home/{{ nuage_user }}/licenses/NOKIA_RED HAT_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
       deploy_cfg_file: '/home/{{ nuage_user }}/vsr/config2.txt'}
 ###

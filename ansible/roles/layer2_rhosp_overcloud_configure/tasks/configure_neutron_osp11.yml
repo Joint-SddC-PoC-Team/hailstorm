@@ -77,61 +77,61 @@
         provider_network_type: flat
         provider_physical_network: provisioning
         validate_certs: False
-    - name: create provisioning  subnet (in admin project)
+    - name: create provisioning subnet (in admin project)
       os_subnet:
         auth: "{{ os_auth_hailstorm }}"
         name: sub_provisioning
         project: admin
         enable_dhcp: False
-        allocation_pool_start: "{{ infrastructure_network_rhosp_provisioning.floating_start }}"
-        allocation_pool_end: "{{ infrastructure_network_rhosp_provisioning.floating_end }}"
-        gateway_ip: "{{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix | ipaddr('address') }}"
+        allocation_pool_start: "{{ infrastructure_network_provisioning.floating_start }}"
+        allocation_pool_end: "{{ infrastructure_network_provisioning.floating_end }}"
+        gateway_ip: "{{ infrastructure_network_provisioning.default_gw_host_prefix | ipaddr('address') }}"
         network_name: provisioning
-        cidr:  "{{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix | ipaddr('prefix') }}"
+        cidr:  "{{ infrastructure_network_provisioning.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_provisioning.default_gw_host_prefix | ipaddr('prefix') }}"
         validate_certs: False
 
-    - name: create provider1 network (in admin project)
+    - name: create bgp1 network (in admin project)
       os_network:
         auth: "{{ os_auth_hailstorm }}"
-        name: provider1
+        name: bgp1
         project: admin
         external: true
         provider_network_type: flat
-        provider_physical_network: provider1
+        provider_physical_network: bgp1
         validate_certs: False
-    - name: create provider1  subnet (in admin project)
+    - name: create bgp1  subnet (in admin project)
       os_subnet:
         auth: "{{ os_auth_hailstorm }}"
-        name: sub_provider1
+        name: sub_bgp1
         project: admin
         enable_dhcp: False
-        allocation_pool_start: "{{ infrastructure_network_provider1.floating_start }}"
-        allocation_pool_end: "{{ infrastructure_network_provider1.floating_end }}"
-        gateway_ip: "{{ infrastructure_network_provider1.default_gw_host_prefix | ipaddr('address') }}"
-        network_name: provider1
-        cidr:  "{{ infrastructure_network_provider1.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_provider1.default_gw_host_prefix | ipaddr('prefix') }}"
+        allocation_pool_start: "{{ infrastructure_network_bgp1.floating_start }}"
+        allocation_pool_end: "{{ infrastructure_network_bgp1.floating_end }}"
+        gateway_ip: "{{ infrastructure_network_bgp1.default_gw_host_prefix | ipaddr('address') }}"
+        network_name: bgp1
+        cidr:  "{{ infrastructure_network_bgp1.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_bgp1.default_gw_host_prefix | ipaddr('prefix') }}"
         validate_certs: False
 
-    - name: create provider2 network (in admin project)
+    - name: create bgp2 network (in admin project)
       os_network:
         auth: "{{ os_auth_hailstorm }}"
-        name: provider2
+        name: bgp2
         project: admin
         external: true
         provider_network_type: flat
-        provider_physical_network: provider2
+        provider_physical_network: bgp2
         validate_certs: False
-    - name: create provider2  subnet (in admin project)
+    - name: create bgp2  subnet (in admin project)
       os_subnet:
         auth: "{{ os_auth_hailstorm }}"
-        name: sub_provider2
+        name: sub_bgp2
         project: admin
         enable_dhcp: False
-        allocation_pool_start: "{{ infrastructure_network_provider2.floating_start }}"
-        allocation_pool_end: "{{ infrastructure_network_provider2.floating_end }}"
-        gateway_ip: "{{ infrastructure_network_provider2.default_gw_host_prefix | ipaddr('address') }}"
-        network_name: provider2
-        cidr:  "{{ infrastructure_network_provider2.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_provider2.default_gw_host_prefix | ipaddr('prefix') }}"
+        allocation_pool_start: "{{ infrastructure_network_bgp2.floating_start }}"
+        allocation_pool_end: "{{ infrastructure_network_bgp2.floating_end }}"
+        gateway_ip: "{{ infrastructure_network_bgp2.default_gw_host_prefix | ipaddr('address') }}"
+        network_name: bgp2
+        cidr:  "{{ infrastructure_network_bgp2.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_bgp2.default_gw_host_prefix | ipaddr('prefix') }}"
         validate_certs: False
 
     - name: create internal network
