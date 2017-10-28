@@ -86,9 +86,9 @@ ose3-osp-master2  jump_host=ose3-osp-lb Xansible_host=10.116.127.131  openshift_
 ose3-osp-master3  jump_host=ose3-osp-lb Xansible_host=10.116.127.132  openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
 
 [ose3-osp-node]
-ose3-osp-infranode1 Xansible_host=10.116.127.133 openshift_node_labels="{'region': 'infra', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOSE3-{{ stage }}" additional_dns="*.apps-osp,apps-osp" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
-ose3-osp-node1      jump_host=ose3-osp-lb Xansible_host=10.116.127.134 openshift_node_labels="{'region': 'primary', 'zone': 'east', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
-ose3-osp-node2      jump_host=ose3-osp-lb Xansible_host=10.116.127.135 openshift_node_labels="{'region': 'primary', 'zone': 'west', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ose3-osp-infranode1 openshift_node_labels="{'region': 'infra', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOSE3-{{ stage }}" additional_dns="*.apps,apps" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ose3-osp-node1      jump_host=ose3-osp-lb openshift_node_labels="{'region': 'primary', 'zone': 'east', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ose3-osp-node2      jump_host=ose3-osp-lb openshift_node_labels="{'region': 'primary', 'zone': 'west', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
 
 [ose3-osp-lb]
 ose3-osp-lb         Xansible_host=10.116.127.136 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" additional_dns="openshift-osp" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.medium" osp_image="RHEL7"
