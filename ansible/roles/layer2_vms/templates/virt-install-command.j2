@@ -1,7 +1,7 @@
 virt-install  --name {{ inventory_hostname_short }}
             {%if uuid is defined %} --uuid uuid={{ uuid }}{% endif %}
               --ram {{ mem }}
-              --vcpus {{ vcpu }}
+              --vcpus {{ vcpu }},sockets=1
               --os-type {{ os_type }}
               --os-variant {{ os_variant }}
             {% for nic in vm_nics %}
