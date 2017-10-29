@@ -52,5 +52,7 @@ parameter_defaults:
   EC2MetadataIp: {{ vm_nics[0].ip }}
 
   NeutronExternalNetworkBridge: "''"
-  NeutronBridgeMappings: "datacentre:br-services,guests:br-guests,admin:br-admin,provisioning:br-prov{% if infrastructure_network_bgp1 is defined %},bgp1:br-bgp1{% endif %}{% if infrastructure_network_bgp2 is defined %},bgp2:br-bgp2{% endif %}"
-  NeutronFlatNetworks: "datacentre, guests, admin, provisioning{% if infrastructure_network_bgp1 is defined %}, bgp1{% endif %}{% if infrastructure_network_bgp2 is defined %}, bgp2{% endif %}"
+  #NeutronBridgeMappings: "datacentre:br-services,guests:br-guests,admin:br-admin,provisioning:br-prov{% if infrastructure_network_bgp1 is defined %},bgp1:br-bgp1{% endif %}{% if infrastructure_network_bgp2 is defined %},bgp2:br-bgp2{% endif %}"
+  #NeutronFlatNetworks: "datacentre, guests, admin, provisioning{% if infrastructure_network_bgp1 is defined %}, bgp1{% endif %}{% if infrastructure_network_bgp2 is defined %}, bgp2{% endif %}"
+  NeutronBridgeMappings: "{% for network in overcloud_provider_networks %}{{ network.netname }}:br-{{ network.netname }}{% if not loop.last %},{% endif %}{% endfor %}"
+  NeutronFlatNetworks: "{% for network in overcloud_provider_networks %}{{ network.netname }}{% if not loop.last %},{% endif %}{% endfor %}"

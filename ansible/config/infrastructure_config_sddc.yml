@@ -42,6 +42,7 @@ infrastructure_network_services:
   osp_undercloud_end:     10.116.127.174
   osp_overcloud_start:    10.116.127.175
   osp_overcloud_end:      10.116.127.175
+
   # dhcp_start:             10.116.127.10
   # dhcp_end:               10.116.127.20
   floating_start:         10.116.127.177
@@ -148,9 +149,9 @@ infrastructure_network_provisioning:
   default_gw_host_prefix: 192.168.105.1/24
 #  vlan: 1
   undercloud_dhcp_start:  192.168.105.10
-  undercloud_dhcp_end:    192.168.105.29
-  undercloud_discovery_start: 192.168.105.30
-  undercloud_discovery_end: 192.168.105.49
+  undercloud_dhcp_end:    192.168.105.41
+  undercloud_discovery_start: 192.168.105.42
+  undercloud_discovery_end: 192.168.105.73
   # floating_start:         10.116.122.101
   # floating_end:           10.116.122.120
   mac_prefix: "02:00:00:00:69:"
