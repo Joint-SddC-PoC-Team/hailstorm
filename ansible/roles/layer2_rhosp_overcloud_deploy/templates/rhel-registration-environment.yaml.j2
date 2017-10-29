@@ -18,7 +18,7 @@ parameter_defaults:
   rhel_reg_pool_id: ""
   rhel_reg_release: ""
   rhel_reg_repos: "{{ rhosp_overcloud_repos | join(' ') }}"
-  rhel_reg_sat_url: "http://{{ hostvars['satellite'].vm_nics[0].ip }}"
+  rhel_reg_sat_url: "https://{{ (hostvars['satellite'].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}"
   rhel_reg_server_url: ""
   rhel_reg_service_level: ""
   rhel_reg_user: ""
