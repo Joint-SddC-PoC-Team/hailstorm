@@ -762,6 +762,7 @@ osp_projects:
       cores: 100
       volumes: 50
       ram: 102400
+      instances: 20
     security_groups:
       webserver:
         description: webserver

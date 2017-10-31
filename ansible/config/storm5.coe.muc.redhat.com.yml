@@ -38,10 +38,10 @@ layer2_rhosp_director_cpu: 4
 layer2_rhosp_control_mem: 16384
 #layer2_rhosp_control_mem: 8192
 layer2_rhosp_control_cpu: 4
-layer2_rhosp_compute_mem: 131072
-# layer2_rhosp_compute_cpu: 16
-#layer2_rhosp_compute_mem: 65536
-layer2_rhosp_compute_cpu: 8
+#layer2_rhosp_compute_mem: 131072
+layer2_rhosp_compute_cpu: 16
+layer2_rhosp_compute_mem: 32768
+#layer2_rhosp_compute_cpu: 8
 
 layer2_satellite_mem: 32768
 layer2_satellite_cpu: 4
