@@ -95,7 +95,7 @@ ose3-osp-lb         activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" additiona
 
 # Elasticsearch, FluentD, Kibana
 [efk]
-efk             ansible_host=10.116.127.176 activation_key="AK-CV-RHOSP-{{ stage }}"
+efk             ansible_host=10.116.127.174 activation_key="AK-CV-RHOSP-{{ stage }}"
 
 # the Infrastructure server (DNS, SMTP/IMAP)
 [infrastructure-group]
@@ -104,7 +104,7 @@ syslog		      ansible_host=10.116.127.9 activation_key="AK-CV-OS-RHEL7-SERVER-{{
 
 # The single system where osp-director will be installed to
 [rhosp-director]
-rhosp-director  ansible_host=10.116.127.172 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-director  ansible_host=10.116.127.172 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director"
 
 # The group of all osp compute nodes
 [rhosp-compute]
@@ -163,9 +163,9 @@ r2 ansible_host=10.116.127.168 nic_attachments="[ {{ infrastructure_network_serv
 
 # virtual IPs - these will not be instantiated through Ansible (but need them for DNS records, DNAT, etc)
 [vips]
-openstack         ansible_host=10.116.127.175 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-undercloud-public ansible_host=10.116.127.173 nic_attachments="[ {{ infrastructure_network_provisioning }} ]" default_route_via={{infrastructure_network_provisioning}} additional_dns="director"
-undercloud-admin  ansible_host=10.116.127.174 nic_attachments="[ {{ infrastructure_network_provisioning }} ]"
+openstack         ansible_host=10.116.127.173 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+#undercloud-public ansible_host=192.168.105.173 nic_attachments="[ {{ infrastructure_network_provisioning }} ]" default_route_via={{infrastructure_network_provisioning}} additional_dns="director"
+#undercloud-admin  ansible_host=192.168.105.174 nic_attachments="[ {{ infrastructure_network_provisioning }} ]"
 
 # layer 3 openstack
 [lookbusy-osp]

@@ -28,8 +28,13 @@ ocp_on_osp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
 ocp_tenant: "demo-infra"
 
 
+### VIRTUAL NETWORK setup
+# dhcp_start/end: pool configured in the underlay for DHCP
+# osp_overcloud_start/end: allocation pools configured in the undercloud networks for the overcloud
+# floating_start/end: allocation pools configured in the overcloud networks for instances
+
+
 # services is an external network to access all public services (accept for storage that has its own net), so this can be seen as a carved out part of OpenStacks br-ex for the public services
-# SDDC: BGP1 breakout?
 infrastructure_network_services:
   netname: 'services'
   bridge: 'services'
@@ -38,11 +43,8 @@ infrastructure_network_services:
   vlan:                   2813
   nuage_start:            10.116.127.156
   nuage_end:              10.116.127.171
-  osp_undercloud_start:   10.116.127.173
-  osp_undercloud_end:     10.116.127.174
   osp_overcloud_start:    10.116.127.175
   osp_overcloud_end:      10.116.127.175
-
   # dhcp_start:             10.116.127.10
   # dhcp_end:               10.116.127.20
   floating_start:         10.116.127.177
@@ -152,6 +154,8 @@ infrastructure_network_provisioning:
   undercloud_dhcp_end:    192.168.105.41
   undercloud_discovery_start: 192.168.105.42
   undercloud_discovery_end: 192.168.105.73
+  undercloud_public:      192.168.105.74
+  undercloud_admin:       192.168.105.75
   # floating_start:         10.116.122.101
   # floating_end:           10.116.122.120
   mac_prefix: "02:00:00:00:69:"

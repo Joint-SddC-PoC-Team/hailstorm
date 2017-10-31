@@ -4,28 +4,29 @@
   become_user: "{{ rhosp_stack_user }}"
   register: undercloud_conf
 - name: install undercloud (you can grab a coffee now, this takes a while)
-  command: openstack undercloud install
+  shell: openstack undercloud install 2>&1 >undercloud_install.log
   become: yes
   become_user: "{{ rhosp_stack_user }}"
   when: undercloud_conf.changed
 
-- name: ensure that provisioning network route has default route configured
-  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-br-ctlplane line="GATEWAY=\"{{ infrastructure_network_provisioning.default_gw_host_prefix|ipaddr('address') }}\""
-  register: ifcfg_br_ctlplane
+# - name: ensure that provisioning network route has default route configured
+#   lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-br-ctlplane line="GATEWAY=\"{{ infrastructure_network_provisioning.default_gw_host_prefix|ipaddr('address') }}\""
+#   register: ifcfg_br_ctlplane
 
 - block:
-    - name: ensure that additional IP is configured
-      lineinfile: state=present regexp="^IPADDR.*={{ hostvars['undercloud-public'].vm_nics[0].ip }}" line="IPADDR1={{  hostvars['undercloud-public'].vm_nics[0].ip }}" dest="/etc/sysconfig/network-scripts/ifcfg-br-ctlplane"
-      register: ifcfg_br_ctlplane2
-    - name: ensure that prefix is set to /32
-      lineinfile: state=present regexp="^PREFIX1" line="PREFIX1=32" dest=/etc/sysconfig/network-scripts/ifcfg-br-ctlplane
+    # - name: ensure that additional IP is configured
+    #   lineinfile: state=present regexp="^IPADDR.*={{ hostvars['undercloud-public'].vm_nics[0].ip }}" line="IPADDR1={{  hostvars['undercloud-public'].vm_nics[0].ip }}" dest="/etc/sysconfig/network-scripts/ifcfg-br-ctlplane"
+    #   register: ifcfg_br_ctlplane2
+    # - name: ensure that prefix is set to /32
+    #   lineinfile: state=present regexp="^PREFIX1" line="PREFIX1=32" dest=/etc/sysconfig/network-scripts/ifcfg-br-ctlplane
     - name: remove name from 127.0.0.1 /etc/hosts entry
       lineinfile:
         dest: /etc/hosts
         line: "127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4"
         regexp: "^127\\.0\\.0\\.1.*"
-    - name: change /etc/hosts entry to undercloud-public ip
-      lineinfile: state=present regexp=".*{{ hostname }} {{ hostname_short }}" line="{{ hostvars['undercloud-public'].vm_nics[0].ip }} {{ hostname }} {{ hostname_short }}" dest=/etc/hosts
+    - name: change /etc/hosts entry to rhosp-director services ip
+      lineinfile: state=present regexp=".*{{ hostname }} {{ hostname_short }}" line="{{ (vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }} {{ hostname }} {{ hostname_short }}" dest=/etc/hosts
+      register: etc_hosts
   when: current_lifecycle_env.openstack_version >= 10
 
 # restarting the network is not enough as it causes the host to lose some IP adresses
@@ -37,11 +38,11 @@
   async: 1
   poll: 0
   ignore_errors: true
-  when: ifcfg_br_ctlplane|changed or ifcfg_br_ctlplane2|changed
+  when: etc_hosts|changed
 - name: waiting for server to come back
   wait_for: host={{ ansible_host }} port=22 delay=30 timeout=600
   become: false
-  when: ifcfg_br_ctlplane|changed or ifcfg_br_ctlplane2|changed
+  when: etc_hosts|changed
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
 
 
