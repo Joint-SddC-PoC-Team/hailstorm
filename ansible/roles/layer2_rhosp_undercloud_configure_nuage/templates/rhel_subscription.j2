@@ -1,0 +1,9 @@
+hostname nuageimage
+yum -y localinstall http://{{ hostvars['satellite'].hostname }}/pub/katello-ca-consumer-latest.noarch.rpm
+curl http://{{ hostvars['satellite'].hostname }}/pub/nuage/nuage.repo -o /etc/yum.repos.d/nuage.repo
+yum -y install nuage-ironic-inspector
+subscription-manager register --org "{{ hostvars['satellite'].organization_id }}" --name "{{ hostname }}" --activationkey  "{{ activation_key }}"
+subscription-manager repos --enable=rhel-7-server-optional-rpms
+subscription-manager repos --enable=rhel-7-server-rpms
+#subscription-manager repos --enable=rhel-7-server-openstack-11-rpms
+yum -y install python-twisted-core perl-JSON vconfig python-httplib2

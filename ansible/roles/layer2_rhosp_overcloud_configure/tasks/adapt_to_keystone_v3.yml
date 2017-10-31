@@ -1,4 +1,8 @@
 - block:
+    - name: check IPA is available
+      wait_for: host={{ hostvars['ipa'].hostname }} port=22 timeout=1
+      register: ipa_available
+
     - name: copy overcloudrc
       copy: src=~/overcloudrc dest=~/overcloudrc_v3 force=no remote_src=true mode=755
       when: ipa_available|success

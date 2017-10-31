@@ -1,0 +1,21 @@
+- block:
+    - name: patch image
+      command: python nuage-ospdirector-ML2-SRIOV/image-patching/stopgap-script/nuage_overcloud_full_patch_w_ml2.py --RepoName=Nuage --RepoBaseUrl=http://{{ hostvars['satellite'].hostname }}/pub/nuage --ImageName='/home/{{ rhosp_stack_user }}/images/overcloud-full.qcow2' --Version={{ current_lifecycle_env.openstack_version }}
+
+    - name: Create cmd file for unsubscribe
+      template:
+        src: ../templates/rhel_unsubscribe.j2
+        dest: "/home/{{ rhosp_stack_user }}/rhel_unsubscribe"
+
+    - name: Customizing image... unsubscribe
+      shell: virt-customize --run rhel_unsubscribe -a /home/{{ rhosp_stack_user }}/images/overcloud-full.qcow2 --memsize 2048 --selinux-relabel
+
+    - name: clean up
+      file:
+        path: rhel_unsubscribe
+        state: absent
+
+    - name: upload new image
+      shell: source ~/stackrc && cd ~/images && openstack overcloud image upload --image-path /home/{{ rhosp_stack_user }}/images/ --update-existing
+  become: true
+  become_user: "{{ rhosp_stack_user }}"

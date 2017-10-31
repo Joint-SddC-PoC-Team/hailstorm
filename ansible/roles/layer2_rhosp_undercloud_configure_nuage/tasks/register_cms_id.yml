@@ -1,0 +1,14 @@
+- name: create CMS ID
+  shell: cd ~/nuage-ospdirector-ML2-SRIOV/generate-cms-id && \
+         export PYTHONHTTPSVERIFY=0 && \
+         python configure_vsd_cms_id.py --server {{ hostvars['vsd1'].vm_nics[0].ip }}:8443 --serverauth csproot:csproot --organization csp --auth_resource /me --serverssl True --base_uri "/nuage/api/v5_0"
+  become: true
+  become_user: "{{ rhosp_stack_user }}"
+
+- name: read CMS ID into variable
+  slurp:
+    src: /home/{{ rhosp_stack_user }}/nuage-ospdirector-ML2-SRIOV/generate-cms-id/cms_id.txt
+  register: nuage_cms_id
+- debug: var=nuage_cms_id
+
+# use with: nuage_cms_id['content'] | b64decode
