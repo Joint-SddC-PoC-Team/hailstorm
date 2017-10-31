@@ -1,0 +1,37 @@
+- name: check if DNS for the wildcard record was already registered
+  shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-find  {{ hailstorm_dns_domain }} --name={{ hostvars[item].additional_dns|regex_replace('.*,?\*\.([a-z]+).*','\1') }}
+  register: dnsrecord
+  failed_when: "dnsrecord.rc != 0 and 'Number of entries returned 0' not in dnsrecord.stdout_lines"
+  changed_when: False
+  when: "'*' in hostvars[item].additional_dns|default('')"
+  with_items: "{{ group }}"
+
+- name: register DNS for the wildcard record
+  shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ hostvars[item.item].additional_dns|regex_replace('.*,?\*\.([a-z]+).*','\1') }} --a-rec={{ hostvars[item.item].ansible_host }}
+  when: (not item|skipped) and item.rc != 0 and '*' in hostvars[item.item].additional_dns|default('')
+  with_items: "{{ dnsrecord.results }}"
+
+- name: check if wildcard host was already registered
+  shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa host-find {{ hostvars[item].additional_dns|regex_replace('.*,?\*\.([a-z]+).*','\1') }}.{{ hailstorm_dns_domain }}
+  register: hostrecord
+  failed_when: "hostrecord.rc != 0 and 'Number of entries returned 0' not in hostrecord.stdout_lines"
+  changed_when: False
+  when: "'*' in hostvars[item].additional_dns|default('')"
+  with_items: "{{ group }}"
+
+- name: add wildcard host
+  shell: echo {{ ipa_admin_password }} | kinit admin && ipa host-add {{ hostvars[item.item].additional_dns|regex_replace('.*,?\*\.([a-z]+).*','\1') }}.{{ hailstorm_dns_domain }}
+  when: "not item|skipped and item.rc != 0 and '*' in hostvars[item.item].additional_dns|default('')"
+  with_items: "{{ hostrecord.results }}"
+
+# - name: check if wildcard host was added to ca acl
+#   shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa caacl-show wildcard-hosts | awk '/Hosts:/{print $2}'
+#   register: caacl
+#   changed_when: False
+
+- name: add wildcard host to wildcard ca acl
+  shell: echo {{ ipa_admin_password }} | kinit admin && ipa caacl-add-host wildcard-hosts --hosts {{ hostvars[item].additional_dns|regex_replace('.*,?\*\.([a-z]+).*','\1') }}.{{ hailstorm_dns_domain }}
+  when: "'*' in hostvars[item].additional_dns|default('')"
+  with_items: "{{ group }}"
+  register: caacl
+  failed_when: caacl.rc != 0 and 'This entry is already a member' not in caacl.stdout

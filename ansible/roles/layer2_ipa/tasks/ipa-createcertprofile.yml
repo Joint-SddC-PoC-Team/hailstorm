@@ -36,12 +36,4 @@
       shell: echo {{ ipa_admin_password }} | kinit admin && ipa caacl-add-ca wildcard-hosts --cas ipa
     - name: ipa caacl-add-profile wildcard-hosts --certprofiles wildcard
       shell: echo {{ ipa_admin_password }} | kinit admin && ipa caacl-add-profile wildcard-hosts --certprofiles wildcard
-    - name: ipa host-add apps.hailstorm1.coe.muc.redhat.com
-      shell: echo {{ ipa_admin_password }} | kinit admin && ipa host-add {{ hostvars[item].additional_dns|regex_replace('.*,?\*\.([a-z]+).*','\1') }}.{{ hailstorm_dns_domain }}
-      when: "'*' in hostvars[item].additional_dns|default('')"
-      with_items: "{{ groups['all'] }}"
-    - name: ipa caacl-add-host wildcard-hosts --hosts apps....
-      shell: echo {{ ipa_admin_password }} | kinit admin && ipa caacl-add-host wildcard-hosts --hosts {{ hostvars[item].additional_dns|regex_replace('.*,?\*\.([a-z]+).*','\1') }}.{{ hailstorm_dns_domain }}
-      when: "'*' in hostvars[item].additional_dns|default('')"
-      with_items: "{{ groups['all'] }}"
   when: "'wildcard-hosts' not in existing_caacls.stdout_lines"
