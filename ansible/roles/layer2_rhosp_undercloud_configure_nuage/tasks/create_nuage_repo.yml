@@ -1,0 +1,78 @@
+# docu: https://github.com/nuagenetworks/nuage-ospdirector/wiki/Nuage-OSP-Director-11-integration-with-ML2
+# script: https://github.com/nuagenetworks/nuage-ospdirector/blob/ML2-SRIOV/image-patching/stopgap-script/nuage_overcloud_full_patch_w_ml2.sh
+- block:
+    - name: create nuage repo directory on satellites web server
+      file:
+        path: /var/www/html/pub/nuage
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: create repo file
+      template:
+        src: ../templates/nuage.repo.j2
+        dest: /var/www/html/pub/nuage/nuage.repo
+        owner: root
+        group: root
+        mode: 0744    
+  delegate_to: satellite
+
+- block:
+    - name: unpack rpms
+      shell: mkdir -p tmp && cd tmp && rm *.rpm && unzip -o -j ../roles/layer2_rhosp_undercloud_configure_nuage/files/nuage-ospdirector-ML2-SRIOV-20171024.zip *.rpm
+
+    - name: collect rpms
+      find: paths="tmp/" patterns="*.rpm" file_type=file
+      register: nuage_rpms
+  delegate_to: localhost
+
+- block:                
+    # rsync -aviPHAXS nuage-ospdirector-ML2-SRIOV/image-patching/nuage-puppet-modules-4.0.x86_64.rpm root@satellite:/var/www/html/pub/nuage
+    - name: copy over github helper files 
+      copy:
+        src: "{{ item.path }}"
+        dest: ~/binaries-unpacked
+      with_items: "{{ nuage_rpms.files|default([]) }}"
+
+    # cd ~/binaries-unpacked;for package in Nuage-selinux-5.1.1-5.tar.gz Nuage-openshift-5.1.1-5.tar.gz; do tar -xpvzf ~/binaries/$package \*.rpm; done
+    - name: unpack additional packages from binaries to binaries-unpacked
+      unarchive:
+        src: ~/binaries/{{ item }}
+        dest: ~/binaries-unpacked
+        remote_src: true
+      with_items:
+        - Nuage-selinux-5.1.1-5.tar.gz
+        - Nuage-openshift-5.1.1-5.tar.gz
+
+    - name: copy over extracted files from install-server
+      shell: rsync -e "ssh -i nuage-metro/binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no" -aviPHAXS `find binaries-unpacked -name \*.rpm|grep el7|grep -v newton; ls -1 binaries-unpacked/nuage-puppet-modules*` root@{{ hostvars['satellite'].hostname }}:/var/www/html/pub/nuage
+  delegate_to: install-host
+  become: true
+  become_user: "{{ hostvars['install-host'].nuage_user }}"
+
+- block:
+    - name: createrepo
+      shell: cd /var/www/html/pub/nuage && createrepo .
+
+    - name: restorecon
+      command: restorecon -rv /var/www/html/pub/nuage
+    
+    - name: chown for http contents
+      file:
+        path: "/var/www/html/pub/nuage"
+        state: directory
+        mode: 0644
+        owner: root
+        group: root
+        recurse: yes
+
+    - name: chmod for http dir
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0755
+      with_items:
+        - /var/www/html/pub/nuage
+        - /var/www/html/pub/nuage/repodata
+  delegate_to: satellite

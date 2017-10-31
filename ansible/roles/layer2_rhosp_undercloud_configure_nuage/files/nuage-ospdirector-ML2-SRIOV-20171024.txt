@@ -1,0 +1,7 @@
+https://github.com/nuagenetworks/nuage-ospdirector/tree/ML2-SRIOV
+
+You also need:
+yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yumdownloader --enablerepo epel python-twisted-core vconfig python-httplib2
+
+And put the rpms into binary/nuage

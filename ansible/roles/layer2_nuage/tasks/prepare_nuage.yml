@@ -119,6 +119,9 @@
         - binary
         - ansible_ssh_config
 
+    - name: mv the rpms to the binaries-unpacked directory
+      shell: mv *.rpm binaries-unpacked
+
     - name: Install pip modules
       pip:
         name: "{{item}}"

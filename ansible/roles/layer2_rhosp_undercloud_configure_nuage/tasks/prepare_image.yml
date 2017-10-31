@@ -1,0 +1,23 @@
+- block:
+    - name: unpack nuage github helper files
+      unarchive:
+        src: ../files/nuage-ospdirector-ML2-SRIOV-20171024.zip
+        dest: "/home/{{ rhosp_stack_user }}"
+
+    - name: Reverting to clean image
+      shell: ImageName="/home/{{ rhosp_stack_user }}/images/overcloud-full.qcow2"; [ -e "$ImageName".preNuage ] && cp -a "$ImageName".preNuage "$ImageName" || cp -a "$ImageName" "$ImageName".preNuage
+
+    - name: Creating cmd file
+      template:
+        src: ../templates/rhel_subscription.j2
+        dest: "/home/{{ rhosp_stack_user }}/rhel_subscription"
+
+    - name: Customizing image...
+      shell: virt-customize --run rhel_subscription -a /home/{{ rhosp_stack_user }}/images/overcloud-full.qcow2 --memsize 2048 --selinux-relabel
+
+    - name: clean up
+      file:
+        path: rhel_subscription
+        state: absent
+  become: true
+  become_user: "{{ rhosp_stack_user }}"

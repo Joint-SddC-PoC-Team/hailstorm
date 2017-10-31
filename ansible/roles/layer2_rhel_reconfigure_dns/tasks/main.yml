@@ -46,7 +46,8 @@
       service: state=restarted name=network
       when: dns1|changed or dns2|changed or dns3|changed
 
-  when: mode == "create"
+  when: mode == "create" and (skip_create is not defined or skip_create != true)
+
 
 - block:
     - name: find all /etc/sysconfig/network-scripts/ifcfg-* files
@@ -71,4 +72,4 @@
     - name: restart network
       service: state=restarted name=network
       when: dns1|changed or dns2|changed
-  when: mode == "destroy"
+  when: mode == "destroy" and (skip_create is not defined or skip_create != true)

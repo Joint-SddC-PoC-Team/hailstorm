@@ -69,9 +69,9 @@
 - name: create VM template
   command: "{{ lookup('template','virt-install-command.j2') }}"
   register: domain_xml
-  when: inventory_hostname_short not in virt_vms.list_vms and skip_install is defined and skip_install == true
+  when: inventory_hostname_short not in virt_vms.list_vms and skip_install is defined and skip_install == true and (skip_create is not defined or skip_create != true)
   delegate_to: "{{ infrastructure_delegate_kvm_host }}"
 - name: create VM without installation
   virt: command=define name={{ inventory_hostname_short }} uri=qemu:///system xml={{ domain_xml.stdout }}
-  when: domain_xml.stdout is defined
+  when: domain_xml.stdout is defined and (skip_create is not defined or skip_create != true)
   delegate_to: "{{ infrastructure_delegate_kvm_host }}"
