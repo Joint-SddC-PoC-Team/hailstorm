@@ -15,13 +15,13 @@
     - include: ntp_config.yml
       when: ntp_client == 'ntp'
       tags: ['rhel-ntp']
-  when: mode=="create"
+  when: mode=="create" and (skip_create is not defined or skip_create != true)
 
 - block:
     - name: unsubscribe VM
       redhat_subscription: state=absent
       ignore_errors: yes
-  when: mode=="destroy"
+  when: mode=="destroy" and (skip_create is not defined or skip_create != true)
 
 - block:
     - name: get installed katello ca package name
@@ -32,4 +32,4 @@
       yum: state=absent name={{ pkg.stdout }}
     - name: reinstall katello cert
       yum: state=present name="http://{{ hostvars['satellite'].hostname }}/pub/katello-ca-consumer-latest.noarch.rpm"
-  when: mode=="refreshcert"
+  when: mode=="refreshcert" and (skip_create is not defined or skip_create != true)

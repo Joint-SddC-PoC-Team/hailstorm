@@ -21,7 +21,7 @@
         --force-join
         --unattended
       when:  sssd_conf.stat.exists is not defined or not sssd_conf.stat.exists
-  when: mode=="create"
+  when: mode=="create" and (skip_create is not defined or skip_create != true)
 
 - block:
     - name: remove IPA client
@@ -30,4 +30,4 @@
     - name: remove IPA client package
       yum: name=ipa-client state=absent
     # probably also need to remove /etc/krb5.{keytab|conf}
-  when: mode=="destroy"
+  when: mode=="destroy" and (skip_create is not defined or skip_create != true)
