@@ -13,6 +13,17 @@
   gather_facts: false
   roles:
     - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'ose3-osp', 'vm' ], mode: create }
+
+- hosts: ipa
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer2_ipa_add_host_to_wildcard_ca_acl, tags: [ 'layer3', 'ose3-osp', 'vm', 'dns' ], mode: create, group: "{{ groups['ose3-osp'] }}" }
+
+- hosts: ose3-osp
+  remote_user: root
+  gather_facts: false
+  roles:
     - { role: layer3_vm_on_openstack_etc_hosts_internal_ips, tags: [ 'layer3', 'ose3-osp', 'vm' ], mode: create, group: "{{ groups['ose3-osp'] }}" }
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer3', 'ose3-osp', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer3', 'ose3-osp', 'rhel' ], mode: create }

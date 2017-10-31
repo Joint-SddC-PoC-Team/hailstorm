@@ -28,24 +28,27 @@ ocp_on_osp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
 ocp_tenant: "demo-infra"
 
 
+### VIRTUAL NETWORK setup
+# dhcp_start/end: pool configured in the underlay for DHCP
+# osp_overcloud_start/end: allocation pools configured in the undercloud networks for the overcloud
+# floating_start/end: allocation pools configured in the overcloud networks for instances
+
+
 # services is an external network to access all public services (accept for storage that has its own net), so this can be seen as a carved out part of OpenStacks br-ex for the public services
-# SDDC: BGP1 breakout?
 infrastructure_network_services:
   netname: 'services'
   bridge: 'services'
   forward_mode: 'nat'
-  default_gw_host_prefix: 10.116.120.1/24
+  default_gw_host_prefix: 10.116.127.254/24
   vlan:                   2813
-  osp_undercloud_start:   10.116.120.30
-  osp_undercloud_end:     10.116.120.80
-  osp_overcloud_start:    10.116.120.81
-  osp_overcloud_end:      10.116.120.100
-  nuage_start:            10.116.120.101
-  nuage_end:              10.116.120.115
-  dhcp_start:             10.116.120.128
-  dhcp_end:               10.116.120.172
-  floating_start:         10.116.120.173
-  floating_end:           10.116.120.254
+  nuage_start:            10.116.127.156
+  nuage_end:              10.116.127.171
+  osp_overcloud_start:    10.116.127.175
+  osp_overcloud_end:      10.116.127.175
+  # dhcp_start:             10.116.127.10
+  # dhcp_end:               10.116.127.20
+  floating_start:         10.116.127.177
+  floating_end:           10.116.127.179
   mac_prefix: "02:00:00:00:01:"
 
 # guests is an external network for virtual machine guests, not to be confused with the OpenStack tentant network; it is as a matter of fact OpenStacks br-ex without the public API endpoints
@@ -80,15 +83,16 @@ infrastructure_network_admin:
   netname: 'admin'
   bridge: 'admin'
   forward_mode: 'nat'
-  default_gw_host_prefix: 10.116.127.254/24
+  default_gw_host_prefix: 192.168.23.1/24
   vlan:       2823
-  dhcp_start: 10.116.127.140
-  dhcp_end:   10.116.127.159
-  osp_overcloud_start: 10.116.127.160
-  osp_overcloud_end:   10.116.127.169
-  floating_start:         10.116.127.170
-  floating_end:           10.116.127.179
-  mac_prefix: "02:00:00:00:03:"
+  # need dhcp for kickstart
+  dhcp_start: 192.168.23.10
+  dhcp_end:   192.168.23.29
+  osp_overcloud_start: 192.168.23.140
+  osp_overcloud_end:   192.168.23.151
+  # floating_start:         10.116.127.170
+  # floating_end:           10.116.127.179
+  mac_prefix: "02:00:00:00:23:"
 
 
 # here all internal api calls should happen of products communicating with each other
@@ -96,109 +100,109 @@ infrastructure_network_internal_api:
   netname: 'internal_api'
   bridge: 'internal_api'
   forward_mode: 'nat'
-  default_gw_host_prefix: 10.116.123.1/24
+  default_gw_host_prefix: 192.168.14.1/24
   vlan:       2814
-  osp_overcloud_start: 10.116.123.81
-  osp_overcloud_end:   10.116.123.100
-  mac_prefix: "02:00:00:00:04:"
+  osp_overcloud_start: 192.168.14.140
+  osp_overcloud_end:   192.168.14.151
+  mac_prefix: "02:00:00:00:14:"
 
 # this is the real tenant network where all tenant traffic is encapsulated by the sdn solution
 infrastructure_network_tenant:
   netname: 'tenant'
   bridge: 'tenant'
   forward_mode: 'nat'
-  default_gw_host_prefix: 10.116.124.1/24
-  vlan:       2815
-  osp_overcloud_start: 10.116.124.81
-  osp_overcloud_end:   10.116.124.100
-  nuage_start:            10.116.124.101
-  nuage_end:              10.116.124.115
-  mac_prefix: "02:00:00:00:05:"
+  default_gw_host_prefix: 192.168.12.1/24
+  vlan:       2812
+  osp_overcloud_start: 192.168.12.140
+  osp_overcloud_end:   192.168.12.151
+  nuage_start:         192.168.12.156
+  nuage_end:           192.168.12.171
+  mac_prefix: "02:00:00:00:12:"
 
 # this is a network for accessing the storage systems (aka public APIs); if applicable the storage systems on their own should not utilize this network, e.g. for syncing; for that the Storage Management network should be used like it is done in OpenStack
 infrastructure_network_storage:
   netname: 'storage'
   bridge: 'storage'
   forward_mode: 'nat'
-  default_gw_host_prefix: 10.116.125.1/24
-  vlan:       2816
-  osp_overcloud_start: 10.116.125.81
-  osp_overcloud_end:   10.116.125.100
-  dhcp_start: 10.116.125.172
-  dhcp_end:   10.116.125.254
-  mac_prefix: "02:00:00:00:06:"
+  default_gw_host_prefix: 192.168.11.1/24
+  vlan:       2811
+  osp_overcloud_start: 192.168.11.140
+  osp_overcloud_end:   192.168.11.151
+  # dhcp_start: 10.116.125.172
+  # dhcp_end:   10.116.125.254
+  mac_prefix: "02:00:00:00:11:"
 
 # the Storage Management network should be used for all storage systems for their internal processes like syning and communication; for public endpoints use the Storage Network
 infrastructure_network_storage_mgmt:
   netname: 'storage_mgmt'
   bridge: 'storage_mgmt'
   forward_mode: 'nat'
-  default_gw_host_prefix: 10.116.126.1/24
+  default_gw_host_prefix: 192.168.17.1/24
   vlan:       2817
-  osp_overcloud_start: 10.116.126.81
-  osp_overcloud_end:   10.116.126.100
-  mac_prefix: "02:00:00:00:07:"
+  osp_overcloud_start: 192.168.17.140
+  osp_overcloud_end:   192.168.17.151
+  mac_prefix: "02:00:00:00:17:"
 
 # this is the provisioning network of OpenStack, although it could be used for all provisioning (like Satellite) as none of the systems should listen to requests of unknown machines; by that they should not interfere
-infrastructure_network_rhosp_provisioning:
-  netname: 'rhosp_provisioning'
+infrastructure_network_provisioning:
+  netname: 'provisioning'
   bridge: 'provisioning'
   forward_mode: 'nat'
-  default_gw_host_prefix: 10.116.122.1/24
+  default_gw_host_prefix: 192.168.105.1/24
 #  vlan: 1
-  undercloud_dhcp_start:  10.116.122.43
-  undercloud_dhcp_end:    10.116.122.60
-  undercloud_discovery_start: 10.116.122.61
-  undercloud_discovery_end: 10.116.122.80
-  floating_start:         10.116.122.101
-  floating_end:           10.116.122.120
-  mac_prefix: "02:00:00:00:08:"
-
-# deprecated as those networks melt into the others (like they always should)
-#infrastructure_network_rhosp_internal:
-#  netname: 'rhosp_internal'
-#  bridge: 'rhosp_internal'
-#  default_gw_host_prefix: 192.168.106.1/24
-#  mac_prefix: "02:00:00:00:06:"
+  undercloud_dhcp_start:  192.168.105.10
+  undercloud_dhcp_end:    192.168.105.41
+  undercloud_discovery_start: 192.168.105.42
+  undercloud_discovery_end: 192.168.105.73
+  undercloud_public:      192.168.105.74
+  undercloud_admin:       192.168.105.75
+  # floating_start:         10.116.122.101
+  # floating_end:           10.116.122.120
+  mac_prefix: "02:00:00:00:69:"
 
 # for SDDC external networks, aka provider networks
 # BGP1
-infrastructure_network_provider1:
-  netname: 'provider1'
-  bridge: 'provider1'
+infrastructure_network_bgp1:
+  netname: 'bgp1'
+  bridge: 'bgp1'
   forward_mode: 'nat'
   default_gw_host_prefix: 10.116.111.17/28
   vlan:       2803
-  floating_start:         10.116.111.18
-  floating_end:           10.116.111.30
-  mac_prefix: "02:00:00:00:09:"
+  mac_prefix: "02:00:00:00:03:"
 
 # BGP2
-infrastructure_network_provider2:
-  netname: 'provider2'
-  bridge: 'provider2'
+infrastructure_network_bgp2:
+  netname: 'bgp2'
+  bridge: 'bgp2'
   forward_mode: 'nat'
   default_gw_host_prefix: 10.116.111.49/28
   vlan:       2804
-  floating_start:         10.116.111.50
-  floating_end:           10.116.111.62
-  mac_prefix: "02:00:00:00:10:"
+  # floating_start:         10.116.111.50
+  # floating_end:           10.116.111.62
+  mac_prefix: "02:00:00:00:04:"
 
 # OSPF1
-#infrastructure_network_provider3:
-# netname: 'provider3'
-# bridge: 'provider3'
-# default_gw_host_prefix: 10.116.111.1/28
-# vlan:       2801
-# mac_prefix: "02:00:00:00:11:"
+infrastructure_network_ospf1:
+  netname: 'ospf1'
+  bridge: 'ospf1'
+  default_gw_host_prefix: 10.116.111.1/28
+  vlan:       2801
+  mac_prefix: "02:00:00:00:01:"
 
 # OSPF2
-#infrastructure_network_provider4:
-# netname: 'provider4'
-# bridge: 'provider4'
-# default_gw_host_prefix: 10.116.111.33/28
-# vlan:       2802
-# mac_prefix: "02:00:00:00:12:"
+infrastructure_network_ospf2:
+  netname: 'ospf2'
+  bridge: 'ospf2'
+  default_gw_host_prefix: 10.116.111.33/28
+  vlan:       2802
+  mac_prefix: "02:00:00:00:02:"
+
+infrastructure_network_baremetal:
+  netname: 'baremetal'
+  bridge: 'baremetal'
+  default_gw_host_prefix: 192.168.18.1/28
+  vlan:       2818
+  mac_prefix: "02:00:00:00:18:"
 
 infrastructure_osp_tenant_internal_network:
   netname: "internal_{{ osp_tenant }}"
@@ -212,8 +216,9 @@ infrastructure_networks:
   - "{{ infrastructure_network_tenant }}"
   - "{{ infrastructure_network_storage }}"
   - "{{ infrastructure_network_storage_mgmt }}"
-  - "{{ infrastructure_network_rhosp_provisioning }}"
-  - "{% if infrastructure_network_provider1 is defined %}{{ infrastructure_network_provider1 }}{% endif %}"
-  - "{% if infrastructure_network_provider2 is defined %}{{ infrastructure_network_provider2 }}{% endif %}"
-# - "{{ infrastructure_network_provider3 }}"
-# - "{{ infrastructure_network_provider4 }}"
+  - "{{ infrastructure_network_provisioning }}"
+  - "{{ infrastructure_network_bgp1 }}"
+  - "{{ infrastructure_network_bgp2 }}"
+  - "{{ infrastructure_network_ospf1 }}"
+  - "{{ infrastructure_network_ospf2 }}"
+  - "{{ infrastructure_network_baremetal }}"

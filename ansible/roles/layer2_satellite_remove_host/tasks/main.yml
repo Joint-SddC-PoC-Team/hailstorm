@@ -1,0 +1,10 @@
+- block:
+    - name: get current list of hosts
+      shell: hammer --output json host list --organization "{{ organization }}"
+      register: temp_current_hosts
+      changed_when: false
+
+    - name: delete hosts
+      shell: hammer host delete --id {{ item }}
+      with_items: "{{ temp_current_hosts.stdout|from_json|selectattr('Name','match', '^' + hostnames.join('|^') )|map(attribute='Id')|list }}"
+  when: mode=="destroy"

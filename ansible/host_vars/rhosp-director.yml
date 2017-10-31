@@ -30,11 +30,11 @@ disk:
 hostname_override: director
 
 nic_attachments:
-  - "{{ infrastructure_network_rhosp_provisioning }}"
+  - "{{ infrastructure_network_provisioning }}"
   - "{{ infrastructure_network_services }}"
   - "{{ infrastructure_network_admin }}"
   - "{{ infrastructure_network_storage }}"
-default_route_via: "{{ infrastructure_network_rhosp_provisioning }}"
+default_route_via: "{{ infrastructure_network_services }}"
 name_service_via: "{{ infrastructure_network_services }}"
 
 pool_regex: "{{ rhosp_subscription_pool_regex }}"
@@ -49,9 +49,11 @@ image_path: /home/stack/images
 ironic_rpc_timeout: 600
 nova_rpc_timeout: 600
 
-# will be populated during runtime
-os_auth: {}
-
+overcloud_provider_networks:
+  - "{{ infrastructure_network_services }}"
+  - "{{ infrastructure_network_admin }}"
+  - "{{ infrastructure_network_guests }}"
+  - "{{ infrastructure_network_provisioning }}"
 
 default_overcloud_flavors: [
   {

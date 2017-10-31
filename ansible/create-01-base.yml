@@ -141,7 +141,7 @@
     - { role: layer2_ntp, tags: [ 'layer2', 'infrastructure', 'ntp'], mode: create, when: '"ntp" in hostvars[inventory_hostname_short].roles' }
     - { role: layer2_syslog, tags: [ 'layer2', 'infrastructure', 'syslog'], mode: create, when: '"syslog" in hostvars[inventory_hostname_short].roles' }
     - { role: layer2_tdagent, tags: [ 'layer2', 'tdagent', 'infrastructure'], mode: create }
-    - { role: layer2_haproxy_service, tags: [ 'haproxy_setup' ], mode: create,  when: '"haproxy" in hostvars[inventory_hostname_short].roles' }
+    #- { role: layer2_haproxy_service, tags: [ 'haproxy_setup' ], mode: create,  when: '"haproxy" in hostvars[inventory_hostname_short].roles' }
 
 
 #### VIRT-WHO host (either infrastrcture or satellite)

@@ -68,8 +68,8 @@ infrastructure_network_storage:
   dhcp_end:   192.168.104.254
   mac_prefix: "02:00:00:00:04:"
 
-infrastructure_network_rhosp_provisioning:
-  netname: 'rhosp_provisioning'
+infrastructure_network_provisioning:
+  netname: 'provisioning'
   bridge: 'virbr5'
   forward_mode: 'nat'
   default_gw_host_prefix: 192.168.105.1/24
@@ -86,5 +86,5 @@ infrastructure_networks:
   - "{{ infrastructure_network_guests }}"
   - "{{ infrastructure_network_admin }}"
   - "{{ infrastructure_network_storage }}"
-  - "{{ infrastructure_network_rhosp_provisioning }}"
+  - "{{ infrastructure_network_provisioning }}"
   - "{{ infrastructure_network_rhosp_internal }}"

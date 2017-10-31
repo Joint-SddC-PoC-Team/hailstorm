@@ -2,15 +2,15 @@
 #undercloud_hostname={{ hostname }}
 local_ip = {{ vm_nics[0].ip }}/24
 local_interface = {{ vm_nics[0].dev }}
-undercloud_public_vip = {% if current_lifecycle_env.openstack_version >= 10 %}{{ hostname }}{% else %}{{ hostvars['undercloud-public'].vm_nics[0].ip }}{% endif %}
+undercloud_public_vip = {% if current_lifecycle_env.openstack_version >= 10 %}{{ hostname }}{% else %}{{ infrastructure_network_provisioning.undercloud_public }}{% endif %}
 
-undercloud_admin_vip = {{ hostvars['undercloud-admin'].vm_nics[0].ip }}
+undercloud_admin_vip = {{ infrastructure_network_provisioning.undercloud_admin }}
 masquerade_network = {{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}0/24
-dhcp_start = {{ infrastructure_network_rhosp_provisioning.undercloud_dhcp_start }}
-dhcp_end = {{ infrastructure_network_rhosp_provisioning.undercloud_dhcp_end }}
-network_cidr = {{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix }}
-network_gateway = {{ infrastructure_network_rhosp_provisioning.default_gw_host_prefix|ipaddr('address') }}
-discovery_iprange = {{ infrastructure_network_rhosp_provisioning.undercloud_discovery_start }},{{ infrastructure_network_rhosp_provisioning.undercloud_discovery_end }}
+dhcp_start = {{ infrastructure_network_provisioning.undercloud_dhcp_start }}
+dhcp_end = {{ infrastructure_network_provisioning.undercloud_dhcp_end }}
+network_cidr = {{ infrastructure_network_provisioning.default_gw_host_prefix }}
+network_gateway = {{ infrastructure_network_provisioning.default_gw_host_prefix|ipaddr('address') }}
+discovery_iprange = {{ infrastructure_network_provisioning.undercloud_discovery_start }},{{ infrastructure_network_provisioning.undercloud_discovery_end }}
 store_events = true
 
 {% if current_lifecycle_env.openstack_version >= 10 %}

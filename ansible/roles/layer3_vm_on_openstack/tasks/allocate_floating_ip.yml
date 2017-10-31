@@ -4,7 +4,7 @@
     # - debug: var=temp_internal_network_ip
 
     - name: check if DNS for the floating IP was already registered
-      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-find  {{ node_hailstorm_dns_domain }} --name={{ inventory_hostname_short }}
+      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-find  {{ hailstorm_dns_domain }} --name={{ inventory_hostname_short }}
       register: dnsrecord
       become_user: root
       become: True
@@ -38,11 +38,12 @@
 
     - debug: var=assign_floating_ip
     - name: register DNS for the floating IP
-      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ inventory_hostname_short }} --a-rec={{ assign_floating_ip.floating_ip.floating_ip_address }}
+      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ assign_floating_ip.floating_ip.floating_ip_address }}
       become_user: root
       become: True
       delegate_to: ipa
       when: dnsrecord.rc != 0
+      with_items: "{{ (additional_dns|default('')).split(',') + [inventory_hostname_short] }}"
 
   when: >
     infrastructure_osp_tenant_internal_network.netname in (vm_nics|map(attribute="netname")|list)

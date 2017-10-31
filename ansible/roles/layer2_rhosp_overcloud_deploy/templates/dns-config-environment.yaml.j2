@@ -6,4 +6,4 @@ parameter_defaults:
   #CloudDomain: {{ hailstorm_dns_domain }}
 
   # Define the DNS servers (maximum 2) for the overcloud nodes
-  DnsServers: [{% if ipa_available|success %}'{{ hostvars['ipa'].vm_nics[0].ip }}',{% endif %}'{{ infrastructure_address_default_dns }}']
+  DnsServers: [{% if ipa_available|success %}'{{ (hostvars['ipa'].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}',{% endif %}'{{ infrastructure_address_default_dns }}']

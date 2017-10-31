@@ -3,17 +3,71 @@ resource_registry:
   OS::TripleO::Controller::Ports::ManagementPort: /usr/share/openstack-tripleo-heat-templates/network/ports/management_from_pool.yaml
   OS::TripleO::Compute::Ports::ManagementPort: /usr/share/openstack-tripleo-heat-templates/network/ports/management_from_pool.yaml
 
+  OS::TripleO::Controller::Ports::ExternalPort: /usr/share/openstack-tripleo-heat-templates/network/ports/external_from_pool.yaml
+  OS::TripleO::Compute::Ports::ExternalPort: /usr/share/openstack-tripleo-heat-templates/network/ports/external_from_pool.yaml
+
+#  OS::TripleO::Controller::Ports::InternalApiPort: /usr/share/openstack-tripleo-heat-templates/network/ports/internal_api_from_pool.yaml
+#  OS::TripleO::Compute::Ports::InternalApiPort: /usr/share/openstack-tripleo-heat-templates/network/ports/internal_api_from_pool.yaml
+
+#  OS::TripleO::Controller::Ports::TenantPort: /usr/share/openstack-tripleo-heat-templates/network/ports/tenant_from_pool.yaml
+#  OS::TripleO::Compute::Ports::TenantPort: /usr/share/openstack-tripleo-heat-templates/network/ports/tenant_from_pool.yaml
+
+#  OS::TripleO::Controller::Ports::StoragePort: /usr/share/openstack-tripleo-heat-templates/network/ports/storage_from_pool.yaml
+#  OS::TripleO::Compute::Ports::StoragePort: /usr/share/openstack-tripleo-heat-templates/network/ports/storage_from_pool.yaml
+
+#  OS::TripleO::Controller::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heat-templates/network/ports/storage_mgmt_from_pool.yaml
+#  OS::TripleO::Compute::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heat-templates/network/ports/storage_mgmt_from_pool.yaml
+
 parameter_defaults:
   ControllerIPs:
     # Each controller will get an IP from the lists below, first controller, first IP
     management:
-    - {{ hostvars['rhosp-control1']['ansible_host'] }}
-    - {{ hostvars['rhosp-control2']['ansible_host'] }}
-    - {{ hostvars['rhosp-control3']['ansible_host'] }}
+{% for node in groups['rhosp-control'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_admin.netname)|first).ip }}
+{% endfor %}
+    external:
+{% for node in groups['rhosp-control'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}
+{% endfor %}
+    internal_api:
+{% for node in groups['rhosp-control'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_internal_api.netname)|first).ip }}
+{% endfor %}
+    tenant:
+{% for node in groups['rhosp-control'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_tenant.netname)|first).ip }}
+{% endfor %}
+    storage:
+{% for node in groups['rhosp-control'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_storage.netname)|first).ip }}
+{% endfor %}
+    storage_mgmt:
+{% for node in groups['rhosp-control'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_storage_mgmt.netname)|first).ip }}
+{% endfor %}
   NovaComputeIPs:
     # Each compute will get an IP from the lists below, first compute, first IP
     management:
-    - {{ hostvars['rhosp-compute1']['ansible_host'] }}
-    - {{ hostvars['rhosp-compute2']['ansible_host'] }}
-    - {{ hostvars['rhosp-compute3']['ansible_host'] }}
-    - {{ hostvars['rhosp-compute4']['ansible_host'] }}
+{% for node in groups['rhosp-compute'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_admin.netname)|first).ip }}
+{% endfor %}
+    external:
+{% for node in groups['rhosp-compute'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}
+{% endfor %}
+    internal_api:
+{% for node in groups['rhosp-compute'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_internal_api.netname)|first).ip }}
+{% endfor %}
+    tenant:
+{% for node in groups['rhosp-compute'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_tenant.netname)|first).ip }}
+{% endfor %}
+    storage:
+{% for node in groups['rhosp-compute'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_storage.netname)|first).ip }}
+{% endfor %}
+    storage_mgmt:
+{% for node in groups['rhosp-compute'] %}
+    - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_storage_mgmt.netname)|first).ip }}
+{% endfor %}

@@ -199,7 +199,7 @@
 - hosts: cloudforms-ui
   gather_facts: false
   remote_user: root
-  roles: 
+  roles:
     - role: layer3_vm_on_rhev
       tags: [ 'layer3', 'cf' ]
       mode: start
@@ -219,7 +219,7 @@
 - hosts: cloudforms-db
   gather_facts: false
   remote_user: root
-  roles: 
+  roles:
     - role: layer3_vm_on_rhev
       tags: [ 'layer3', 'cf' ]
       mode: start
@@ -239,7 +239,7 @@
 - hosts: cloudforms-wk-osp
   gather_facts: false
   remote_user: root
-  roles: 
+  roles:
     - role: layer3_vm_on_rhev
       tags: [ 'layer3', 'cf' ]
       mode: start
@@ -259,7 +259,7 @@
 - hosts: cloudforms-wk-ocp
   gather_facts: false
   remote_user: root
-  roles: 
+  roles:
     - role: layer3_vm_on_rhev
       tags: [ 'layer3', 'cf' ]
       mode: start
@@ -279,7 +279,7 @@
 - hosts: cloudforms-wk-rhev
   gather_facts: false
   remote_user: root
-  roles: 
+  roles:
     - role: layer3_vm_on_rhev
       tags: [ 'layer3', 'cf' ]
       mode: start

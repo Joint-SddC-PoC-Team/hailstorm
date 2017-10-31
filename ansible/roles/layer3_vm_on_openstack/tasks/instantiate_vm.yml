@@ -7,7 +7,7 @@
       os_port:
         auth: "{{ vars['os_auth_hailstorm_' + osp_tenant.replace('-','_')] }}"
         name: "{{ inventory_hostname_short }}-{{ item.netname }}"
-        network: "{{ item.netname|regex_replace('rhosp_','') }}"
+        network: "{{ item.netname }}"
         fixed_ips:
           - ip_address: "{{ item.ip }}"
         mac_address: "{{ item.mac }}"
@@ -28,13 +28,13 @@
         terminate_volume: True
         # nics: >
         #   [ {% for network in vm_nics %}
-        #         {'net-name': '{{ network.netname|regex_replace('rhosp_','') }}' }
+        #         {'net-name': '{{ network.netname }}' }
         #     {% if not loop.last %},{% endif %}
         #     {% endfor %} ]
         nics: >
           [ {% for port_result in temp_ports.results %}
           {% if port_result|skipped %}
-          { "net-name":"{{ port_result.item.netname|regex_replace('rhosp_','') }}" }
+          { "net-name":"{{ port_result.item.netname }}" }
           {% else %}
           { "port-id":"{{ port_result.id }}" }
           {% endif %}
