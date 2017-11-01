@@ -36,8 +36,8 @@
 
 - name: wait for cfme web ui to become available
 #  wait_for: host={{ hostvars[cfmehostname.stdout].vm_nics[0].ip }} port=443 timeout=600
-  wait_for: host="{{ (vm_nics|selectattr('netname','match', infrastructure_network_services.netname)|first).ip }}" port=443 timeout=600
-  delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+  wait_for: host="{{ ansible_host }}" port=443 timeout=600
+  delegate_to: "{{ jump_host|default(infrastructure_delegate_host_used_to_test_if_layer2_host_is_available) }}"
 
 - name: Create Zone OSP
   shell: "/var/www/miq/vmdb/bin/rails runner 'Zone.create(:name => \"OSP\", :description => \"OSP Zone\")'"

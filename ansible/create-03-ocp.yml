@@ -12,7 +12,7 @@
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'ose3-osp', 'vm' ], mode: create }
+    - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'ose3-osp', 'vm','dnat' ], mode: create }
 
 - hosts: infrastructure
   remote_user: root
