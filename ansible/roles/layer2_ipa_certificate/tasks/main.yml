@@ -12,7 +12,7 @@
     - name: create host in IPA DB
       shell: echo "{{ hostvars['ipa'].ipa_admin_password }}" | kinit admin 1>/dev/null && ipa host-add {{ item.item }}
       #when: item.item == ""
-      when: item.stdout == ""
+      when: item.item not in item.stdout_lines
       with_items: "{{ existing_host.results }}"
 
     - name: get principal for host
