@@ -761,7 +761,7 @@ osp_projects:
     quota:
       cores: 100
       volumes: 50
-      ram: 102400
+      ram: 204800
       instances: 20
     security_groups:
       webserver:

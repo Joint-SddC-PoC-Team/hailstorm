@@ -100,5 +100,14 @@ default_overcloud_flavors: [
     "Ephemeral": 0,
     "RAM": 16384,
     "Name": "m1.xlarge"
+  },
+  {
+    "ID": "6",
+    "Disk": 40,
+    "Is Public": true,
+    "VCPUs": 8,
+    "Ephemeral": 0,
+    "RAM": 16384,
+    "Name": "cf.xlarge"
   }
 ]

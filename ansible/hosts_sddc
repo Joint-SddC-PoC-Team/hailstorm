@@ -42,24 +42,24 @@ ipa             ansible_host=10.116.127.153 activation_key="AK-CV-OS-RHEL7-SERVE
 
 #zone 919000000000001
 [cloudforms-db]
-cloudforms-db01        ansible_host=10.116.127.201 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="db" db=true extra_disks=true
+cloudforms-db01        ansible_host=10.116.127.201 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="db" db=true extra_disks=true osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
 
 #zone 919000000000002
 [cloudforms-ui]
-cloudforms-ui01   ansible_host=10.116.127.202 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false
-#cloudforms        ansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false
+cloudforms-ui01   ansible_host=10.116.127.202 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false osp_tenant="demo-infra" osp_flavor="cf.xlarge" osp_image="Cloudforms" additional_dns="cloudforms"
+#cloudforms        ansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false osp_tenant="demo-infra" osp_flavor="cf.xlarge" osp_image="Cloudforms"
 
 #zone 919000000000003
 [cloudforms-wk-ocp]
-cloudforms-wk-ocp01   ansible_host=10.116.127.203 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-ocp" wk-ocp=true extra_disks=false
+cloudforms-wk-ocp01   ansible_host=10.116.127.203 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-ocp" wk-ocp=true extra_disks=false osp_tenant="demo-infra" osp_flavor="cf.xlarge" osp_image="Cloudforms"
 
 #zone 919000000000004
 [cloudforms-wk-osp]
-cloudforms-wk-osp01   ansible_host=10.116.127.204 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-osp" wk-osp=true extra_disks=false
+cloudforms-wk-osp01   ansible_host=10.116.127.204 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-osp" wk-osp=true extra_disks=false osp_tenant="demo-infra" osp_flavor="cf.xlarge" osp_image="Cloudforms"
 
 #zone 919000000000005
 [cloudforms-wk-rhev]
-cloudforms-wk-rhev01   ansible_host=10.116.127.205 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-rhev" wk-rhev=true extra_disks=false
+cloudforms-wk-rhev01   ansible_host=10.116.127.205 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-rhev" wk-rhev=true extra_disks=false osp_tenant="demo-infra" osp_flavor="cf.xlarge" osp_image="Cloudforms"
 
 #[test-rhel6]
 #test-rhel6      ansible_host=10.116.127.18 activation_key="AK-CV-OS-RHEL6-SERVER-{{ stage }}"
@@ -179,9 +179,6 @@ lbaas-demo-osp1 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="d
 lbaas-demo-osp2 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
 
 
-[cloudforms-osp-group]
-cloudforms-osp ansible_host=10.116.127.121 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
-cloudforms-osp-2 ansible_host=10.116.127.122 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.xlarge" osp_image="Cloudforms"
 
 [ansible-jump-host]
 ansible-jump-demo-vms  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-vms" osp_flavor="m1.small" osp_image="RHEL7"
@@ -192,6 +189,14 @@ localhost              ansible_connection=local openshift_master_api_host_and_po
 
 
 #### ADDITIONAL GROUPS
+
+[cloudforms-group:children]
+cloudforms-db
+cloudforms-ui
+cloudforms-wk-ocp
+cloudforms-wk-osp
+#cloudforms-wk-rhev
+
 
 # which system will host virt-who -> this should not be satellite since virt-who reports to subscription-manager which reports to RHN (which doesn't know the Default Organization) on satellite
 [virt-who]
@@ -269,12 +274,7 @@ lookbusy
 dev-client
 tower
 #cloudforms
-cloudforms-db
-cloudforms-ui
-cloudforms-wk-ocp
-cloudforms-wk-osp
-cloudforms-wk-rhev
-cloudforms-osp-group
+cloudforms-group
 ansible-jump-host
 storage-console
 bosch-vpn-group
@@ -306,13 +306,7 @@ bosch-vpn-group
 # and the ssh proxy command used to communicate with all layer2/3 hosts
 [accessible_via_underlay:children]
 layer2
-#cloudforms
-cloudforms-db
-cloudforms-ui
-cloudforms-wk-ocp
-cloudforms-wk-osp
-cloudforms-wk-rhev
-cloudforms-osp-group
+cloudforms-group
 vips
 lookbusy-rhev
 bosch-vpn-group
@@ -322,6 +316,7 @@ ansible-jump-host
 lookbusy-osp
 lbaas-demo-osp-group
 ose3-osp
+#cloudforms-group
 
 [accessible_via_services_network:children]
 nuage

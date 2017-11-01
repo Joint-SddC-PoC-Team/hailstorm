@@ -4,14 +4,18 @@ vcpu: 4
 disk:
   size: 50
 
-vm_additional_disks:
+vm_secgroups:
+    - webserver
+    - default
 
 nic_attachments:
+#  - "{{ infrastructure_osp_tenant_internal_network }}"
   - "{{ infrastructure_network_services }}"
   - "{{ infrastructure_network_admin }}"
-  - "{{ infrastructure_network_storage }}"
-  - "{{ infrastructure_network_provisioning }}"
+#  - "{{ infrastructure_network_storage }}"
+#  - "{{ infrastructure_network_provisioning }}"
 default_route_via: "{{ infrastructure_network_services }}"
+name_service_via: "{{ infrastructure_network_services }}"
 
 repos: "{{ cloudforms_repos }}"
 pool_regex: "{{ cloudforms_subscription_pool_regex }}"
