@@ -18,3 +18,43 @@
       service: name=named enabled=yes state=restarted
 
   when: mode=="create" and external_network_config.services_network_dnat is defined
+
+- debug:
+    msg: >
+      [{% set needscomma = [false] %}{% for host in group %}
+      {% for name in ((hostvars[host].additional_dns|default('')).split(',') + [host]) %}
+      {% if hostvars[host].floating_ip|default('') != '' %}
+      {% if needscomma|last %},{% endif %}
+      {"name": "{{ name }}", "ip": "{{ hostvars[host].floating_ip}}" }
+      {% if needscomma.append(true) %}{% endif %}
+      {% endif %}
+      {% endfor %}
+      {% endfor %}]
+
+- block:
+    - name: create a sensible serial for BIND zone
+      shell: date +%Y%m%d$((`date +%-H`*4+`date +%-M`/8))
+      register: bind_zone_serial
+    - name: add or change host in zone db
+      lineinfile:
+        dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
+        line: "{{ item.name }} 				IN      A       {{ item.ip }}"
+        regexp: "^{{ item.name }}.*"
+      with_items: >
+        [{% set needscomma = [false] %}{% for host in group %}
+        {% for name in ((hostvars[host].additional_dns|default('')).split(',') + [host]) %}
+        {% if hostvars[host].floating_ip|default('') != '' %}
+        {% if needscomma|last %},{% endif %}
+        {"name": "{{ name }}", "ip": "{{ hostvars[host].floating_ip}}" }
+        {% if needscomma.append(true) %}{% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endfor %}]
+    - name: change serial in zone db
+      lineinfile:
+        dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
+        line: "                          {{ bind_zone_serial.stdout }}        ; Serial"
+        regexp: ".*; Serial$"
+    - name: ensure that named is restarted
+      service: name=named enabled=yes state=restarted
+  when: mode=="floating_ip"

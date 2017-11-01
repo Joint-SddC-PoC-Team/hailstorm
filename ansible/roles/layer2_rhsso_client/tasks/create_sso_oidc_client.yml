@@ -1,35 +1,43 @@
-- name: login to sso
-  shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh \
-    config credentials --server http://localhost:8080/auth \
-    --realm master --user admin --password {{ root_password }}
+- name: check if sso is available
+  shell: curl -k https//{{ hostvars['rh-sso'].vm_nics[0].ip }}/ || true
+  register: rhsso_response
   changed_when: false
-  delegate_to: rh-sso
+  delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
 
-- name: create oidc json
-  template: src=create_oidc_client.json.j2 dest=/root/create_oidc_client_{{ oidcClientName }}.json
-  delegate_to: rh-sso
+- block:
+    - name: login to sso
+      shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh \
+        config credentials --server http://localhost:8080/auth \
+        --realm master --user admin --password {{ root_password }}
+      changed_when: false
+      delegate_to: rh-sso
 
-- name: create oidc client in rh-sso for {{ oidcClientName }}
-  shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh create clients -r infra -f /root/create_oidc_client_{{ oidcClientName }}.json
-  failed_when: "'already exists' not in create_client_result.stderr and create_client_result.rc != 0"
-  changed_when: "'already exists' not in create_client_result.stderr"
-  delegate_to: rh-sso
-  register: create_client_result
+    - name: create oidc json
+      template: src=create_oidc_client.json.j2 dest=/root/create_oidc_client_{{ oidcClientName }}.json
+      delegate_to: rh-sso
 
-- name: get client id from rh-sso
-  shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh get clients -r infra --fields=id -q clientId={{ oidcClientName }} --format=csv --noquotes
-  delegate_to: rh-sso
-  register: ssoClientId
-  changed_when: false
+    - name: create oidc client in rh-sso for {{ oidcClientName }}
+      shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh create clients -r infra -f /root/create_oidc_client_{{ oidcClientName }}.json
+      failed_when: "'already exists' not in create_client_result.stderr and create_client_result.rc != 0"
+      changed_when: "'already exists' not in create_client_result.stderr"
+      delegate_to: rh-sso
+      register: create_client_result
 
-- name: get client secret from client
-  shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh \
-    get clients/{{ ssoClientId.stdout }}/installation/providers/keycloak-oidc-keycloak-json \
-    -r infra | grep secret | cut -d \" -f 4
-  delegate_to: rh-sso
-  register: oidcClientSecret
-  changed_when: false
-  failed_when: oidcClientSecret.stderr != ""
+    - name: get client id from rh-sso
+      shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh get clients -r infra --fields=id -q clientId={{ oidcClientName }} --format=csv --noquotes
+      delegate_to: rh-sso
+      register: ssoClientId
+      changed_when: false
 
-- name: set client secret as fact
-  set_fact: {"{{ factprefix|default('oidcClient') }}Secret":"{{ oidcClientSecret.stdout }}"}
+    - name: get client secret from client
+      shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh \
+        get clients/{{ ssoClientId.stdout }}/installation/providers/keycloak-oidc-keycloak-json \
+        -r infra | grep secret | cut -d \" -f 4
+      delegate_to: rh-sso
+      register: oidcClientSecret
+      changed_when: false
+      failed_when: oidcClientSecret.stderr != ""
+
+    - name: set client secret as fact
+      set_fact: {"{{ factprefix|default('oidcClient') }}Secret":"{{ oidcClientSecret.stdout }}"}
+  when: rhsso_response.stdout|length > 0

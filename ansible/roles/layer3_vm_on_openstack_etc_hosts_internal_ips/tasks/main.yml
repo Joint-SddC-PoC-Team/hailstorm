@@ -6,7 +6,7 @@
         dest: /etc/hosts
         line: "{{ hostvars[item].osp_internal_ip }} {{ item }} {{ item }}.{{ hailstorm_dns_domain }}{% for name in (hostvars[item].additional_dns|default('')).split(',') %}{% if name != '' and name[0] != '*' %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endif %}{% endfor %}"
         regexp: "{{ hostvars[item].osp_internal_ip }} {{ item }} {{ item }}\\.{{ hailstorm_dns_domain }}.*$"
-      when: hostvars[item].osp_internal_ip != ''
+      when: hostvars[item].osp_internal_ip|default('') != ''
       with_items: "{{ group }}"
 
 
@@ -15,7 +15,7 @@
         dest: /etc/cloud/templates/hosts.redhat.tmpl
         line: "{{ hostvars[item].osp_internal_ip }} {{ item }} {{ item }}.{{ hailstorm_dns_domain }}{% for name in (hostvars[item].additional_dns|default('')).split(',') %}{% if name != '' and name[0] != '*' %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endif %}{% endfor %}"
         regexp: "{{ hostvars[item].osp_internal_ip }} {{ item }} {{ item }}\\.{{ hailstorm_dns_domain }}.*$"
-      when: hostvars[item].osp_internal_ip != ''
+      when: hostvars[item].osp_internal_ip|default('') != ''
       with_items: "{{ group }}"
   when: mode=="create"
 

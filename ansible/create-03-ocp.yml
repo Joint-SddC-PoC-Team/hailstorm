@@ -14,6 +14,12 @@
   roles:
     - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'ose3-osp', 'vm' ], mode: create }
 
+- hosts: infrastructure
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer2_dnat_dns, tags: [ 'layer3', 'ose3-osp', 'dnat' ], mode: floating_ip, group: "{{ groups['ose3-osp'] }}" }
+
 - hosts: ipa
   remote_user: root
   gather_facts: false
