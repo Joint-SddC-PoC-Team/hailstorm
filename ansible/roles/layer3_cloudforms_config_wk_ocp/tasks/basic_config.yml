@@ -18,20 +18,20 @@
    state: restarted
   when: chrony_conf|changed
 
-#appliance_console_cli --fetch-key  cloudforms-db01.hailstorm6.coe.muc.redhat.com --sshlogin root --sshpassword {{ root_password }} --hostname cloudforms-db01.hailstorm6.coe.muc.redhat.com --password {{ root_password }}
+#appliance_console_cli --fetch-key  cloudforms-db01.{{ hailstorm_dns_domain }} --sshlogin root --sshpassword {{ root_password }} --hostname cloudforms-db01.{{ hailstorm_dns_domain }} --password {{ root_password }}
 - name: Join OCP server to the Master Region 919
   shell: >
     LC_CTYPE= appliance_console_cli
-    --fetch-key=cloudforms-db01.hailstorm6.coe.muc.redhat.com
+    --fetch-key=cloudforms-db01.{{ hailstorm_dns_domain }}
     --sshlogin=root
-    --sshpassword="{{ root_password }}" 
-    --hostname=cloudforms-db01.hailstorm6.coe.muc.redhat.com 
+    --sshpassword="{{ root_password }}"
+    --hostname=cloudforms-db01.{{ hailstorm_dns_domain }}
     --password="{{ root_password }}"
     creates=/var/www/miq/vmdb/log/appliance_console.log
 
 - name: wait for cfme web ui to become available
 #  wait_for: host={{ hostvars[cfmehostname.stdout].vm_nics[0].ip }} port=443 timeout=600
-  wait_for: host="{% for vm_nic in hostvars[inventory_hostname_short].vm_nics %}{% if vm_nic.netname|regex_search('(services)') %}{{ vm_nic.ip }}{% endif %}{% endfor %} }}" port=443 timeout=600
+  wait_for: host="{{ (vm_nics|selectattr('netname','match', infrastructure_network_services.netname)|first).ip }}" port=443 timeout=600
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
 
 - name: Create Zone OCP
@@ -54,5 +54,3 @@
 - name: set internal admin password
   shell: cd /var/www/miq/vmdb && rails r "User.find_by_userid('admin').update_attributes(:password => '{{ root_password }}')"
   #https://access.redhat.com/solutions/801103
-
-

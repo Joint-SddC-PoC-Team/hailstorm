@@ -18,23 +18,23 @@
    state: restarted
   when: chrony_conf|changed
 #  - name: Join CloudForms/ManageIQ region
-#      command: appliance_console_cli --fetch-key  cloudforms-db01.hailstorm6.coe.muc.redhat.com --sshlogin root --sshpassword {{ root_password }} --hostname cloudforms-db01.hailstorm6.coe.muc.redhat.com --password {{ root_password }}
+#      command: appliance_console_cli --fetch-key  cloudforms-db01.{{ hailstorm_dns_domain }} --sshlogin root --sshpassword {{ root_password }} --hostname cloudforms-db01.{{ hailstorm_dns_domain }} --password {{ root_password }}
 #appliance_console_cli --host=cloudforms.example.com --region=919 --internal --password="redhat01" --key --force-key --dbdisk=/dev/vdb --sshpassword="redhat01"
 
 
 - name: Join WebUI to the Master Region 919
   shell: >
     LC_CTYPE= appliance_console_cli
-    --fetch-key=cloudforms-db01.hailstorm6.coe.muc.redhat.com 
-    --sshlogin=root 
-    --sshpassword="{{ root_password }}" 
-    --hostname=cloudforms-db01.hailstorm6.coe.muc.redhat.com 
+    --fetch-key=cloudforms-db01.{{ hailstorm_dns_domain }} 
+    --sshlogin=root
+    --sshpassword="{{ root_password }}"
+    --hostname=cloudforms-db01.{{ hailstorm_dns_domain }}
     --password="{{ root_password }}"
     creates=/var/www/miq/vmdb/log/appliance_console.log
 
 - name: wait for cfme web ui to become available
 #  wait_for: host={{ hostvars[cfmehostname.stdout].vm_nics[0].ip }} port=443 timeout=600
-  wait_for: host="{% for vm_nic in hostvars[inventory_hostname_short].vm_nics %}{% if vm_nic.netname|regex_search('(services)') %}{{ vm_nic.ip }}{% endif %}{% endfor %} }}" port=443 timeout=600
+  wait_for: host="{{ (vm_nics|selectattr('netname','match', infrastructure_network_services.netname)|first).ip }}" port=443 timeout=600
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
 
 - name: Create Zone WebUI
