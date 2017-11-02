@@ -231,7 +231,8 @@ external_network_config:
             proto: tcp
       - expose_machine: rhosp-director
         on_host_prefix: 10.32.105.93/32
-        via_network: provisioning
+        via_network: services
+        ports:
           - from_port: 22
             to_port: 22
             proto: tcp
