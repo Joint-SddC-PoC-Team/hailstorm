@@ -232,14 +232,13 @@ external_network_config:
       - expose_machine: rhosp-director
         on_host_prefix: 10.32.105.93/32
         via_network: provisioning
-        ports:
           - from_port: 22
             to_port: 22
             proto: tcp
-      - expose_machine: undercloud-public
-        on_host_prefix: 10.32.105.93/32
-        via_network: provisioning
-        ports:
+      # - expose_machine: undercloud-public
+      #   on_host_prefix: 10.32.105.78/32
+      #   via_network: provisioning
+      #   ports:
           # webui
           - from_port: 443
             to_port: 443
@@ -267,6 +266,19 @@ external_network_config:
           # zaqar-websocket
           - from_port: 9000
             to_port: 9000
+            proto: tcp
+          # for cloudforms <-> director
+          - from_port: 13292
+            to_port: 13292
+            proto: tcp
+          - from_port: 13774
+            to_port: 13774
+            proto: tcp
+          - from_port: 13050
+            to_port: 13050
+            proto: tcp
+          - from_port: 13696
+            to_port: 13696
             proto: tcp
       - expose_machine: openstack
         on_host_prefix: 10.32.105.94/32
