@@ -6,7 +6,7 @@ disk:
 
 vm_secgroups:
     - webserver
-    - default
+    - default-{{ osp_tenant }}
 
 nic_attachments:
   - "{{ infrastructure_osp_tenant_internal_network }}"
