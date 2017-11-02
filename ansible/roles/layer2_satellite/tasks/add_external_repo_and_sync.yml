@@ -33,7 +33,7 @@
 
 - name: add new repo
   shell: hammer repository create --name "{{ item.repo_name }}" --organization "{{ organization }}" --product "{{ item.product_name }}" --content-type yum --gpg-key {{item.gpgkey_name}} --publish-via-http true --url "{{ item.repository_url }}"
-  when: item.repo_name not in (current_product_list.stdout|from_json)|map(attribute="Name")
+  when: item.repo_name not in (current_repo_list.stdout|from_json)|map(attribute="Name")
   with_items: "{{ satellite_external_repos }}"
 
 - name: start sync tasks for external repos
