@@ -39,7 +39,7 @@
       lineinfile:
         dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
         line: "{{ item.name }} 				IN      A       {{ item.ip }}"
-        regexp: "^{{ item.name }}.*"
+        regexp: "^{{ item.name|regex_escape }}.*"
       with_items: >
         [{% set needscomma = [false] %}{% for host in group %}
         {% for name in ((hostvars[host].additional_dns|default('')).split(',') + [host]) %}
