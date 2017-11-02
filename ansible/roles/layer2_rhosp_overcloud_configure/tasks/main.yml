@@ -31,8 +31,6 @@
         - name: admin
       tags: ['overcloud-config-tenants','overcloud-config-users','overcloud-config-security','overcloud-create-flavors']
 
-
-
     - include: adapt_to_keystone_v3.yml
       tags: ['overcloud-config-keystone']
     - include: create_host_aggregates.yml
@@ -51,10 +49,10 @@
       when: current_lifecycle_env.openstack_version >= 11
     - include: configure_security.yml
       tags: ['overcloud-config-security']
-    - include: configure_images.yml
-      tags: ['overcloud-config-images']
     - include: create_flavors.yml
       tags: ['overcloud-create-flavors']
+    - include: configure_images.yml
+      tags: ['overcloud-config-images']
   environment:
     OS_IDENTITY_API_VERSION: 3
   when: mode=="create"
