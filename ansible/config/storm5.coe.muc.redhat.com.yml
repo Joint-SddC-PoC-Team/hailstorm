@@ -40,7 +40,7 @@ layer2_rhosp_control_mem: 16384
 layer2_rhosp_control_cpu: 4
 #layer2_rhosp_compute_mem: 131072
 layer2_rhosp_compute_cpu: 16
-layer2_rhosp_compute_mem: 32768
+layer2_rhosp_compute_mem: 65536
 #layer2_rhosp_compute_cpu: 8
 
 layer2_satellite_mem: 32768
@@ -270,6 +270,9 @@ external_network_config:
           # zaqar-websocket
           - from_port: 9000
             to_port: 9000
+            proto: tcp
+          - from_port: 13292
+            to_port: 13292
             proto: tcp
       - expose_machine: openstack
         on_host_prefix: 10.32.105.79/32
