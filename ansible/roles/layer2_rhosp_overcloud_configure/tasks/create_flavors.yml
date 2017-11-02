@@ -9,6 +9,6 @@
     vcpus: "{{ item.VCPUs }}"
     is_public: "{% if item['Is Public'] %}True{% else %}False{% endif %}"
     validate_certs: False
+    extra_specs: "{{ item.extra_specs|default({}) }}"
   with_items: "{{ default_overcloud_flavors }}"
   delegate_to: localhost
-

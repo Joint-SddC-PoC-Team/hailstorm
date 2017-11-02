@@ -81,7 +81,8 @@ default_overcloud_flavors: [
     "VCPUs": 2,
     "Ephemeral": 0,
     "RAM": 4096,
-    "Name": "m1.medium"
+    "Name": "m1.medium",
+    "extra_specs": {"hw:cpu_sockets":1, "hw:cpu_threads":2}
   },
   {
     "ID": "4",
@@ -90,7 +91,8 @@ default_overcloud_flavors: [
     "VCPUs": 4,
     "Ephemeral": 0,
     "RAM": 8192,
-    "Name": "m1.large"
+    "Name": "m1.large",
+    "extra_specs": {"hw:cpu_sockets":1, "hw:cpu_threads":4}
   },
   {
     "ID": "5",
@@ -99,7 +101,8 @@ default_overcloud_flavors: [
     "VCPUs": 8,
     "Ephemeral": 0,
     "RAM": 16384,
-    "Name": "m1.xlarge"
+    "Name": "m1.xlarge",
+    "extra_specs": {"hw:cpu_sockets":1, "hw:cpu_threads":8}
   },
   {
     "ID": "6",
@@ -108,6 +111,7 @@ default_overcloud_flavors: [
     "VCPUs": 8,
     "Ephemeral": 0,
     "RAM": 16384,
-    "Name": "cf.xlarge"
+    "Name": "cf.xlarge",
+    "extra_specs": {"hw:cpu_sockets":1, "hw:cpu_threads":8}
   }
 ]
