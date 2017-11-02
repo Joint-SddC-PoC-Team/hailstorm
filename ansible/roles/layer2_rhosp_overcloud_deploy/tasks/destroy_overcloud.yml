@@ -1,3 +1,15 @@
+- name: Get list of the nodes
+  shell: . ~/stackrc && openstack server list -f value -c Name
+  become: yes
+  register: rhosp_nodes
+  become_user: "{{ rhosp_stack_user }}"
+
+- name: Unregister nodes from satellite
+  command: hammer host delete --name "{{ item }}"
+  with_items: "{{ rhosp_nodes.stdout_lines }}"
+  delegate_to: satellite
+  ignore_errors: True # Maybe the node was not correctly registered, so better ignore errors and continue
+
 - name: delete overcloud heat stack
   shell: . ~/stackrc && heat stack-list | grep overcloud && heat stack-delete overcloud -y || true
   ignore_errors: true
