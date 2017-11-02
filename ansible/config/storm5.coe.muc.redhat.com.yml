@@ -271,20 +271,46 @@ external_network_config:
           - from_port: 9000
             to_port: 9000
             proto: tcp
-          # for cloudforms <-> director
+          # glance
           - from_port: 13292
             to_port: 13292
             proto: tcp
+          # nova
           - from_port: 13774
             to_port: 13774
             proto: tcp
+          # baremetal introspection
           - from_port: 13050
             to_port: 13050
             proto: tcp
+          # neutron
           - from_port: 13696
             to_port: 13696
             proto: tcp
-
+          #messaging
+          - from_port: 13888
+            to_port: 13888
+            proto: tcp
+          #cloudformation
+          - from_port: 13800
+            to_port: 13800
+            proto: tcp
+          # metering
+          - from_port: 13777
+            to_port: 13777
+            proto: tcp
+          # event
+          - from_port: 13779
+            to_port: 13779
+            proto: tcp
+          # placement
+          - from_port: 13778
+            to_port: 13778
+            proto: tcp
+          # gnocci - metric
+          - from_port: 13041
+            to_port: 13041
+            proto: tcp
       - expose_machine: openstack
         on_host_prefix: 10.32.105.79/32
         via_network: services
