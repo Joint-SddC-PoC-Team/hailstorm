@@ -895,3 +895,4 @@ osp_host_aggregates:
 
 proxy_users:
   - { "name": "satellite", "password": "redhat01" }
+  - { "name": "infrastructure", "password": "redhat01" }
