@@ -1,7 +1,5 @@
-- name: install epel-release
-  yum:
-    name: "{{ epel_rpm }}"
-    state: present
+- name: Enable EPEL
+  command: subscription-manager repos --enable="{{ satellite_repo_name_epel }}"
 
 - name: check if installer dir exists
   stat: path={{ current_lifecycle_env.ansible_tower_url | basename | regex_replace('.tar.gz','') }}
