@@ -114,6 +114,10 @@ rhosp-compute3  ansible_host=10.116.127.145 activation_key="AK-CV-RHOSP-{{ stage
 rhosp-compute4  ansible_host=10.116.127.146 activation_key="AK-CV-RHOSP-{{ stage }}"
 rhosp-compute5  ansible_host=10.116.127.147 activation_key="AK-CV-RHOSP-{{ stage }}"
 rhosp-compute6  ansible_host=10.116.127.148 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-compute7  ansible_host=10.116.127.149 activation_key="AK-CV-RHOSP-{{ stage }}"
+# the allocation pools only allow up to 7 compute nodes in addition to the 3 control nodes
+rhosp-compute8  ansible_host=10.116.127.150 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-compute9  ansible_host=10.116.127.151 activation_key="AK-CV-RHOSP-{{ stage }}"
 
 # The group of all osp control nodes
 [rhosp-control]
