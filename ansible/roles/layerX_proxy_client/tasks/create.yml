@@ -1,0 +1,25 @@
+- name: Copy CA certificate (alienca is proxy CA)
+  copy:
+    dest: /etc/pki/tls/certs/proxy.pem
+    content: "{% for ssl_cert in ssl_certs %}{{ lookup('file','binary/' + ssl_cert) }}\n{% endfor %}"
+    owner: root
+    group: root
+    mode: 0640
+  register: copy_ca
+
+- name: Update ca trust certificates
+  command: update-ca-trust
+  when: copy_ca|changed
+
+- name: Create bash profile for the server
+  copy:
+    dest: /etc/profile.d/proxy.sh
+    mode: 0640
+    owner: root
+    group: root
+    content: |
+       export http_proxy=https://{{ proxy_username }}:{{ proxy_password }}@{{ proxy_host }}:3128/
+       export https_proxy=$http_proxy
+       export ftp_proxy=$http_proxy
+       export rsync_proxy=$http_proxy
+       export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com,.{{ hailstorm_dns_domain }}"
