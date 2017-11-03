@@ -68,7 +68,7 @@
   roles:
 #    - { role: layerX_openshift_lb, tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ], mode: create }
 
-- hosts: ose3-osp-master
+- hosts: ose3-osp-master:ose3-osp-infra
   gather_facts: false
   remote_user: root
   roles:
@@ -79,4 +79,13 @@
   remote_user: root
   gather_facts: false
   roles:
-     - { role: layer2_dnat_dns, tags: [ 'layer3', 'ose3-osp', 'dnat', 'ose3-osp-lb' ], mode: lbaas_ip, lbdnsname: 'openshift-osp', lbip: "{{ lbaas_fip }}" }
+     - { role: layer2_dnat_dns, tags: [ 'layer3', 'ose3-osp', 'dns', 'ose3-osp-lb' ], mode: lbaas_ip, lbdnsname: ['openshift-osp','apps', '*.apps'], lbip: "{{ lbaas_fip }}" }
+
+
+- hosts: ipa
+  remote_user: root
+  gather_facts: false
+  roles:
+     - { role: layer2_ipa_add_host_to_wildcard_ca_acl, tags: [ 'layer3', 'ose3-osp', 'dns', 'ose3-osp-lb' ], mode: create_fip, lbdnsname: "*.apps,apps", lbip: "{{ hostvars['infrastructure']['lbaas_fip'] }}" }
+
+

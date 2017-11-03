@@ -90,6 +90,9 @@ ose3-osp-infranode1 openshift_node_labels="{'region': 'infra', 'zone': 'default'
 ose3-osp-node1      jump_host=ose3-osp-lb openshift_node_labels="{'region': 'primary', 'zone': 'east', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
 ose3-osp-node2      jump_host=ose3-osp-lb openshift_node_labels="{'region': 'primary', 'zone': 'west', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
 
+[ose3-osp-infra]
+ose3-osp-infranode1
+
 [ose3-osp-lb]
 ose3-osp-lb         activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" additional_dns="openshift-osp" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.medium" osp_image="RHEL7"
 
@@ -313,7 +316,6 @@ bosch-vpn-group
 [accessible_via_floating_ip:children]
 ansible-jump-host
 lookbusy-osp
-lbaas-demo-osp-group
 ose3-osp
 cloudforms-group
 
@@ -345,7 +347,6 @@ bosch-vpn-group
 
 [lookbusy:children]
 lookbusy-osp
-lbaas-demo-osp-group
 lookbusy-rhev
 
 [haproxy_frontend]

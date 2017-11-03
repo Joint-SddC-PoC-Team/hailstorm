@@ -54,8 +54,9 @@
     - name: add or change host in zone db
       lineinfile:
         dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
-        line: "{{ lbdnsname }} 				IN      A       {{ lbip }}"
-        regexp: "^{{ lbdnsname|regex_escape }} .*"
+        line: "{{ item }} 				IN      A       {{ lbip }}"
+        regexp: "^{{ item|regex_escape }} .*"
+      with_items: "{{ lbdnsname }}"
     - name: change serial in zone db
       lineinfile:
         dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
@@ -64,4 +65,3 @@
     - name: ensure that named is restarted
       service: name=named enabled=yes state=restarted
   when: mode=="lbaas_ip"
- 

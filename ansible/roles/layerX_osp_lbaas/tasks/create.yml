@@ -1,13 +1,13 @@
 - block:
     - name: List load balancers
-      shell:  . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-list -f json
+      shell:  . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-loadbalancer-list -f json
       run_once: true
       register: list_lb
       changed_when: False
 
     - block:
         - name: Create load balancer
-          shell: . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-create -f json --name {{ lbname }} "sub_internal_{{ osp_tenant }}"
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-loadbalancer-create -f json --name {{ lbname }} "sub_internal_{{ osp_tenant }}"
           run_once: true
           register: create_lb
         
@@ -16,26 +16,26 @@
 
         - name: Wait for load balancer creation
           run_once: true
-          shell: . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-show -f value -c provisioning_status {{ lbname }}
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-loadbalancer-show -f value -c provisioning_status {{ lbname }}
           register: lb_status
           until: lb_status.stdout.find("PENDING") == -1
           retries: 5
           delay: 5
 
         - name: Assign security group webserver to the load balancer
-          shell: . ~/overcloudrc_v3 && neutron port-update --security-group webserver "{{ vip_port_id }}"
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron port-update --security-group webserver "{{ vip_port_id }}"
 
         - name: Create listener HTTP
           run_once: true
-          shell: . ~/overcloudrc_v3 && neutron lbaas-listener-create --name {{ lbname }}-http-listener --loadbalancer {{ lbname }} --protocol HTTP --protocol-port 80
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-listener-create --name {{ lbname }}-http-listener --loadbalancer {{ lbname }} --protocol HTTP --protocol-port 80
 
         - name: Create listener HTTPS
           run_once: true
-          shell: . ~/overcloudrc_v3 && neutron lbaas-listener-create --name {{ lbname }}-https-listener --loadbalancer {{ lbname }} --protocol HTTPS --protocol-port 443
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-listener-create --name {{ lbname }}-https-listener --loadbalancer {{ lbname }} --protocol HTTPS --protocol-port 443
 
         - name: Wait for load balancer creation
           run_once: true
-          shell: . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-show -f value -c provisioning_status {{ lbname }}
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-loadbalancer-show -f value -c provisioning_status {{ lbname }}
           register: lb_status
           until: lb_status.stdout.find("PENDING") == -1
           retries: 5
@@ -43,21 +43,21 @@
         
         - name: Create pool HTTP
           run_once: true
-          shell: . ~/overcloudrc_v3 && neutron lbaas-pool-create --name {{ lbname }}-http-pool  --lb-algorithm ROUND_ROBIN --listener {{ lbname }}-http-listener --protocol HTTP
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-pool-create --name {{ lbname }}-http-pool  --lb-algorithm ROUND_ROBIN --listener {{ lbname }}-http-listener --protocol HTTP
 
         - name: Create pool HTTPS
           run_once: true
-          shell: . ~/overcloudrc_v3 && neutron lbaas-pool-create --name {{ lbname }}-https-pool  --lb-algorithm ROUND_ROBIN --listener {{ lbname }}-https-listener --protocol HTTPS
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-pool-create --name {{ lbname }}-https-pool  --lb-algorithm ROUND_ROBIN --listener {{ lbname }}-https-listener --protocol HTTPS
 
         - name: Add the members to HTTP pool
-          shell: . ~/overcloudrc_v3 && neutron lbaas-member-create --subnet sub_internal_{{ osp_tenant }} --address "{{  hostvars[inventory_hostname_short]["openstack_servers"][0].private_v4 }}" --protocol-port 80 {{ lbname }}-http-pool
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-member-create --subnet sub_internal_{{ osp_tenant }} --address "{{  hostvars[inventory_hostname_short]["openstack_servers"][0].private_v4 }}" --protocol-port 80 {{ lbname }}-http-pool
           register: member_add_status
           until: member_add_status.stderr.find("Invalid state PENDING_UPDATE") == -1
           retries: 5
           delay: 5
 
         - name: Add the members to HTTPS pool
-          shell: . ~/overcloudrc_v3 && neutron lbaas-member-create --subnet sub_internal_{{ osp_tenant }} --address "{{  hostvars[inventory_hostname_short]["openstack_servers"][0].private_v4 }}" --protocol-port 443 {{ lbname }}-https-pool
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-member-create --subnet sub_internal_{{ osp_tenant }} --address "{{  hostvars[inventory_hostname_short]["openstack_servers"][0].private_v4 }}" --protocol-port 443 {{ lbname }}-https-pool
           register: member_add_status
           until: member_add_status.stderr.find("Invalid state PENDING_UPDATE") == -1
           retries: 5
@@ -65,7 +65,7 @@
 
         - name: Create the floating IP for the load balancer
           run_once: true
-          shell:  . ~/overcloudrc_v3 &&  openstack floating ip create -f json --port {{ vip_port_id }} guests
+          shell:  . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} openstack floating ip create -f json --port {{ vip_port_id }} guests
           register: create_fip
           run_once: true
 
