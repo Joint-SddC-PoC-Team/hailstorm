@@ -46,3 +46,22 @@
     - name: ensure that named is restarted
       service: name=named enabled=yes state=restarted
   when: mode=="floating_ip"
+
+- block:
+    - name: create a sensible serial for BIND zone
+      shell: date +%Y%m%d$((`date +%-H`*4+`date +%-M`/8))
+      register: bind_zone_serial
+    - name: add or change host in zone db
+      lineinfile:
+        dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
+        line: "{{ lbdnsname }} 				IN      A       {{ lbip }}"
+        regexp: "^{{ lbdnsname|regex_escape }} .*"
+    - name: change serial in zone db
+      lineinfile:
+        dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
+        line: "                          {{ bind_zone_serial.stdout }}        ; Serial"
+        regexp: ".*; Serial$"
+    - name: ensure that named is restarted
+      service: name=named enabled=yes state=restarted
+  when: mode=="lbaas_ip"
+ 

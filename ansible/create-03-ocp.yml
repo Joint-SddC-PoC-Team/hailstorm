@@ -67,3 +67,16 @@
   gather_facts: false
   roles:
 #    - { role: layerX_openshift_lb, tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ], mode: create }
+
+- hosts: ose3-osp-master
+  gather_facts: false
+  remote_user: root
+  roles:
+     - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-lb' ], mode: readfacts }
+     - { role: layerX_osp_lbaas,  tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install', 'ose3-osp-lb' ], mode: create, lbname: 'lb-ose3', dnsname: 'openshift-osp-lb'  }
+
+- hosts: infrastructure
+  remote_user: root
+  gather_facts: false
+  roles:
+     - { role: layer2_dnat_dns, tags: [ 'layer3', 'ose3-osp', 'dnat', 'ose3-osp-lb' ], mode: lbaas_ip, lbdnsname: 'openshift-osp', lbip: "{{ lbaas_fip }}" }

@@ -1,6 +1,6 @@
 - block:
   - name: List load balancers
-    shell:  . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-show lbaas-demo-osp-lb -f json
+    shell:  . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-show "{{ lbname }}" -f json
     run_once: true
     register: list_lb
     failed_when: False
@@ -17,16 +17,24 @@
       run_once: True
       when: floating_ip.stdout != '[]'
  
-    - name: Delete the pool for the load balancer
-      shell: . ~/overcloudrc_v3 &&  neutron lbaas-pool-delete lbaas-demo-osp-lb-pool
+    - name: Delete the pool for the load balancer HTTP
+      shell: . ~/overcloudrc_v3 &&  neutron lbaas-pool-delete {{ lbname }}-http-pool
       run_once: True
 
-    - name: Delete the listener for the load balancer
-      shell: . ~/overcloudrc_v3 && neutron lbaas-listener-delete lbaas-demo-osp-lb-listener
+    - name: Delete the pool for the load balancer HTTPS
+      shell: . ~/overcloudrc_v3 &&  neutron lbaas-pool-delete {{ lbname }}-https-pool
+      run_once: True
+
+    - name: Delete the listener for the load balancer HTTP
+      shell: . ~/overcloudrc_v3 && neutron lbaas-listener-delete {{ lbname }}-http-listener
+      run_once: True
+
+    - name: Delete the listener for the load balancer HTTPS
+      shell: . ~/overcloudrc_v3 && neutron lbaas-listener-delete {{ lbname }}-https-listener
       run_once: True
 
     - name: Delete the load balancer
-      shell: . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-delete lbaas-demo-osp-lb
+      shell: . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-delete {{ lbname }}
       run_once: True
 
     when: list_lb.rc == 0

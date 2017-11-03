@@ -24,7 +24,7 @@
     ansible_ssh_common_args: "-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no -o ProxyCommand='ssh -i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p -q root@{{ hostvars[jump_host].ansible_host }}'"
     vm_exists: true
     override_wait_for_delegate_host: "{{ jump_host }}"
-  when: vm_exists and ansible_host == inventory_hostname_short and jump_host is defined
+  when: vm_exists and ansible_host == inventory_hostname_short and jump_host is defined and ansible_host in hostvars[jump_host]
 
 - name: set osp_internal_ip
   set_fact:

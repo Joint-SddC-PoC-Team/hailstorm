@@ -94,27 +94,12 @@
       tags: [ 'layer3','lookbusy-osp','lookbusy', 'vm' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
-
-- hosts: lbaas-demo-osp-group
+- hosts: ose3-osp-master
   gather_facts: false
   remote_user: root
   roles:
-    - role: layer3_vm_on_openstack
-      tags: [ 'layer3','lbaas-demo-osp','lbaas-demo' ]
-      mode: readfacts
-    - role: layer2_rhel
-      tags: [ 'layer3','lbaas-demo-osp','lbaas-demo', 'rhel' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_vm_on_openstack
-      tags: [ 'layer3','lbaas-demo-osp','lbaas-demo', 'vm' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_lbass_demo
-      tags: [ 'layer3','lbaas-demo-osp','lbaas-demo', 'vm' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-
+     - { role: layerX_osp_lbaas,  tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ], mode: destroy, lbname: 'lb-ose3', dnsname: 'openshift-osp-lb'  }
+ 
 - hosts: efk
   gather_facts: false
   remote_user: root
