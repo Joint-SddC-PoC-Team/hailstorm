@@ -6,4 +6,4 @@
 - name: create Cinder Storage Class
   shell: "oc create -f - <<EOF
          {{ lookup('template','cinder_storageclass.yaml.j2') }}"
-  when: "'cinder' not in storageclasses.stdout_lines"
+  when: "'cinder' not in storageclasses.stdout_lines and groups['ocp-osp-vm-group']|length > 0"

@@ -1,10 +1,10 @@
 ---
-mem: "{{ layer2_ose3lb_mem }}"
-vcpu: "{{ layer2_ose3lb_cpu }}"
+mem: "{{ layer2_ose3node_mem }}"
+vcpu: "{{ layer2_ose3node_cpu }}"
 
 disk:
   path: "{{ inventory_hostname_short }}.qcow2"
-  size: 30
+  size: 60
   format: qcow2
   # partition_table:
   #   lvmpv: 29500
@@ -14,7 +14,7 @@ disk:
 
   physvols:
     boot: 500
-    rhel: 29500
+    rhel: 59500
   logvols:
     - name: swap
       fstype: swap
@@ -23,16 +23,19 @@ disk:
     - name: root
       fstype: "{{ fstype }}"
       mountpoint: /
-      size: 10000
+      size: 5120
     - name: home
       fstype: "{{ fstype }}"
       mountpoint: /home
       size: 2048
+    - name: var
+      fstype: "{{ fstype }}"
+      mountpoint: /var
+      size: 40720
+
+
+openshift_master_api_host_and_port: openshift.{{ hailstorm_dns_domain }}:443
 
 vm_secgroups:
-    - ocp_lb
-
-repos:
-  - rhel-7-server-rpms
-
-pool_regex: "{{ rhel_subscription_pool_regex }}"
+  - ocp_master
+  - ocp_appnode

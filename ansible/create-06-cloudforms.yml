@@ -55,7 +55,7 @@
     - { role: layer3_cloudforms_config_wk_osp, tags: [ 'layer3', 'cf', 'cf-config' ], mode: create }
     - { role: layer3_cloudforms_osp_provider_zone, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-osp' ], mode: create }
 
-- hosts: ose3-osp
+- hosts: ocp-osp-vm-group
   remote_user: root
   gather_facts: false
   roles:

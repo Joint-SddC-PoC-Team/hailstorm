@@ -94,12 +94,7 @@
       tags: [ 'layer3','lookbusy-osp','lookbusy', 'vm' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
-- hosts: ose3-osp-master
-  gather_facts: false
-  remote_user: root
-  roles:
-     - { role: layerX_osp_lbaas,  tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ], mode: destroy, lbname: 'lb-ose3', dnsname: 'openshift-osp-lb'  }
- 
+
 - hosts: efk
   gather_facts: false
   remote_user: root
@@ -116,7 +111,7 @@
       mode: destroy
 
 
-- hosts: ose3
+- hosts: ocp-osp-vm-group,ocp-l2-vm-group
   gather_facts: false
   remote_user: root
   roles:
@@ -124,7 +119,7 @@
       tags: [ 'layer2','ose3', 'rhel','ose3-devops', 'ose3-testvm' ]
       mode: start
 
-- hosts: ose3-installer
+- hosts: ocp-installer-group
   remote_user: root
   gather_facts: false
   roles:
@@ -149,7 +144,7 @@
       mode: destroy
       oidcClientName: 'ocp-master'
 
-- hosts: ose3
+- hosts: ocp-osp-vm-group,ocp-l2-vm-group
   gather_facts: false
   remote_user: root
   roles:
@@ -160,6 +155,13 @@
     - role: layer2_vms
       tags: [ 'layer2','ose3', 'vm' ]
       mode: destroy
+
+- hosts: ocp-osp-lbaas-group
+  gather_facts: false
+  remote_user: root
+  roles:
+     - { role: layer3_lbaas_on_openstack,  tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ], mode: destroy }
+
 
 - hosts: cloudforms
   gather_facts: false

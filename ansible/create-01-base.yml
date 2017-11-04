@@ -67,7 +67,7 @@
       tags: [ 'layer1', 'nuage' ]
 #### SATELLITE ####
 
-- hosts: satellite
+- hosts: satellite-group
   remote_user: root
   gather_facts: false
   roles:
@@ -77,7 +77,7 @@
 
 #### IPA ####
 
-- hosts: ipa
+- hosts: ipa-group
   remote_user: root
   gather_facts: false
   roles:
@@ -96,7 +96,7 @@
 
 #### SATELLITE (again) ####
 
-- hosts: satellite
+- hosts: satellite-group
   remote_user: root
   gather_facts: false
   #pre_tasks:
@@ -114,131 +114,6 @@
 #   roles:
 #     - { role: layer2_rhel, tags: [ 'layer2', 'ipa', 'satellite_cert' ], mode: refreshcert }
 
-#### install-host
-# ansible-playbook -i hosts -e @config/infrastructure_config.yml -e @config/hailstorm_config.yml -e @config/storm3.coe.muc.redhat.com.yml create-01-base.yml --tags install-host
-- hosts: install-host
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_vms, tags: [ 'layer2', 'install-host', 'vm' ], mode: create }
-    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'install-host', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-    - { role: layer2_rhel, tags: [ 'layer2', 'install-host', 'rhel' ], mode: create }
-    - { role: layerX_ipa_client, tags: [ 'layer2', 'install-host',  'ipa-client' ], mode: create }
-    - { role: layer2_installhost, tags: [ 'layer2', 'install-host' ], mode: create }
-    - { role: layerX_distribute_proxycert, tags: [ 'layer2', 'install-host', 'proxy-cert' ], mode: create }
-
-#### Infrastructure (DNS, SMTP/IMAP) ####
-
-- hosts: infrastructure-group
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_vms, tags: [ 'layer2', 'infrastructure', 'vm' ], mode: create }
-    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'infrastructure', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-    - { role: layer2_rhel, tags: [ 'layer2', 'infrastructure', 'rhel' ], mode: create }
-    - { role: layer2_dnat_dns, tags: [ 'layer2', 'infrastructure', 'dnat' ], mode: create, when: '"dnat" in hostvars[inventory_hostname_short].roles'  }
-    - { role: layer2_smtp_imap, tags: [ 'layer2', 'infrastructure', 'smtp'], mode: create, when: '"smtp" in hostvars[inventory_hostname_short].roles' }
-    - { role: layer2_ntp, tags: [ 'layer2', 'infrastructure', 'ntp'], mode: create, when: '"ntp" in hostvars[inventory_hostname_short].roles' }
-    - { role: layer2_syslog, tags: [ 'layer2', 'infrastructure', 'syslog'], mode: create, when: '"syslog" in hostvars[inventory_hostname_short].roles' }
-    - { role: layer2_tdagent, tags: [ 'layer2', 'tdagent', 'infrastructure'], mode: create }
-
-    #- { role: layer2_haproxy_service, tags: [ 'haproxy_setup' ], mode: create,  when: '"haproxy" in hostvars[inventory_hostname_short].roles' }
-
-
-#### VIRT-WHO host (either infrastrcture or satellite)
-
-- hosts: virt-who
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_virtwho, tags: [ 'layer2', 'virtwho' ], mode: create }
-
-#### BOSCH VPN Client
-
-- hosts: bosch-vpn-group
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_vms, tags: [ 'layer2', 'bosch-vpn', 'vm'], mode: create }
-    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'bosch-vpn', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-    - { role: layer2_rhel, tags: [ 'layer2', 'bosch-vpn', 'rhel' ], mode: create }
-    - { role: layer2_cisco_anyconnect_client, tags: [ 'layer2', 'bosch-vpn', 'anyconnect' ], mode: create }
-
-
-
-#### CEPH
-
-- hosts: ceph
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_vms, tags: [ 'layer2', 'ceph', 'vm' ], mode: create }
-    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'ceph', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-    - { role: layer2_rhel, tags: [ 'layer2', 'ceph', 'rhel' ], mode: create }
-    - { role: layerX_distribute_pubkey, tags: [ 'layer2', 'ceph', 'ceph-installprep' ], mode: create, pubkeyhost: ceph0 }
-
-- hosts: ceph-installer
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_ceph_installer, tags: [ 'layer2', 'ceph', 'ceph-install', 'ceph-installer' ], mode: create }
-
-- hosts: ceph-calamari
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_ceph_calamari, tags: [ 'layer2', 'ceph', 'ceph-install', 'ceph-calamari' ], mode: create }
-
-- hosts: ceph-rgws-installer
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_ceph_rgw_installer, tags: [ 'layer2', 'ceph', 'ceph-install', 'ceph-rgws' ], mode: create }
-
-# - hosts: storage-console
-#   remote_user: root
-#   gather_facts: false
-#   roles:
-#     - { role: layer2_vms, tags: [ 'layer2', 'storage-console', 'vm' ], mode: create }
-#     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'storage-console', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-#     - { role: layer2_rhel, tags: [ 'layer2', 'storage-console', 'rhel' ], mode: create }
-#     - { role: layer2_ipa_certificate, tags: ['layer2', 'storage-console', 'cert' ], mode: create }
-#     - { role: layer2_storageconsole, tags: [ 'layer2', 'storage-console', 'storage-console-install' ], mode: create }
-
-#### RH-SSO
-# ansible-playbook -i hosts -e @config/infrastructure_config.yml -e @config/hailstorm_config.yml -e @config/storm3.coe.muc.redhat.com.yml create-01-base.yml --tags rh-sso
-- hosts: rh-sso
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_vms, tags: [ 'layer2', 'rhsso', 'vm' ], mode: create }
-    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'rhsso', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-    - { role: layer2_rhel, tags: [ 'layer2', 'rhsso', 'rhel' ], mode: create }
-    - { role: layerX_ipa_client, tags: [ 'layer2', 'rhsso',  'ipa-client'], mode: create }
-    - { role: layer2_ipa_certificate, tags: ['layer2', 'rhsso', 'rhsso-cert', 'rhsso-install'], mode: create, certcn: 'sso.{{ hailstorm_dns_domain }}', factprefix: rhsso }
-    - { role: layer2_rhsso, tags: [ 'layer2', 'rhsso', 'rhsso-install' ], mode: create }
-
-# create the "nuage" VMs, subscribe against satellite,
-# install packages defined in groups/newgroup.yml and
-# register IPA client
-# ansible-playbook -i hosts -e @config/infrastructure_config.yml -e @config/hailstorm_config.yml -e @config/storm3.coe.muc.redhat.com.yml create-01-base.yml --tags nuage
-# - hosts: nuage
-#   remote_user: root
-#   gather_facts: false
-#   roles:
-#     - role: layer2_vms
-#       tags: [ 'layer2', 'nuage', 'vm' ]
-#       mode: create
-#     - role: layer2_rhel_reconfigure_dns
-#       tags: [ 'layer2', 'nuage', 'dns' ]
-#       mode: create
-#       nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}"
-#     - role: layer2_rhel
-#       tags: [ 'layer2', 'nuage', 'rhel' ]
-#       mode: create
-#     - role: layerX_ipa_client
-#       tags: [ 'layer2', 'nuage',  'ipa-client']
-#       mode: create
 
 - hosts: proxy-group
   remote_user: root
@@ -250,3 +125,17 @@
      - { role: layerX_ipa_client, tags: [ 'layer2', 'proxy',  'ipa-client'], mode: create }
      - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
      - { role: layer2_proxy, tags: [ 'layer2', 'proxy', 'proxy-config' ], mode: create }
+
+
+ #### install-host
+ # ansible-playbook -i hosts -e @config/infrastructure_config.yml -e @config/hailstorm_config.yml -e @config/storm3.coe.muc.redhat.com.yml create-01-base.yml --tags install-host
+- hosts: install-host-group
+  remote_user: root
+  gather_facts: false
+  roles:
+   - { role: layer2_vms, tags: [ 'layer2', 'install-host', 'vm' ], mode: create }
+   - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'install-host', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+   - { role: layer2_rhel, tags: [ 'layer2', 'install-host', 'rhel' ], mode: create }
+   - { role: layerX_ipa_client, tags: [ 'layer2', 'install-host',  'ipa-client' ], mode: create }
+   - { role: layer2_installhost, tags: [ 'layer2', 'install-host' ], mode: create }
+   - { role: layerX_distribute_proxycert, tags: [ 'layer2', 'install-host', 'proxy-cert' ], mode: create }

@@ -27,7 +27,7 @@
       proxy_host: "{{ (hostvars['proxy'].vm_nics|selectattr('netname','match',infrastructure_network_admin.netname)|first).ip }}"
       proxy_username: "infrastructure"
       proxy_password: "{{ (proxy_users | selectattr('name','match', 'infrastructure') | first).password }}"
-
+      proxy_port: 3128
 
 - hosts: rhosp-director
   remote_user: root

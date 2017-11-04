@@ -15,7 +15,7 @@
     - set_fact: dns_floating_ip="{{ dnsrecord.stdout_lines[2].split(' ')[4] }}"
       when: dnsrecord.rc == 0
 
-    - name: assign floating IP
+    - name: assign existing floating IP
       os_floating_ip:
          auth:  "{{ vars['os_auth_hailstorm_' + osp_tenant.replace('-','_')] }}"
          server: "{{ inventory_hostname_short }}"
@@ -24,8 +24,7 @@
       delegate_to: localhost
       when: dnsrecord.rc == 0
 
-
-    - name: assign floating IP
+    - name: assign new floating IP
       os_floating_ip:
          auth:  "{{ vars['os_auth_hailstorm_' + osp_tenant.replace('-','_')] }}"
          server: "{{ inventory_hostname_short }}"
@@ -43,7 +42,7 @@
       become: True
       delegate_to: ipa
       when: dnsrecord.rc != 0
-      with_items: "{{ (additional_dns|default('')).split(',') + [inventory_hostname_short] }}"
+      with_items: "{{ ((additional_dns|default('')).split(',') + [inventory_hostname_short])|select|list }}"
 
   when: >
     infrastructure_osp_tenant_internal_network.netname in (vm_nics|map(attribute="netname")|list)

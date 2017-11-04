@@ -1,8 +1,4 @@
 ---
-
-vm_additional_disks:
-  - 53687091200
-
 mem: "{{ layer2_ose3node_mem }}"
 vcpu: "{{ layer2_ose3node_cpu }}"
 
@@ -57,5 +53,9 @@ cns_disk_files:
     format: qcow2
     dev: /dev/vde
 
+
 vm_secgroups:
   - ocp_appnode
+
+vm_additional_disks:
+  - 53687091200

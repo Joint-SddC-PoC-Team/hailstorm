@@ -1,6 +1,6 @@
 - block:
   - name: List load balancers
-    shell:  . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-show "{{ lbname }}" -f json
+    shell:  . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-show "{{ inventory_hostname_short }}" -f json
     run_once: true
     register: list_lb
     failed_when: False
@@ -9,39 +9,35 @@
 
     - name: Obtain the floating IP for the load balancer
       shell: . ~/overcloudrc_v3 && openstack floating ip list -f json  --fixed-ip-address {{ (list_lb.stdout|from_json).vip_address }}
-      register: floating_ip
+      register: temp_floating_ip
 
     - name:  Delete the floating IP for the load balancer
       shell:  . ~/overcloudrc_v3 &&  openstack floating ip delete {{ (floating_ip.stdout | from_json | first)["Floating IP Address"] }}
       register: create_fip
       run_once: True
-      when: floating_ip.stdout != '[]'
- 
+      when: temp_floating_ip.stdout != '[]'
+
     - name: Delete the pool for the load balancer HTTP
-      shell: . ~/overcloudrc_v3 &&  neutron lbaas-pool-delete {{ lbname }}-http-pool
+      shell: . ~/overcloudrc_v3 &&  neutron lbaas-pool-delete {{ inventory_hostname_short }}-http-pool
       run_once: True
 
     - name: Delete the pool for the load balancer HTTPS
-      shell: . ~/overcloudrc_v3 &&  neutron lbaas-pool-delete {{ lbname }}-https-pool
+      shell: . ~/overcloudrc_v3 &&  neutron lbaas-pool-delete {{ inventory_hostname_short }}-https-pool
       run_once: True
 
     - name: Delete the listener for the load balancer HTTP
-      shell: . ~/overcloudrc_v3 && neutron lbaas-listener-delete {{ lbname }}-http-listener
+      shell: . ~/overcloudrc_v3 && neutron lbaas-listener-delete {{ inventory_hostname_short }}-http-listener
       run_once: True
 
     - name: Delete the listener for the load balancer HTTPS
-      shell: . ~/overcloudrc_v3 && neutron lbaas-listener-delete {{ lbname }}-https-listener
+      shell: . ~/overcloudrc_v3 && neutron lbaas-listener-delete {{ inventory_hostname_short }}-https-listener
       run_once: True
 
     - name: Delete the load balancer
-      shell: . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-delete {{ lbname }}
+      shell: . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-delete {{ inventory_hostname_short }}
       run_once: True
 
     when: list_lb.rc == 0
   become_user: "{{ hostvars['rhosp-director'].rhosp_stack_user }}"
   become: True
   delegate_to: rhosp-director
-
-
-
-

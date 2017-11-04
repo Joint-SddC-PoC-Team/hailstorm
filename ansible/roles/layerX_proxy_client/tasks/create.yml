@@ -18,7 +18,7 @@
     owner: root
     group: root
     content: |
-       export http_proxy=https://{{ proxy_username }}:{{ proxy_password }}@{{ proxy_host }}:3128/
+       export http_proxy=https://{{ proxy_username }}:{{ proxy_password }}@{{ proxy_host }}:{{ proxy_port }}/
        export https_proxy=$http_proxy
        export ftp_proxy=$http_proxy
        export rsync_proxy=$http_proxy

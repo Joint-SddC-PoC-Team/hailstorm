@@ -4,18 +4,14 @@
   changed_when: false
 
 - name: deploy router
-  command: oadm router router --replicas=1 \
-           --credentials='/etc/origin/master/openshift-router.kubeconfig' \
-           --service-account=router
+  command: oc adm router router --replicas={{ groups['ocp-infra-group']|length }} --service-account=router
   when: "'router' not in rc.stdout"
 
-#registry is deployed via ansible playbook with OSCP3.3
 - name: deploy registry
   command: >
     oadm registry
     --replicas=1
     --config=/etc/origin/master/admin.kubeconfig
-    --credentials=/etc/origin/master/openshift-registry.kubeconfig
     --images='registry.access.redhat.com/openshift3/ose-${component}:${version}'
   when: "'docker-registry' not in rc.stdout"
 

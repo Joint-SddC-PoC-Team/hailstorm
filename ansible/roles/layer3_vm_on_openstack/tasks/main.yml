@@ -1,3 +1,12 @@
+# after create or readfacts has run, the following hostvars are set:
+#  * vm_exists: true or false, depending on whether the VM exists
+#  * floating_ip: optional, if a floating IP has been assigned
+#  * ansible_host: floating IP if assigned, osp_internal_ip if not
+#  * ansible_ssh_common_args: connection params via floating ip or jump host
+#  * osp_internal_ip: IP on the tenant network
+# (compare with roles/layer3_lbaas_on_openstack)
+
+
 - name: check if openstack is reachable
   shell: curl -k {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://{{ hostvars['openstack'].vm_nics[0].ip }}/ || true
   register: openstack_response
@@ -30,7 +39,9 @@
 
     - block:
        - include: instantiate_vm.yml
+         tags: ['instantiate-vm']
        - include: allocate_floating_ip.yml
+         tags: ['floating-ip']
       when: mode=="create"
 
     - block:
@@ -76,8 +87,8 @@
         - include: terminate_vm.yml
           when: vm_exists
       when: mode=="destroy"
-  when: openstack_response.stdout|length > 0
+  when: openstack_response.stdout|default('')|length > 0
 
 - set_fact:
     vm_exists: false
-  when: openstack_response.stdout|length == 0
+  when: openstack_response.stdout|default('')|length == 0

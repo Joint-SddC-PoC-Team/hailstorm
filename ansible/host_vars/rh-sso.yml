@@ -43,7 +43,8 @@ packages:
   - zip
   - postgresql
   - postgresql-jdbc
-#  - @rh-sso7
+  - firewalld
+  - "@rh-sso7"
 
 firewalld_rules:
   - HTTPStcp:
@@ -54,3 +55,7 @@ firewalld_rules:
     permanent: true
     immediate: true
 
+
+vm_secgroups:
+    - webserver
+    - default-{{ osp_tenant }}

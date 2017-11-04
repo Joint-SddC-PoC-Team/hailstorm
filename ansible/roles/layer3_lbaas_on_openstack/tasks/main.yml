@@ -1,0 +1,16 @@
+# after create or readfacts has run, the following hostvars are set:
+#  * floating_ip: floating IP which been assigned
+#  * ansible_host: floating_ip
+#  * osp_internal_ip: IP on the tenant network
+# (compare with roles/layer3_vm_on_openstack)
+
+- block:
+    - include: create.yml
+      tags: ["lbaas-osp"]
+  when: mode=="create"
+
+
+- block:
+    - include: destroy.yml
+      tags: ["lbaas-osp"]
+  when: mode=="destroy"

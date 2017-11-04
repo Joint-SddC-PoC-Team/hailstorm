@@ -14,10 +14,17 @@ ansible_ssh_user=root
 #ansible_sudo=true
 
 deployment_type=openshift-enterprise
-osm_default_subdomain={{ ocp_on_osp_apps_dns_domain }}
-openshift_master_default_subdomain={{ ocp_on_osp_apps_dns_domain }}
+osm_default_subdomain={{ ocp_apps_dns_domain }}
+openshift_master_default_subdomain={{ ocp_apps_dns_domain }}
 osm_default_node_selector="region=primary"
 
+{% if proxy_host|default('') != '' and proxy_port|default('') != '' and proxy_username|default('') != '' and proxy_password|default('') != '' %}
+openshift_http_proxy=https://{{ proxy_username }}:{{ proxy_password }}@{{ proxy_host }}:{{ proxy_port }}/
+openshift_https_proxy=https://{{ proxy_username }}:{{ proxy_password }}@{{ proxy_host }}:{{ proxy_port }}/
+openshift_no_proxy=*.{{ hailstorm_dns_domain }}
+{% endif %}
+
+{% if groups['ocp-osp-vm-group']|length > 0 %}
 #openstack cloudprovider
 openshift_cloudprovider_kind=openstack
 openshift_cloudprovider_openstack_auth_url=https://openstack.{{ hailstorm_dns_domain }}:13000/v3
@@ -26,6 +33,7 @@ openshift_cloudprovider_openstack_password={{ root_password }}
 openshift_cloudprovider_openstack_tenant_name={{ osp_tenant }}
 openshift_cloudprovider_openstack_domain_name=hailstorm
 openshift_cloudprovider_openstack_region=regionOne
+{% endif %}
 
 # uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
 #openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
@@ -54,21 +62,24 @@ openshift_disable_check=memory_availability,disk_availability,docker_storage,doc
 
 #openshift_use_dnsmasq=False
 openshift_master_cluster_method=native
-openshift_master_cluster_hostname=openshift-osp.{{ hailstorm_dns_domain }}
-openshift_master_cluster_public_hostname=openshift-osp.{{ hailstorm_dns_domain }}
+openshift_master_cluster_hostname=openshift.{{ hailstorm_dns_domain }}
+openshift_master_cluster_public_hostname=openshift.{{ hailstorm_dns_domain }}
 openshift_master_api_port=443
-openshift_master_public_console_url=https://openshift-osp.{{ hailstorm_dns_domain }}/console
-openshift_master_logging_public_url=https://kibana.{{ ocp_on_osp_apps_dns_domain }}
-openshift_master_metrics_public_url=https://hawkular-metrics.{{ ocp_on_osp_apps_dns_domain }}/hawkular/metrics
+openshift_master_public_console_url=https://openshift.{{ hailstorm_dns_domain }}/console
+openshift_master_logging_public_url=https://kibana.{{ ocp_apps_dns_domain }}
+openshift_master_metrics_public_url=https://hawkular-metrics.{{ ocp_apps_dns_domain }}/hawkular/metrics
 
 {% if openshift_key is defined %}
 openshift_master_named_certificates=[{"certfile": "/root/openshift.crt", "keyfile": "/root/openshift.key", "cafile": "/root/openshift-ca.crt"}]
 openshift_master_overwrite_named_certificates=true
 {% endif %}
 
+#don't automatically deploy registry to allow finer-grained control
+openshift_hosted_manage_registry=false
+#openshift_hosted_manage_router=false
 openshift_router_selector="region=infra"
-openshift_hosted_router_selector="region=infra"
 openshift_registry_selector="region=infra"
+
 #openshift_docker_options="--log-opt max-size=1M --log-opt max-file=3"
 os_sdn_network_plugin_name="redhat/openshift-ovs-multitenant"
 #openshift_docker_additional_registries
@@ -76,7 +87,7 @@ os_sdn_network_plugin_name="redhat/openshift-ovs-multitenant"
 #openshift_master_overwrite_named_certificates=true
 
 openshift_hosted_metrics_deploy=false
-openshift_metrics_hawkular_hostname=hawkular-metrics.{{ ocp_on_osp_apps_dns_domain }}
+openshift_metrics_hawkular_hostname=hawkular-metrics.{{ ocp_apps_dns_domain }}
 openshift_metrics_cassandra_storage_type=dynamic
 openshift_metrics_cassandra_replicas=1
 openshift_metrics_cassandra_limits_memory=2Gi
@@ -89,7 +100,7 @@ openshift_metrics_heapster_nodeselector={"region":"infra"}
 openshift_hosted_logging_deploy=false
 openshift_logging_es_pvc_dynamic=true
 openshift_logging_use_ops=false
-openshift_logging_kibana_hostname=kibana.{{ ocp_on_osp_apps_dns_domain }}
+openshift_logging_kibana_hostname=kibana.{{ ocp_apps_dns_domain }}
 openshift_logging_curator_default_days=7
 openshift_logging_curator_nodeselector={"region":"infra"}
 openshift_logging_kibana_nodeselector={"region":"infra"}
@@ -97,26 +108,26 @@ openshift_logging_es_nodeselector={"region":"infra"}
 
 # host group for masters
 [masters]
-{% for master in groups["ose3-osp-master"] %}
+{% for master in groups["ocp-master-group"] %}
 {{ hostvars[master].hostname }}
 {% endfor %}
 
 [etcd]
-{% for master in groups["ose3-osp-master"] %}
+{% for master in groups["ocp-master-group"] %}
 {{ hostvars[master].hostname }}
 {% endfor %}
 
 # host group for nodes, includes region info
 [nodes]
-{% for master in groups["ose3-osp-master"] %}
+{% for master in groups["ocp-master-group"] %}
 {{ hostvars[master].hostname }} openshift_hostname={{ hostvars[master].hostname_short }} openshift_node_labels="{{ hostvars[master].openshift_node_labels }}"
 {% endfor %}
-{% for node in groups["ose3-osp-node"] %}
+{% for node in groups["ocp-node-group"] %}
 {{ hostvars[node].hostname }} openshift_hostname={{ hostvars[node].hostname_short }} openshift_node_labels="{{ hostvars[node].openshift_node_labels }}"
 {% endfor %}
 
 # Specify load balancer host
 [lb]
-{% for lb in groups["ose3-osp-lb"] %}
+{% for lb in groups["ocp-l2-lb-group"] %}
 {{ hostvars[lb].hostname }}
 {% endfor %}

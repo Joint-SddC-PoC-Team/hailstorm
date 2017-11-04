@@ -1,0 +1,143 @@
+- block:
+    - name: List load balancers
+      shell:  . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-loadbalancer-list -f json
+      run_once: true
+      register: list_lb
+      changed_when: False
+
+    - block:
+        - name: Create load balancer
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-loadbalancer-create -f json --name {{ inventory_hostname_short }} "sub_internal_{{ osp_tenant }}"
+          #run_once: true
+          register: create_lb
+
+        - set_fact: vip_port_id="{{ (create_lb.stdout|from_json).vip_port_id }}"
+          #run_once: true
+
+        - name: Wait for load balancer creation
+          #run_once: true
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-loadbalancer-show -f value -c provisioning_status {{ inventory_hostname_short }}
+          register: lb_status
+          until: lb_status.stdout.find("PENDING") == -1
+          retries: 5
+          delay: 5
+
+        - name: Assign security group webserver to the load balancer
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron port-update --security-group webserver "{{ vip_port_id }}"
+
+        - name: Create listener HTTP
+          #run_once: true
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-listener-create --name {{ inventory_hostname_short }}-http-listener --loadbalancer {{ inventory_hostname_short }} --protocol HTTP --protocol-port 80
+          register: lb_status
+          until: lb_status.stderr.find("PENDING") == -1
+          retries: 5
+          delay: 5
+          failed_when: lb_status.rc != 0 and lb_status.stderr.find("PENDING") == -1
+
+        - name: Create listener HTTPS
+          #run_once: true
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-listener-create --name {{ inventory_hostname_short }}-https-listener --loadbalancer {{ inventory_hostname_short }} --protocol HTTPS --protocol-port 443
+          register: lb_status
+          until: lb_status.stderr.find("PENDING") == -1
+          retries: 5
+          delay: 5
+          failed_when: lb_status.rc != 0 and lb_status.stderr.find("PENDING") == -1
+
+        - name: Wait for load balancer creation
+          #run_once: true
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-loadbalancer-show -f value -c provisioning_status {{ inventory_hostname_short }}
+          register: lb_status
+          until: lb_status.stdout.find("PENDING") == -1
+          retries: 5
+          delay: 5
+
+        - name: Create pool HTTP
+          #run_once: true
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-pool-create --name {{ inventory_hostname_short }}-http-pool  --lb-algorithm ROUND_ROBIN --listener {{ inventory_hostname_short }}-http-listener --protocol HTTP
+
+        - name: Create pool HTTPS
+          #run_once: true
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-pool-create --name {{ inventory_hostname_short }}-https-pool  --lb-algorithm ROUND_ROBIN --listener {{ inventory_hostname_short }}-https-listener --protocol HTTPS
+
+        - name: Add the members to HTTP pool
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-member-create --subnet sub_internal_{{ osp_tenant }} --address "{{  hostvars[item]["openstack_servers"][0].private_v4 }}" --protocol-port 80 {{ inventory_hostname_short }}-http-pool
+          register: member_add_status
+          until: member_add_status.stderr.find("Invalid state PENDING_UPDATE") == -1
+          retries: 5
+          delay: 5
+          with_items: "{{ groups[balances] }}"
+
+        - name: Add the members to HTTPS pool
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron lbaas-member-create --subnet sub_internal_{{ osp_tenant }} --address "{{  hostvars[item]["openstack_servers"][0].private_v4 }}" --protocol-port 443 {{ inventory_hostname_short }}-https-pool
+          register: member_add_status
+          until: member_add_status.stderr.find("Invalid state PENDING_UPDATE") == -1
+          retries: 5
+          delay: 5
+          with_items: "{{ groups[balances] }}"
+      when: 'inventory_hostname_short not in (list_lb.stdout|from_json)|map(attribute="name")  | list'
+
+    - name: check if DNS for the floating IP was already registered
+      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-find {{ hailstorm_dns_domain }} --name={{ inventory_hostname_short }}
+      register: dnsrecord
+      become_user: root
+      become: True
+      delegate_to: ipa
+      failed_when: "dnsrecord.rc != 0 and 'Number of entries returned 0' not in dnsrecord.stdout_lines"
+      changed_when: False
+
+    - name: retrieve lbaas id
+      shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} OS_TENANT_NAME={{ osp_tenant }} neutron lbaas-loadbalancer-show {{ inventory_hostname_short }} -f json
+      register: lbaas_data
+      changed_when: false
+
+    - block:
+        - name: retrieve existing floatingip port id
+          shell:  . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} openstack floating ip show {{ dnsrecord.stdout_lines[2].split(' ')[4] }} -f json
+          register: floatingip_data
+          changed_when: false
+
+        - name: Assign existing floating IP to the load balancer
+          #run_once: true
+          shell:  . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} OS_TENANT_NAME={{ osp_tenant }} neutron floatingip-associate {{ (floatingip_data.stdout|from_json).id }} {{ (lbaas_data.stdout|from_json).vip_port_id }}
+          #run_once: true
+
+        - set_fact:
+            floating_ip: "{{ dnsrecord.stdout_lines[2].split(' ')[4] }}"
+            ansible_host: "{{ dnsrecord.stdout_lines[2].split(' ')[4] }}"
+            osp_internal_ip: "TODO"
+      when: dnsrecord.rc == 0
+
+    - block:
+        - name: Create the floating IP for the load balancer
+          #run_once: true
+          shell:  . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} openstack floating ip create -f json --port {{ (lbaas_data.stdout|from_json).vip_port_id }} {{ infrastructure_network_guests.netname }}
+          register: create_fip
+          #run_once: true
+
+        - set_fact:
+            floating_ip: "{{ (create_fip.stdout|from_json).floating_ip_address }}"
+            ansible_host: "{{ (create_fip.stdout|from_json).floating_ip_address }}"
+            osp_internal_ip: "TODO"
+          # run_once: true
+          # delegate_to: infrastructure
+          # delegate_facts: True
+
+        - name: register DNS for the floating IP
+          shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ floating_ip }}
+          become_user: root
+          become: True
+          delegate_to: ipa
+          with_items: "{{ ((additional_dns|default('')).split(',') + [inventory_hostname_short])|select|list }}"
+
+      when: dnsrecord.rc != 0
+
+    - name: Wait some seconds to finish the creation
+      pause:
+        seconds: 3
+
+
+  become_user: "{{ hostvars['rhosp-director'].rhosp_stack_user }}"
+  become: True
+  delegate_to: rhosp-director
+
+- debug: var=floating_ip
