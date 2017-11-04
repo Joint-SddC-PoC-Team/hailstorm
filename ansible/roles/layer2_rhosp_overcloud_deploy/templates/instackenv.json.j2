@@ -5,7 +5,7 @@
   "host-ip": "{{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('address') }}",
   "arch": "x86_64",
   "nodes": [
-    {% for node in groups['rhosp-control'] %}
+    {% for node in controller %}
     {
       "pm_addr": "{{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('address') }}",
       "pm_password": "{{ ssh_priv_key_undercloud.replace('\n','\\n').replace('\r','') }}",
@@ -21,7 +21,7 @@
       "capabilities": "{% if current_lifecycle_env.osp_controlled_node_placement %}node:control-{{ loop.index0 }},profile:baremetal{% else %}profile:control{% endif %},boot_option:local"
     },
     {% endfor %}
-    {% for node in groups['rhosp-compute'] %}
+    {% for node in compute %}
     {
       "pm_addr": "{{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('address') }}",
       "pm_password": "{{ ssh_priv_key_undercloud.replace('\n','\\n').replace('\r','') }}",

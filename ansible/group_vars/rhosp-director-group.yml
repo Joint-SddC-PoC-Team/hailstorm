@@ -27,7 +27,7 @@ disk:
       mountpoint: /home
       size: 20480
 
-hostname_override: director
+hostname_override: "{{ additional_dns }}"
 
 nic_attachments:
   - "{{ infrastructure_network_provisioning }}"

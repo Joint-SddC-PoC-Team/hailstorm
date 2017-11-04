@@ -19,16 +19,23 @@
         - baremetal
     - name: configure ironic flavor for baremetal (dummy)
       shell: . ~/stackrc && openstack flavor create --id auto --ram 4096 --disk 58 --vcpus 4 baremetal
+
     - name: configure ironic flavors
       shell: >
         . ~/stackrc && openstack flavor create --id auto
-        --ram {{ hostvars[groups['rhosp-' + item][0]].mem }}
-        --disk {{ hostvars[groups['rhosp-' + item][0]].disk.size - 2 }}
-        --vcpus {{ hostvars[groups['rhosp-' + item][0]].vcpu }}
-        {{ item }}
+        --ram {{ item.mem }}
+        --disk {{ item.disk|int - 2 }}
+        --vcpus {{ item.vcpu }}
+        {{ item.name }}
       with_items:
-        - compute
-        - control
+        - name: compute
+          mem: "{{ hostvars[compute[0]].mem }}"
+          disk: "{{ hostvars[compute[0]].disk.size }}"
+          vcpu: "{{ hostvars[compute[0]].vcpu }}"
+        - name: control
+          mem: "{{ hostvars[controller[0]].mem }}"
+          disk: "{{ hostvars[controller[0]].disk.size }}"
+          vcpu: "{{ hostvars[controller[0]].vcpu }}"
     - name: adapt ironic flavors (and match flavor to node profile)
       shell: >
         . ~/stackrc && openstack flavor set
@@ -51,13 +58,13 @@
             . ~/stackrc && ironic node-update \
             $(ironic port-show --address {{ hostvars[item.1].vm_nics[0].mac }} |  awk '/node_uuid/{ print $4 }') \
             add properties/capabilities='{% if current_lifecycle_env.osp_controlled_node_placement %}node:control-{{ item.0}},profile:baremetal{% else %}profile:control{% endif %},boot_option:local'
-          with_indexed_items: "{{ groups['rhosp-control'] }}"
+          with_indexed_items: "{{ controller }}"
         - name: update compute nodes with flavor / node info
           shell: >
             . ~/stackrc && ironic node-update \
             $(ironic port-show --address {{ hostvars[item.1].vm_nics[0].mac }} |  awk '/node_uuid/{ print $4 }') \
             add properties/capabilities='{% if current_lifecycle_env.osp_controlled_node_placement %}node:compute-{{ item.0 }},profile:baremetal{% else %}profile:compute{% endif %},boot_option:local'
-          with_indexed_items: "{{ groups['rhosp-compute'] }}"
+          with_indexed_items: "{{ compute }}"
       when: current_lifecycle_env.openstack_version <= 9
   when: instackenv_json.changed
   become: yes
@@ -68,4 +75,4 @@
     . ~/stackrc && ironic node-update \
     $(ironic port-show --address {{ hostvars[item].vm_nics[0].mac }} |  awk '/node_uuid/{ print $4 }') \
     add properties/hailstorm_name='{{ hostvars[item].inventory_hostname_short }}'
-  with_items: "{{ groups['rhosp-compute'] + groups['rhosp-control'] }}"
+  with_items: "{{ compute + controller }}"

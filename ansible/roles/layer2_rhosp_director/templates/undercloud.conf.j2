@@ -2,19 +2,19 @@
 #undercloud_hostname={{ hostname }}
 local_ip = {{ vm_nics[0].ip }}/24
 local_interface = {{ vm_nics[0].dev }}
-undercloud_public_vip = {% if current_lifecycle_env.openstack_version >= 10 %}{{ hostname }}{% else %}{{ infrastructure_network_provisioning.undercloud_public }}{% endif %}
+undercloud_public_vip = {{ hostname }}
+undercloud_admin_vip = {{ provisioning_admin_vip }}
 
-undercloud_admin_vip = {{ infrastructure_network_provisioning.undercloud_admin }}
 masquerade_network = {{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}0/24
-dhcp_start = {{ infrastructure_network_provisioning.undercloud_dhcp_start }}
-dhcp_end = {{ infrastructure_network_provisioning.undercloud_dhcp_end }}
+dhcp_start = {{ provisioning_dhcp_start }}
+dhcp_end = {{ provisioning_dhcp_end }}
 network_cidr = {{ infrastructure_network_provisioning.default_gw_host_prefix }}
 network_gateway = {{ infrastructure_network_provisioning.default_gw_host_prefix|ipaddr('address') }}
-discovery_iprange = {{ infrastructure_network_provisioning.undercloud_discovery_start }},{{ infrastructure_network_provisioning.undercloud_discovery_end }}
+discovery_iprange = {{ provisioning_discovery_start }},{{ provisioning_discovery_end }}
 store_events = true
 
-{% if current_lifecycle_env.openstack_version >= 10 %}
 enable_ui = true
+enable_validations = true
 {% if ssl_key is defined and ssl_cert is defined %}
 undercloud_service_certificate = /etc/pki/instack-certs/undercloud.pem
 {% else %}
@@ -22,7 +22,8 @@ generate_service_certificate = true
 certificate_generation_ca = IPA
 service_principal = haproxy/{{ hostname }}@{{ hailstorm_dns_domain|upper }}
 {% endif %}
-{% endif %}
+
+hieradata_override = /home/stack/custom_hiera.yaml
 
 [auth]
 undercloud_admin_password = {{ root_password }}

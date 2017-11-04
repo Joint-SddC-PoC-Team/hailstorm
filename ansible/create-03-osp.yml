@@ -1,5 +1,5 @@
 ---
-- hosts: layer1
+- hosts: layer1-group
   remote_user: root
   gather_facts: false
   pre_tasks:
@@ -18,7 +18,7 @@
   roles:
     - { role: layer2_vms, tags: [ 'layer2', 'rhosp', 'vm' ], mode: create }
 
-- hosts: rhosp-director
+- hosts: rhosp-director-group
   remote_user: root
   gather_facts: false
   roles:
@@ -41,20 +41,42 @@
     - role: layer2_rhosp_director
       tags: ['layer2', 'rhosp', 'undercloud' ]
       mode: create
+
+- hosts: overcloud2-director-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer2_ipa_certificate
+      tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-cert']
+      mode: create
+      certcn: 'openstack2.{{ hailstorm_dns_domain }}'
+      when: current_lifecycle_env.osp_use_tls
+    - role: layer2_rhosp_overcloud_deploy
+      tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-deploy']
+      mode: prepare
+      controller: "{{ groups['overcloud2-controller-group'] }}"
+      compute: "{{ groups['overcloud2-compute-group'] }}"
+
+- hosts: overcloud-director-group
+  remote_user: root
+  gather_facts: false
+  roles:
     - role: layer2_ipa_certificate
       tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-cert']
       mode: create
       certcn: 'openstack.{{ hailstorm_dns_domain }}'
       when: current_lifecycle_env.osp_use_tls
-    - role: layer2_ceph_openstackconfig
-      tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-ceph']
-      mode: create
-      when: current_lifecycle_env.osp_storage_backend == "ceph_ownvms"
+    # - role: layer2_ceph_openstackconfig
+    #   tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-ceph']
+    #   mode: create
+    #   when: current_lifecycle_env.osp_storage_backend == "ceph_ownvms"
     - role: layer2_rhosp_overcloud_deploy
       tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-deploy']
       mode: create
+      controller: "{{ groups['overcloud-controller-group'] }}"
+      compute: "{{ groups['overcloud-compute-group'] }}"
 
-- hosts: rhosp-control
+- hosts: overcloud-controller-group
   remote_user: root
   gather_facts: false
   roles:
@@ -62,7 +84,7 @@
       tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-controller']
       mode: create
 
-- hosts: rhosp-director
+- hosts: overcloud-director-group
   remote_user: root
   gather_facts: false
   roles:
@@ -70,12 +92,10 @@
       tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-configure']
       mode: create
 
-- hosts: rhosp-control
+- hosts: overcloud-controller-group
   remote_user: root
   gather_facts: false
   roles:
     - role: layer2_rhosp_overcloud_configure_lbaas
       tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-controller']
       mode: create
-
-

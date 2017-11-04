@@ -1,7 +1,7 @@
 ---
 #### RHEV ####
 
-- hosts: layer1
+- hosts: layer1-group
   remote_user: root
   gather_facts: false
   pre_tasks:
