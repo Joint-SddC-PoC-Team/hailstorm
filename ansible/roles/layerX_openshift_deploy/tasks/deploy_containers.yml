@@ -3,8 +3,17 @@
   register: rc
   changed_when: false
 
+- name: oadm policy add-scc-to-user hostnetwork -z router
+  command: oadm policy add-scc-to-user hostnetwork -z router -n default
+  when: "'router' not in rc.stdout"
+
 - name: deploy router
-  command: oc adm router router --replicas={{ groups['ocp-infra-group']|length }} --service-account=router
+  command: >
+    oc adm router router
+    --replicas={{ groups['ocp-infra-group']|length }}
+    --service-account=router
+    --selector='region=infra'
+    -n default
   when: "'router' not in rc.stdout"
 
 - name: deploy registry

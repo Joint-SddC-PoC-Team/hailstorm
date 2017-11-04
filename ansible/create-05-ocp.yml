@@ -16,6 +16,7 @@
       mode: create
       when: groups['ocp-osp-vm-group']|length > 0
 
+# instantiate VMs
 - hosts: ocp-osp-vm-group
   remote_user: root
   gather_facts: false
@@ -23,11 +24,8 @@
     - role: layer3_vm_on_openstack
       tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'vm','dnat' ]
       mode: create
-    - role: layer3_vm_on_openstack_etc_hosts_internal_ips
-      tags: [ 'layer3', 'ocp', 'ocp-osp', 'vm', 'ocp-vm', 'etc-hosts' ]
-      mode: create
-      group: "{{ groups['ocp-osp-vm-group'] }}"
 
+# instantiate LBaaS
 - hosts: ocp-osp-lbaas-group
   gather_facts: false
   remote_user: root
@@ -37,6 +35,18 @@
       mode: create
       when: groups['ocp-osp-vm-group']|length > 0
 
+# write VM+LBaaS tenant IPs to /etc/hosts
+- hosts: ocp-osp-vm-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_openstack_etc_hosts_internal_ips
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'vm', 'ocp-vm', 'etc-hosts' ]
+      mode: create
+      group: "{{ groups['ocp-osp-vm-group']+groups['ocp-osp-lbaas-group'] }}"
+      when: groups['ocp-osp-vm-group']|length > 0
+
+# write floatign IPs to DNAT DNS
 - hosts: infrastructure
   remote_user: root
   gather_facts: false
@@ -47,6 +57,7 @@
      group: "{{ groups['ocp-osp-lbaas-group'] }}"
      when: groups['ocp-osp-vm-group']|length > 0
 
+# register wildcard hosts with floating IPs in IPA
 - hosts: ipa
   remote_user: root
   gather_facts: false

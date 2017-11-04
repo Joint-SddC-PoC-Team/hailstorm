@@ -74,9 +74,9 @@ openshift_master_named_certificates=[{"certfile": "/root/openshift.crt", "keyfil
 openshift_master_overwrite_named_certificates=true
 {% endif %}
 
-#don't automatically deploy registry to allow finer-grained control
-openshift_hosted_manage_registry=false
-#openshift_hosted_manage_router=false
+#don't automatically deploy router to allow finer-grained control
+#openshift_hosted_manage_registry=false
+openshift_hosted_manage_router=false
 openshift_router_selector="region=infra"
 openshift_registry_selector="region=infra"
 

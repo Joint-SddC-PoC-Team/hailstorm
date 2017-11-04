@@ -104,7 +104,7 @@
         - set_fact:
             floating_ip: "{{ dnsrecord.stdout_lines[2].split(' ')[4] }}"
             ansible_host: "{{ dnsrecord.stdout_lines[2].split(' ')[4] }}"
-            osp_internal_ip: "TODO"
+            osp_internal_ip: "{{ (lbaas_data.stdout|from_json).vip_address }}"
       when: dnsrecord.rc == 0
 
     - block:
@@ -117,7 +117,7 @@
         - set_fact:
             floating_ip: "{{ (create_fip.stdout|from_json).floating_ip_address }}"
             ansible_host: "{{ (create_fip.stdout|from_json).floating_ip_address }}"
-            osp_internal_ip: "TODO"
+            osp_internal_ip: "{{ (lbaas_data.stdout|from_json).vip_address }}"
           # run_once: true
           # delegate_to: infrastructure
           # delegate_facts: True
