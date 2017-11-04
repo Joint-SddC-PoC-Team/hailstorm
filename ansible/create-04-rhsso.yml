@@ -17,6 +17,17 @@
       tags: [ 'layer3', 'rhsso', 'vm' ]
       mode: create
 
+# write floatign IPs to DNAT DNS
+- hosts: infrastructure
+  remote_user: root
+  gather_facts: false
+  roles:
+   - role: layer2_dnat_dns
+     tags: [ 'layer3', 'rhsso', 'dnat']
+     mode: floating_ip
+     group: "{{ groups['rh-sso-osp-vm-group'] }}"
+     when: groups['rh-sso-osp-vm-group']|length > 0
+
 - hosts: rh-sso-group
   remote_user: root
   gather_facts: false

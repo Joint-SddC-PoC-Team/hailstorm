@@ -38,7 +38,7 @@
 
 - name: create pkcs12 keystore
   shell: openssl pkcs12 -export -in /root/rhsso.crt -inkey /root/rhsso.key -name keycloak -CAfile /root/rhsso-ca.crt -caname rootca -out /root/keycloak.p12 -password pass:keystore
-  when: keycloak_p12.stat.exists == false
+  when: not keycloak_p12.stat.exists
 
 - name: check for jks keystore existance
   stat: path=/opt/rh/rh-sso7/root/usr/share/keycloak/standalone/configuration/keycloak.jks
