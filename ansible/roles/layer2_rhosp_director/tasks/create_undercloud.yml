@@ -1,3 +1,7 @@
+- name: create custom hiera data file
+  template: src=custom_hiera.yaml.j2 dest=~/custom_hiera.yaml mode=0644
+  become: yes
+  become_user: "{{ rhosp_stack_user }}"
 - name: create undercloud.conf
   template: src=undercloud.conf.j2 dest=~/undercloud.conf mode=0644
   become: yes
