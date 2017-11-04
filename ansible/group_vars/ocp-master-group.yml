@@ -1,4 +1,7 @@
 ---
+ose_management_infra_project: management-infra
+ose_cfme_serviceaccount_name: management-admin
+
 mem: "{{ layer2_ose3node_mem }}"
 vcpu: "{{ layer2_ose3node_cpu }}"
 

@@ -16,10 +16,17 @@
     floating_ip: "{{ openstack_servers[0]['accessIPv4'] }}"
     ansible_host: "{{ openstack_servers[0]['accessIPv4'] }}"
     ansible_ssh_common_args: "-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no"
-  when: vm_exists and ansible_host == inventory_hostname_short and jump_host is not defined
+  when: vm_exists and ansible_host|default(inventory_hostname_short) == inventory_hostname_short and jump_host is not defined
+
+- fail: msg="missing floating ip config"
+  when: >
+    jump_host is not defined and
+    ansible_host|default(inventory_hostname_short) == inventory_hostname_short
 
 - fail: msg="fail if jump host is required but not configured"
-  when: jump_host is defined and hostvars[jump_host].ansible_host == inventory_hostname_short
+  when: >
+    jump_host is defined and
+    hostvars[jump_host].ansible_host|default(inventory_hostname_short) == inventory_hostname_short
 
 - name: set ansible_host and set ansible_ssh_common_args for VMs via jump host
   set_fact:
@@ -27,7 +34,11 @@
     ansible_ssh_common_args: "-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no -o ProxyCommand='ssh -i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -W %h:%p -q root@{{ hostvars[jump_host].ansible_host }}'"
     vm_exists: true
     override_wait_for_delegate_host: "{{ jump_host }}"
-  when: vm_exists and ansible_host == inventory_hostname_short and jump_host is defined and hostvars[jump_host].ansible_host != inventory_hostname_short
+  when: >
+    vm_exists and
+    ansible_host|default(inventory_hostname_short) == inventory_hostname_short and
+    jump_host is defined and
+    hostvars[jump_host].ansible_host != inventory_hostname_short
 
 - name: set osp_internal_ip
   set_fact:

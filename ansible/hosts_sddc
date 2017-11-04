@@ -247,14 +247,14 @@ cloudforms-wk-osp01  jump_host=cloudforms-ui01 Xansible_host=10.116.127.204 acti
 
 #zone 919000000000005
 [cloudforms-wk-rhev]
-cloudforms-wk-rhev01  jump_host=cloudforms-ui01 Xansible_host=10.116.127.205 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-rhev" wk-rhev=true extra_disks=false osp_tenant="demo-infra" osp_flavor="cf.xlarge" osp_image="Cloudforms"
+#cloudforms-wk-rhev01  jump_host=cloudforms-ui01 Xansible_host=10.116.127.205 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-rhev" wk-rhev=true extra_disks=false osp_tenant="demo-infra" osp_flavor="cf.xlarge" osp_image="Cloudforms"
 
 [cloudforms-group:children]
 cloudforms-db
 cloudforms-ui
 cloudforms-wk-ocp
 cloudforms-wk-osp
-#cloudforms-wk-rhev
+cloudforms-wk-rhev
 
 #### END CLOUDFORMS
 
