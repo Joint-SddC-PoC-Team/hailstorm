@@ -10,7 +10,7 @@
 #    - debug: var=existing_host.results.item
 
     - name: create host in IPA DB
-      shell: echo "{{ hostvars['ipa'].ipa_admin_password }}" | kinit admin 1>/dev/null && ipa host-add {{ item.item }}
+      shell: echo "{{ hostvars['ipa'].ipa_admin_password }}" | kinit admin 1>/dev/null && ipa host-add {{ item.item }} --force
       #when: item.item == ""
       when: item.item not in item.stdout_lines
       with_items: "{{ existing_host.results }}"
@@ -23,7 +23,7 @@
       with_items: "{{ existing_host.results }}"
 
     - name: create principal for host
-      shell: echo "{{ hostvars['ipa'].ipa_admin_password }}" | kinit admin 1>/dev/null && ipa service-add {{ service|default('HTTP') }}/{{ item.item.item }}
+      shell: echo "{{ hostvars['ipa'].ipa_admin_password }}" | kinit admin 1>/dev/null && ipa service-add {{ service|default('HTTP') }}/{{ item.item.item }} --force
       when: item.stdout == ""
       with_items: "{{ existing_principal.results }}"
 

@@ -6,6 +6,7 @@
       changed_when: false
       failed_when: false
       register: existing_host
+    #- debug: var=existing_host.results
     - name: create host in IPA DB
       shell: echo "{{ hostvars['ipa'].ipa_admin_password }}" | kinit admin 1>/dev/null && ipa host-add {{ host|default(hostname) }}
       when:  host|default(hostname) not in existing_host.stdout_lines
