@@ -3,21 +3,19 @@
 - include: create-01-base.yml
   when: is_install_host is not defined or is_install_host!="yes"
 
-- include: create-02-ansibletower.yml
+- include: create-03-ansibletower.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
-- include: create-02-rhev.yml
+- include: create-03-rhev.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-02-nuage.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
-- include: create-02-osp.yml
+- include: create-03-osp.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
-- include: create-02-ocp.yml
+- include: create-05-ocp.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
-- include: create-03-ocp.yml
+- include: create-07-finalize.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
-- include: create-03-finalize.yml
-  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
-- include: create-04-democontent.yml
+- include: create-08-democontent.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 
 # If we use a install host, indicate how to continue
