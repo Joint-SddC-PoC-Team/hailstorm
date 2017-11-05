@@ -2,16 +2,19 @@
 # Condition bug https://github.com/ansible/ansible/issues/17193
 - include: create-01-base.yml
   when: is_install_host is not defined or is_install_host!="yes"
-
+- include: create-02-nuage.yml
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-03-ansibletower.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
-- include: create-03-rhev.yml
-  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
-- include: create-02-nuage.yml
+- include: create-03-rhv.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-03-osp.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
+- include: create-04-rhsso.yml
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-05-ocp.yml
+  when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
+- include: create-06-cloudforms.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-07-finalize.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
@@ -30,5 +33,3 @@
           delegate_to: localhost
         - debug: msg="Installation continues on install host, connect to {{ hostvars['install-host'].vm_nics[0].ip }} and run tmux attach -t ansible-{{ whoami.stdout }}"
       when: current_lifecycle_env.use_install_host is defined and current_lifecycle_env.use_install_host==True
-
-
