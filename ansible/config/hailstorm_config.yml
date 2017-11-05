@@ -885,14 +885,14 @@ osp_host_aggregates:
   - name: DEV
     availability_zone: development
     hosts:
-     - overcloud-compute-0.localdomain
+     - overcloud-compute-0.{{ hailstorm_dns_domain }}
 
   - name: PROD
     availability_zone: nova
     hosts:
-     - overcloud-compute-1.localdomain
-     - overcloud-compute-2.localdomain
-     - overcloud-compute-3.localdomain
+     - overcloud-compute-1.{{ hailstorm_dns_domain }}
+     - overcloud-compute-2.{{ hailstorm_dns_domain }}
+     - overcloud-compute-3.{{ hailstorm_dns_domain }}
 
 proxy_users:
   - { "name": "satellite", "password": "redhat01" }
