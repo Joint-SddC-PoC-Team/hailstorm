@@ -11,5 +11,3 @@
   with_items: "{{ outer_item.security_groups }}"
   loop_control:
      loop_var: inner_item
-
-

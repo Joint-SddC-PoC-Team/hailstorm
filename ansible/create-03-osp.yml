@@ -12,7 +12,7 @@
     - role: layer1_ceph_inventory
       tags: [ 'layer2', 'ceph', 'overcloud', 'overcloud-ceph' ]
 
-- hosts: rhosp-all
+- hosts: rhosp-all-group
   remote_user: root
   gather_facts: false
   roles:
@@ -47,12 +47,12 @@
   gather_facts: false
   roles:
     - role: layer2_ipa_certificate
-      tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-cert']
+      tags: ['layer2', 'rhosp', 'overcloud2', 'overcloud2-cert']
       mode: create
       certcn: 'openstack2.{{ hailstorm_dns_domain }}'
       when: current_lifecycle_env.osp_use_tls
     - role: layer2_rhosp_overcloud_deploy
-      tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-deploy']
+      tags: ['layer2', 'rhosp', 'overcloud2', 'overcloud2-deploy']
       mode: prepare
       controller: "{{ groups['overcloud2-controller-group'] }}"
       compute: "{{ groups['overcloud2-compute-group'] }}"

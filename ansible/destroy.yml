@@ -1,45 +1,6 @@
 ---
-- hosts: install-host
-  gather_facts: false
-  remote_user: root
-  roles:
-    - role: layer2_vms
-      tags: [ 'layer2','install-host', 'vm' ]
-      mode: start
-    - role: layer2_nuage
-      tags: [ 'layer2', 'nuage' ]
-      mode: destroy
-    - role: layer2_installhost
-      tags: [ 'layer2', 'install-host' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layerX_ipa_client
-      tags: [ 'layer2','install-host', 'ipa-client' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer2_rhel
-      tags: [ 'layer2','install-host', 'rhel' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer2_vms
-      tags: [ 'layer2','install-host', 'vm' ]
-      mode: destroy
 
-# - hosts: test-rhel
-#   gather_facts: false
-#   remote_user: root
-#   roles:
-#     - role: layer2_vms
-#       tags: [ 'layer2', 'test-rhel', 'vm' ]
-#       mode: start
-#     - role: layer2_rhel
-#       tags: [ 'layer2', 'test-rhel', 'rhel' ]
-#       mode: destroy
-#     - role: layer2_vms
-#       tags: [ 'layer2', 'test-rhel', 'vm' ]
-#       mode: destroy
-
-- hosts: dev-client
+- hosts: dev-client-group
   gather_facts: false
   remote_user: root
   roles:
@@ -62,7 +23,7 @@
       tags: [ 'layer2','dev-client', 'ose3', 'vm' ]
       mode: destroy
 
-- hosts: lookbusy-rhev
+- hosts: lookbusy-rhev-group
   gather_facts: false
   remote_user: root
   roles:
@@ -79,7 +40,7 @@
       when: vm_exists is defined and vm_exists == true
 
 
-- hosts: lookbusy-osp
+- hosts: lookbusy-osp-group
   gather_facts: false
   remote_user: root
   roles:
@@ -95,29 +56,90 @@
       mode: destroy
       when: vm_exists is defined and vm_exists == true
 
-- hosts: efk
+
+
+### BEGIN CLOUDFORMS
+
+- hosts: cf-rhv-vm-group
   gather_facts: false
   remote_user: root
   roles:
-    - role: layer2_vms
-      tags: [ 'layer2','efk', 'rhel' ]
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf', 'vm']
       mode: start
+      when: cf_is_deployed_on == 'rhv'
+
+- hosts: cf-osp-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer2', 'cf', 'vm' ]
+      mode: start
+      when: cf_is_deployed_on == 'osp'
+
+- hosts: cloudforms-group
+  gather_facts: false
+  remote_user: root
+  roles:
     - role: layer2_rhel
-      tags: [ 'layer2','efk', 'rhel' ]
+      tags: [ 'layer3', 'cf', 'rhel']
       mode: destroy
       when: vm_exists is defined and vm_exists == true
-    - role: layer2_vms
-      tags: [ 'layer2','efk', 'vm' ]
+
+- hosts: cf-rhv-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer2', 'cf', 'vm' ]
       mode: destroy
+      when: cf_is_deployed_on == 'rhv' and vm_exists is defined and vm_exists == true
+    - role: layer3_cloudforms_rhev_template
+      tags: [ 'layer3', 'cf', 'cf-template' ]
+      mode: destroy
+      when: cf_is_deployed_on == 'rhv'
+
+- hosts: cf-osp-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer2', 'cf', 'vm' ]
+      mode: destroy
+      when: cf_is_deployed_on == 'osp' and vm_exists is defined and vm_exists == true
+
+#### END CLOUDFORMS
 
 
-- hosts: ocp-osp-vm-group,ocp-l2-vm-group
+#### BEGIN OPENSHIFT
+
+- hosts: ocp-l2-vm-group
   gather_facts: false
   remote_user: root
   roles:
     - role: layer2_vms
-      tags: [ 'layer2','ose3', 'rhel','ose3-devops', 'ose3-testvm' ]
+      tags: [ 'layer2', 'ocp', 'vm' ]
       mode: start
+      when: ocp_is_deployed_on == 'baremetal'
+
+- hosts: ocp-rhv-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'ocp', 'vm']
+      mode: start
+      when: ocp_is_deployed_on == 'rhv'
+
+- hosts: ocp-osp-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer2', 'ocp', 'vm' ]
+      mode: start
+      when: ocp_is_deployed_on == 'osp'
 
 - hosts: ocp-installer-group
   remote_user: root
@@ -144,172 +166,130 @@
       mode: destroy
       oidcClientName: 'ocp-master'
 
-- hosts: ocp-osp-vm-group,ocp-l2-vm-group
+- hosts: ocp-l2-vm-group
   gather_facts: false
   remote_user: root
   roles:
-    - role: layer2_rhel
-      tags: [ 'layer2','ose3', 'rhel' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
     - role: layer2_vms
-      tags: [ 'layer2','ose3', 'vm' ]
+      tags: [ 'layer2', 'ocp', 'vm' ]
       mode: destroy
+      when: ocp_is_deployed_on == 'baremetal' and vm_exists is defined and vm_exists == true
+
+- hosts: ocp-rhv-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'ocp', 'vm']
+      mode: destroy
+      when: ocp_is_deployed_on == 'rhv' and vm_exists is defined and vm_exists == true
+
+- hosts: ocp-osp-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer2', 'ocp', 'vm' ]
+      mode: destroy
+      when: ocp_is_deployed_on == 'osp' and vm_exists is defined and vm_exists == true
 
 - hosts: ocp-osp-lbaas-group
   gather_facts: false
   remote_user: root
   roles:
-     - { role: layer3_lbaas_on_openstack,  tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ], mode: destroy }
+    - role: layer3_lbaas_on_openstack
+      tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ]
+      mode: destroy
+      when: ocp_is_deployed_on == 'osp'
+
+#### END OPENSHIFT
 
 
-- hosts: cloudforms
+#### BEGIN RH SSO
+
+- hosts: rh-sso-l2-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer2_vms
+      tags: [ 'layer2', 'rhsso', 'vm', 'rhsso-install' ]
+      mode: start
+      when: rhsso_is_deployed_on == 'baremetal'
+
+- hosts: rh-sso-rhv-vm-group
   gather_facts: false
   remote_user: root
   roles:
     - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
+      tags: [ 'layer2', 'rhsso', 'vm', 'rhsso-install' ]
       mode: start
-    - role: layer2_rhel
-      tags: [ 'layer3', 'cf', 'rhel']
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_cloudforms_rhev_template
-      tags: [ 'layer3', 'cf', 'cf-template' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
+      when: rhsso_is_deployed_on == 'rhv'
 
-- hosts: cloudforms-ui
-  gather_facts: false
-  remote_user: root
-  roles:
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: start
-    - role: layer2_rhel
-      tags: [ 'layer3', 'cf', 'rhel']
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_cloudforms_rhev_template
-      tags: [ 'layer3', 'cf', 'cf-template' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-
-- hosts: cloudforms-db
-  gather_facts: false
-  remote_user: root
-  roles:
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: start
-    - role: layer2_rhel
-      tags: [ 'layer3', 'cf', 'rhel']
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_cloudforms_rhev_template
-      tags: [ 'layer3', 'cf', 'cf-template' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-
-- hosts: cloudforms-wk-osp
-  gather_facts: false
-  remote_user: root
-  roles:
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: start
-    - role: layer2_rhel
-      tags: [ 'layer3', 'cf', 'rhel']
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_cloudforms_rhev_template
-      tags: [ 'layer3', 'cf', 'cf-template' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-
-- hosts: cloudforms-wk-ocp
-  gather_facts: false
-  remote_user: root
-  roles:
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: start
-    - role: layer2_rhel
-      tags: [ 'layer3', 'cf', 'rhel']
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_cloudforms_rhev_template
-      tags: [ 'layer3', 'cf', 'cf-template' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-
-- hosts: cloudforms-wk-rhev
-  gather_facts: false
-  remote_user: root
-  roles:
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: start
-    - role: layer2_rhel
-      tags: [ 'layer3', 'cf', 'rhel']
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'cf' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_cloudforms_rhev_template
-      tags: [ 'layer3', 'cf', 'cf-template' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-
-
-
-
-
-- hosts: cloudforms-osp
+- hosts: rh-sso-osp-vm-group
   gather_facts: false
   remote_user: root
   roles:
     - role: layer3_vm_on_openstack
-      tags: [ 'layer3','cloudforms-osp' ]
-      mode: readfacts
-    - role: layer2_rhel
-      tags: [ 'layer3','cloudforms-osp', 'rhel' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer3_vm_on_openstack
-      tags: [ 'layer3','cloudforms-osp', 'vm' ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
+      tags: [ 'layer2', 'rhsso', 'vm', 'rhsso-install' ]
+      mode: start
+      when: rhsso_is_deployed_on == 'osp'
 
-- hosts: rhevm
-  remote_user: root
+- hosts: rh-sso-group
   gather_facts: false
+  remote_user: root
   roles:
-    - { role: layer2_rhel_version_switch, tags: [ 'layer2', 'rhev', 'rhel' ], mode: destroy }
+    - role: layer2_rhsso
+      tags: [ 'layer2', 'rhsso', 'rhsso-install' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layerX_ipa_client
+      tags: [ 'layer2', 'rhsso', 'ipa-client' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer2_rhel
+      tags: [ 'layer2', 'rhsso', 'rhel' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
 
-- hosts: rhev
+- hosts: rh-sso-l2-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer2_vms
+      tags: [ 'layer2', 'rhsso', 'vm', 'rhsso-install' ]
+      mode: destroy
+      when: rhsso_is_deployed_on == 'baremetal' and vm_exists is defined and vm_exists == true
+
+- hosts: rh-sso-rhv-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'rhsso', 'vm', 'rhsso-install' ]
+      mode: destroy
+      when: rhsso_is_deployed_on == 'rhv' and vm_exists is defined and vm_exists == true
+
+- hosts: rh-sso-osp-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3', 'rhsso', 'vm', 'rhsso-install' ]
+      mode: destroy
+      when: rhsso_is_deployed_on == 'osp' and vm_exists is defined and vm_exists == true
+
+#### END RH SSO
+
+
+#### BEGIN RHV
+
+# - hosts: rhvm-group
+#   remote_user: root
+#   gather_facts: false
+#   roles:
+#     - { role: layer2_rhel_version_switch, tags: [ 'layer2', 'rhev', 'rhel' ], mode: destroy }
+
+- hosts: rhv-group
   gather_facts: false
   remote_user: root
   roles:
@@ -317,7 +297,7 @@
       tags: [ 'layer2','rhev', 'rhel' ]
       mode: start
 
-- hosts: rhevm
+- hosts: rhvm-group
   remote_user: root
   gather_facts: false
   roles:
@@ -330,7 +310,7 @@
       mode: destroy
       when: vm_exists is defined and vm_exists == true
 
-- hosts: rhev
+- hosts: rhv-group
   gather_facts: false
   remote_user: root
   roles:
@@ -341,6 +321,11 @@
     - role: layer2_vms
       tags: [ 'layer2','rhev', 'vm' ]
       mode: destroy
+
+#### END RHV
+
+
+#### BEGIN OPENSTACK+CEPH
 
 - hosts: overcloud-director-group
   gather_facts: false
@@ -380,7 +365,7 @@
       mode: destroy
       when: vm_exists is defined and vm_exists == true
 
-- hosts: rhosp-all
+- hosts: rhosp-all-group
   gather_facts: false
   remote_user: root
   roles:
@@ -388,7 +373,12 @@
       tags: [ 'layer2','rhosp', 'vm' ]
       mode: destroy
 
-- hosts: tower
+#### END OPENSTACK+CEPH
+
+
+#### BEGIN TOWER
+
+- hosts: tower-group
   gather_facts: false
   remote_user: root
   roles:
@@ -422,9 +412,11 @@
       tags: [ 'layer2','tower', 'vm' ]
       mode: destroy
 
+#### END TOWER
 
-#### CEPH
-- hosts: storage-console
+#### BEGIN CEPH STANDALONE
+
+- hosts: storage-console-group
   gather_facts: false
   remote_user: root
   roles:
@@ -444,21 +436,21 @@
   roles:
     - { role: layer1_ceph_inventory, tags: [ 'layer2', 'ceph' ] }
 
-- hosts: ceph
+- hosts: ceph-group
   gather_facts: false
   remote_user: root
   roles:
     - role: layer2_vms
       tags: [ 'layer2','ceph', 'rhel' ]
       mode: start
-- hosts: ceph-installer
+- hosts: ceph-installer-group
   remote_user: root
   gather_facts: false
   roles:
     - role: layer2_ceph_installer
       tags: [ 'layer2', 'ceph', 'ceph-install', 'ceph-installer' ]
       mode: destroy
-- hosts: ceph
+- hosts: ceph-group
   gather_facts: false
   remote_user: root
   roles:
@@ -470,7 +462,33 @@
       tags: [ 'layer2','ceph', 'vm' ]
       mode: destroy
 
-- hosts: infrastructure
+#### END CEPH STANDALONE
+
+
+#### BEGIN EFK
+
+- hosts: efk-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer2_vms
+      tags: [ 'layer2','efk', 'rhel' ]
+      mode: start
+    - role: layer2_rhel
+      tags: [ 'layer2','efk', 'rhel' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+    - role: layer2_vms
+      tags: [ 'layer2','efk', 'vm' ]
+      mode: destroy
+      when: vm_exists is defined and vm_exists == true
+
+#### END EFK
+
+
+#### BEGIN INFRASTRUCTURE
+
+- hosts: infrastructure-group
   gather_facts: false
   remote_user: root
   roles:
@@ -485,45 +503,41 @@
       tags: [ 'layer2','infrastructure', 'vm' ]
       mode: destroy
 
-- hosts: test-rhel
-  gather_facts: false
-  remote_user: root
-  roles:
-    - role: layer2_vms
-      tags: [ 'layer2',  "test-rhel", 'rhel' ]
-      mode: start
-    - role: layer2_rhel
-      tags: [ 'layer2', 'rhel', 'test-rhel'  ]
-      mode: destroy
-      when: vm_exists is defined and vm_exists == true
-    - role: layer2_vms
-      tags: [ 'layer2', 'vm', 'test-rhel' ]
-      mode: destroy
+#### END INFRASTRUCTURE
 
-- hosts: rh-sso
+#### BEGIN INSTALL-HOST
+
+- hosts: install-host-group
   gather_facts: false
   remote_user: root
   roles:
     - role: layer2_vms
-      tags: [ 'layer2', 'rhsso', 'vm', 'rhsso-install' ]
+      tags: [ 'layer2','install-host', 'vm' ]
       mode: start
-    - role: layer2_rhsso
-      tags: [ 'layer2', 'rhsso', 'rhsso-install' ]
+    - role: layer2_nuage
+      tags: [ 'layer2', 'nuage' ]
+      mode: destroy
+    - role: layer2_installhost
+      tags: [ 'layer2', 'install-host' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
     - role: layerX_ipa_client
-      tags: [ 'layer2', 'rhsso', 'ipa-client' ]
+      tags: [ 'layer2','install-host', 'ipa-client' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
     - role: layer2_rhel
-      tags: [ 'layer2', 'rhsso', 'rhel' ]
+      tags: [ 'layer2','install-host', 'rhel' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
     - role: layer2_vms
-      tags: [ 'layer2', 'rhsso', 'vm' ]
+      tags: [ 'layer2','install-host', 'vm' ]
       mode: destroy
 
-- hosts: ipa
+#### END INSTALL-HOST
+
+#### BEGIN IPA
+
+- hosts: ipa-group
   gather_facts: false
   remote_user: root
   roles:
@@ -542,7 +556,11 @@
       tags: [ 'layer2','ipa', 'vm' ]
       mode: destroy
 
-- hosts: satellite
+#### END IPA
+
+#### BEGIN SATELLITE
+
+- hosts: satellite-group
   gather_facts: false
   remote_user: root
   roles:
@@ -562,6 +580,10 @@
       tags: [ 'layer2','satellite', 'vm' ]
       mode: destroy
       when: destroy_satellite is defined and destroy_satellite
+
+#### END SATELLITE
+
+#### BEGIN PROXY
 
 - hosts: proxy-group
   gather_facts: false
@@ -586,8 +608,9 @@
       tags: [ 'layer2','proxy', 'vm' ]
       mode: destroy
 
+#### END PROXY
 
-- hosts: layer1
+- hosts: layer1-group
   gather_facts: false
   remote_user: root
   roles:
@@ -600,7 +623,7 @@
     - role: layer1_rhosp
       tags: [ 'layer1', 'rhosp' ]
       mode: destroy
-      group: rhosp-all
+      group: rhosp-all-group
     - role: layer1_dnat
       tags: [ 'layer1', 'dnat' ]
       mode: destroy

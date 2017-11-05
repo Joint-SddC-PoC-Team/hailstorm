@@ -40,5 +40,5 @@ disk:
 openshift_master_api_host_and_port: openshift.{{ hailstorm_dns_domain }}:443
 
 vm_secgroups:
-  - ocp_master
-  - ocp_appnode
+  - "master-{{ ocp_tenant }}"
+  - "appnode-{{ ocp_tenant }}"

@@ -17,6 +17,7 @@
         regexp: "{{ hostvars[item].osp_internal_ip }} {{ item }} {{ item }}\\.{{ hailstorm_dns_domain }}.*$"
       when: hostvars[item].osp_internal_ip|default('') != ''
       with_items: "{{ group }}"
+      ignore_errors: true
   when: mode=="create"
 
 # - block:

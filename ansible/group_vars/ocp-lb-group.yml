@@ -35,4 +35,4 @@ repos:
 pool_regex: "{{ rhel_subscription_pool_regex }}"
 
 vm_secgroups:
-    - ocp_lb
+    - loadbalancer-{{ ocp_tenant }}

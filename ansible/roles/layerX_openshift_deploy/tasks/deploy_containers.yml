@@ -44,7 +44,7 @@
     - name: add pvc to registry
       command: oc -n default volume deploymentconfigs/docker-registry --add --name=registry-storage -t pvc --claim-name=docker-registry --overwrite
       when: "'docker-registry' not in pvc.stdout"
-  when: groups['ocp-osp-vm-group']|length == 0
+  when: cf_is_deployed_on != 'osp'
 
 # use Swift backend when running on OpenStack
 # see https://docs.openshift.com/container-platform/3.6/install_config/registry/extended_registry_configuration.html#advanced-overriding-the-registry-configuration
@@ -64,4 +64,4 @@
     - name: point env path to configmap
       shell: oc -n default set env dc/docker-registry REGISTRY_CONFIGURATION_PATH=/etc/docker/registry/docker-registry-swift.yaml
       when: "'registry-config' not in configmap.stdout"
-  when: groups['ocp-osp-vm-group']|length > 0
+  when: cf_is_deployed_on == 'osp'

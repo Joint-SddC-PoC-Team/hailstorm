@@ -132,7 +132,10 @@ lifecycle_environments:
 
 current_lifecycle_env: "{{ lifecycle_environments|selectattr('name','match','^'+stage+'$')|first }}"
 
-
+# DEPLOYMENT RULE HELPER
+ocp_is_deployed_on: "{% if groups['ocp-osp-vm-group']|length > 0 %}osp{% elif groups['ocp-rhv-vm-group']|length > 0 %}rhv{% elif groups['ocp-l2-vm-group']|length > 0%}baremetal{% else %}none{% endif %}"
+rhsso_is_deployed_on: "{% if groups['rh-sso-osp-vm-group']|length > 0 %}osp{% elif groups['rh-sso-rhv-vm-group']|length > 0 %}rhv{% elif groups['rh-sso-l2-vm-group']|length > 0%}baremetal{% else %}none{% endif %}"
+cf_is_deployed_on: "{% if groups['cf-osp-vm-group']|length > 0 %}osp{% elif groups['cf-rhv-vm-group']|length > 0 %}rhv{% else %}none{% endif %}"
 
 # RED HAT SUBSCRIPTIONS
 satellite_subscription_pool_regex: "^(Red Hat Satellite Employee Subscription|Red Hat Satellite)$"
@@ -764,8 +767,15 @@ osp_projects:
       volumes: 50
       ram: 204800
       instances: 20
+
+  - name: infra-cloudforms
+    quota:
+      cores: 100
+      volumes: 50
+      ram: 204800
+      instances: 20
     security_groups:
-      webserver:
+      "webserver-infra-cloudforms":
         description: webserver
         rules:
           - protocol: icmp
@@ -779,7 +789,14 @@ osp_projects:
             port_range_max: 443
             remote_ip_prefix: 0.0.0.0/0
 
-      ocp_lb:
+  - name: infra-openshift
+    quota:
+      cores: 100
+      volumes: 50
+      ram: 204800
+      instances: 20
+    security_groups:
+      "loadbalancer-infra-openshift":
         description: OCP load balancer
         rules:
           - protocol: icmp
@@ -800,8 +817,7 @@ osp_projects:
             port_range_min: 8443
             port_range_max: 8443
             remote_ip_prefix: 0.0.0.0/0
-
-      ocp_appnode:
+      "appnode-infra-openshift":
         description: OCP App node
         rules:
           - protocol: icmp
@@ -829,14 +845,12 @@ osp_projects:
           - protocol: tcp
             port_range_min: 10250
             port_range_max: 10250
-            remote_group: ocp_appnode
+            remote_group: appnode-infra-openshift
           - protocol: udp
             port_range_min: 4789
             port_range_max: 4789
-            remote_group: ocp_appnode
-
-
-      ocp_master:
+            remote_group: appnode-infra-openshift
+      "master-infra-openshift":
         description: OCP master
         rules:
           - protocol: tcp
@@ -854,23 +868,43 @@ osp_projects:
           - protocol: tcp
             port_range_min: 2379
             port_range_max: 2380
-            remote_group: ocp_master
+            remote_group: master-infra-openshift
           - protocol: tcp
             port_range_min: 8053
             port_range_max: 8053
-            remote_group: ocp_appnode
+            remote_group: appnode-infra-openshift
           - protocol: udp
             port_range_min: 8053
             port_range_max: 8053
-            remote_group: ocp_appnode
+            remote_group: appnode-infra-openshift
           - protocol: tcp
             port_range_min: 24224
             port_range_max: 24224
-            remote_group: ocp_appnode
+            remote_group: appnode-infra-openshift
           - protocol: udp
             port_range_min: 24224
             port_range_max: 24224
-            remote_group: ocp_appnode
+            remote_group: appnode-infra-openshift
+
+  - name: infra-rh-sso
+    security_groups:
+      "webserver-infra-rh-sso":
+        description: webserver
+        rules:
+          - protocol: icmp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 80
+            port_range_max: 80
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 443
+            port_range_max: 443
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            port_range_min: 8443
+            port_range_max: 8443
+            remote_ip_prefix: 0.0.0.0/0
 
 
 osp_admin_user:

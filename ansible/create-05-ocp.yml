@@ -4,17 +4,20 @@
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer2_vms, tags: [ 'layer2', 'ocp', 'ocp-l2', 'vm', 'ocp-vm'], mode: create }
+    - role: layer2_vms
+      tags: [ 'layer2', 'ocp', 'ocp-l2', 'vm', 'ocp-vm']
+      mode: create
+      when: ocp_is_deployed_on == 'baremetal'
 
 # --- FOR OPENSHIFT ON OSP ---
-- hosts: rhosp-director
-  remote_user: root
-  gather_facts: false
-  roles:
-    - role: layer2_rhosp_overcloud_security
-      tags: ['layer3', 'rhosp', 'overcloud', 'overcloud-security', 'ocp', 'ocp-osp', 'ocp-vm']
-      mode: create
-      when: groups['ocp-osp-vm-group']|length > 0
+# - hosts: rhosp-director
+#   remote_user: root
+#   gather_facts: false
+#   roles:
+#     - role: layer2_rhosp_overcloud_security
+#       tags: ['layer3', 'rhosp', 'overcloud', 'overcloud-security', 'ocp', 'ocp-osp', 'ocp-vm']
+#       mode: create
+#       when: ocp_is_deployed_on == 'osp'
 
 # instantiate VMs
 - hosts: ocp-osp-vm-group
@@ -24,6 +27,7 @@
     - role: layer3_vm_on_openstack
       tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'vm','dnat' ]
       mode: create
+      when: ocp_is_deployed_on == 'osp'
 
 # instantiate LBaaS
 - hosts: ocp-osp-lbaas-group
@@ -33,7 +37,7 @@
     - role: layer3_lbaas_on_openstack
       tags: [ 'layer3', 'ocp-osp', 'ocp-osp-install', 'ocp-vm', 'ocp-osp-lb' ]
       mode: create
-      when: groups['ocp-osp-vm-group']|length > 0
+      when: ocp_is_deployed_on == 'osp'
 
 # write VM+LBaaS tenant IPs to /etc/hosts
 - hosts: ocp-osp-vm-group
@@ -44,7 +48,7 @@
       tags: [ 'layer3', 'ocp', 'ocp-osp', 'vm', 'ocp-vm', 'etc-hosts' ]
       mode: create
       group: "{{ groups['ocp-osp-vm-group']+groups['ocp-osp-lbaas-group'] }}"
-      when: groups['ocp-osp-vm-group']|length > 0
+      when: ocp_is_deployed_on == 'osp'
 
 # write floatign IPs to DNAT DNS
 - hosts: infrastructure
@@ -55,7 +59,7 @@
      tags: [ 'layer3', 'ocp-osp', 'dnat' , 'ocp-vm']
      mode: floating_ip
      group: "{{ groups['ocp-osp-lbaas-group'] }}"
-     when: groups['ocp-osp-vm-group']|length > 0
+     when: ocp_is_deployed_on == 'osp'
 
 # register wildcard hosts with floating IPs in IPA
 - hosts: ipa
@@ -66,10 +70,21 @@
      tags: [ 'layer3', 'ocp-osp', 'vm', 'dns', 'ocp-vm']
      mode: create
      group: "{{ groups['ocp-osp-lbaas-group'] }}"
-     when: groups['ocp-osp-vm-group']|length > 0
+     when: ocp_is_deployed_on == 'osp'
+
+
+ # --- FOR OPENSHIFT ON RHV ---
+- hosts: ocp-rhv-vm-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'ocp', 'ocp-l2', 'vm', 'ocp-vm']
+      mode: create
+      when: ocp_is_deployed_on == 'rhv'
 
 # --- FOR OPENSHIFT ON EITHER LAYER2 OR OSP ---
-- hosts: ocp-osp-bastion-group,ocp-master-group,ocp-node-group,ocp-l2-lb-group
+- hosts: ocp-osp-bastion-group,ocp-master-group,ocp-node-group,ocp-l2-or-rhv-lb-group
   remote_user: root
   gather_facts: false
   roles:
@@ -110,7 +125,7 @@
 #    - { role: layerX_openshift_devops_tools, tags: [layer3, 'ocp', 'ocp-devops'], mode: create }
 
 ### convenience - add redirect to https if user access http endpoint (on l2 lb or on OSP master)
-- hosts: ocp-l2-lb-group
+- hosts: ocp-l2-or-rhv-lb-group
   remote_user: root
   gather_facts: false
   roles:
@@ -125,7 +140,7 @@
   - role: layerX_openshift_redirect_to_https
     tags: [ 'layer3', 'ocp', 'ocp-install','ocp-lb' ]
     mode: create
-    when: groups['ocp-osp-vm-group']|length > 0
+    when: cf_is_deployed_on == 'osp'
 
 
 # - hosts: infrastructure

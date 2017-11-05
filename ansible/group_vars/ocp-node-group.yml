@@ -55,7 +55,7 @@ cns_disk_files:
 
 
 vm_secgroups:
-  - ocp_appnode
+  - "appnode-{{ ocp_tenant }}"
 
 vm_additional_disks:
   - 53687091200

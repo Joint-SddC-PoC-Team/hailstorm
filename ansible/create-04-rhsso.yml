@@ -8,6 +8,7 @@
     - role: layer2_vms
       tags: [ 'layer2', 'rhsso', 'vm' ]
       mode: create
+      when: rhsso_is_deployed_on == 'baremetal'
 
 - hosts: rh-sso-osp-vm-group
   remote_user: root
@@ -16,17 +17,29 @@
     - role: layer3_vm_on_openstack
       tags: [ 'layer3', 'rhsso', 'vm' ]
       mode: create
+      when: rhsso_is_deployed_on == 'osp'
 
 # write floatign IPs to DNAT DNS
 - hosts: infrastructure
   remote_user: root
   gather_facts: false
   roles:
-   - role: layer2_dnat_dns
-     tags: [ 'layer3', 'rhsso', 'dnat']
-     mode: floating_ip
-     group: "{{ groups['rh-sso-osp-vm-group'] }}"
-     when: groups['rh-sso-osp-vm-group']|length > 0
+    - role: layer2_dnat_dns
+      tags: [ 'layer3', 'rhsso', 'dnat']
+      mode: floating_ip
+      group: "{{ groups['rh-sso-osp-vm-group'] }}"
+      when: rhsso_is_deployed_on == 'osp'
+
+
+- hosts: rh-sso-rhv-vm-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'rhsso', 'vm' ]
+      mode: create
+      when: rhsso_is_deployed_on == 'rhv'
+
 
 - hosts: rh-sso-group
   remote_user: root

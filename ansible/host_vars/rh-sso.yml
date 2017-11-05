@@ -57,5 +57,5 @@ firewalld_rules:
 
 
 vm_secgroups:
-    - webserver
-    - default-{{ osp_tenant }}
+    - webserver-{{ rhsso_tenant }}
+    - default-{{ rhsso_tenant }}
