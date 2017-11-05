@@ -1,0 +1,12 @@
+    - name: check for {{ directory }} directory
+      stat: path="~{{ nuage_user }}/{{ directory }}"
+      register: has_nuage_prep_dir
+
+    - name: create {{ directory }} directory
+      file:
+        path: "~{{ nuage_user }}/{{ directory }}"
+        state: directory
+        mode: 0700
+        owner: "{{ nuage_user }}"
+        group: "{{ nuage_user }}"
+      when: has_nuage_prep_dir.stat.exists == False

@@ -20,7 +20,7 @@
 
 - block:
     - name: unpack rpms
-      shell: mkdir -p tmp && cd tmp && rm *.rpm && unzip -o -j ../roles/layer2_rhosp_undercloud_configure_nuage/files/nuage-ospdirector-ML2-SRIOV-20171024.zip *.rpm
+      shell: mkdir -p tmp && cd tmp && rm -f *.rpm && unzip -o -j ../roles/layer2_rhosp_undercloud_configure_nuage/files/nuage-ospdirector-ML2-SRIOV-20171024.zip *.rpm
 
     - name: collect rpms
       find: paths="tmp/" patterns="*.rpm" file_type=file

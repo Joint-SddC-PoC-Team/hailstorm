@@ -26,18 +26,11 @@
 - name: set default password
   shell: echo {{ root_password }} | passwd --stdin {{ nuage_user }}
 
-- name: check for share directory
-  stat: path="~{{ nuage_user }}/share"
-  register: has_nushare_dir
-
-- name: create share directory
-  file:
-    path: "~{{ nuage_user }}/share"
-    state: directory
-    mode: 0700
-    owner: "{{ nuage_user }}"
-    group: "{{ nuage_user }}"
-  when: has_nushare_dir.stat.exists == False
+- include: make_nuage_directories.yml directory={{ item }}
+  with_items:
+    - share
+    - "{{ nuage_metro_bins }}"
+    - binaries-unpacked
 
 - name: make fstab entry to allow to mount binaries from layer1 host (mainly to copy back changes or backups for convenience)
   mount:
@@ -47,18 +40,18 @@
     opts: ro,noauto
     state: present
 
-- name: check for {{ nuage_metro_bins }} directory
-  stat: path="~{{ nuage_user }}/{{ nuage_metro_bins }}"
-  register: has_nubin_dir
+#- name: check for {{ nuage_metro_bins }} directory
+#  stat: path="~{{ nuage_user }}/{{ nuage_metro_bins }}"
+#  register: has_nubin_dir
 
-- name: create {{ nuage_metro_bins }} directory
-  file:
-    path: "~{{ nuage_user }}/{{ nuage_metro_bins }}"
-    state: directory
-    mode: 0700
-    owner: "{{ nuage_user }}"
-    group: "{{ nuage_user }}"
-  when: has_nubin_dir.stat.exists == False
+#- name: create {{ nuage_metro_bins }} directory
+#  file:
+#    path: "~{{ nuage_user }}/{{ nuage_metro_bins }}"
+#    state: directory
+#    mode: 0700
+#    owner: "{{ nuage_user }}"
+#    group: "{{ nuage_user }}"
+#  when: has_nubin_dir.stat.exists == False
 
 - name: copy over needed hailstorm parts
   synchronize:

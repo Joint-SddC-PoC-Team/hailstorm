@@ -96,9 +96,9 @@ resources:
         os_net_config:
           network_config:
             -
-              type: ovs_bridge
+              type: linux_bond
               name: br-provisioning
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               dns_servers: {get_param: DnsServers}
               addresses:
@@ -148,9 +148,9 @@ resources:
                   ip_netmask: {get_param: InternalApiIpSubnet}
             -
               # Create a bridge which can also be used for VLAN-mode bridge mapping
-              type: ovs_bridge
+              type: linux_bond
               name: br-tenant
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               addresses:
                 -
@@ -167,9 +167,9 @@ resources:
             # out the default route on the External interface. This will
             # make the External API unreachable from remote subnets.
             -
-              type: ovs_bridge
+              type: linux_bond
               name: br-admin
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               #use_dhcp: true
               use_dhcp: false
               addresses:
@@ -187,9 +187,9 @@ resources:
             #      next_hop: {get_param: ManagementInterfaceDefaultRoute}
             -
               # HAILSTORM: this one is the services network
-              type: ovs_bridge
+              type: linux_bond
               name: br-services
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               addresses:
                 -
@@ -207,9 +207,9 @@ resources:
                   primary: true
             -
               # HAILSTORM: this one is the guests aka public aka external network
-              type: ovs_bridge
+              type: linux_bond
               name: br-guests
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
 # don't allocate an IP address to the NIC - otherwise access from OSP instances to the OSP API will not work
 # since the request will enter on the br-services interface and should exit via br-guests and is therefore discarded
@@ -231,9 +231,9 @@ resources:
 {# BEGIN COMMENTED OUT % if infrastructure_network_bgp1 is defined %}
             -
               # HAILSTORM: this one is bgp1 network
-              type: ovs_bridge
+              type: linux_bond
               name: br-bgp1
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               members:
                 -
@@ -245,9 +245,9 @@ resources:
 {% if infrastructure_network_bgp2 is defined %}
             -
               # HAILSTORM: this one is bgp2 network
-              type: ovs_bridge
+              type: linux_bond
               name: br-bgp2
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               members:
                 -

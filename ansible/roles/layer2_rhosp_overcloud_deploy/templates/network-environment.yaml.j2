@@ -56,3 +56,13 @@ parameter_defaults:
   #NeutronFlatNetworks: "datacentre, guests, admin, provisioning{% if infrastructure_network_bgp1 is defined %}, bgp1{% endif %}{% if infrastructure_network_bgp2 is defined %}, bgp2{% endif %}"
   NeutronBridgeMappings: "{% for network in overcloud_provider_networks %}{{ network.netname }}:br-{{ network.netname }}{% if not loop.last %},{% endif %}{% endfor %}"
   NeutronFlatNetworks: "{% for network in overcloud_provider_networks %}{{ network.netname }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+  # Customize bonding options, e.g. "bond_mode=4 lacp_rate=1 updelay=1000 miimon=100" or "bond_mode=active-backup"
+  # see http://docs.openstack.org/developer/tripleo-docs/advanced_deployment/network_isolation.html
+  #BondInterfaceOvsOptions: "bond_mode=balance-tcp lacp=active other_config:lacp-time=fast other_config:bond-detect-mode=miimon other_config:bond-miimon-interval=100 other_config:bond_updelay=1000 other-config:lacp-fallback-ab=true"
+  #BondInterfaceOvsOptions: "bond_mode=balance-slb"
+  # we use Linux-Bonds here and misuse the param
+  BondInterfaceOvsOptions: "mode=active-backup"
+  #BondInterfaceOvsOptions: "mode=1 miimon=100"
+  #BondInterfaceOvsOptions: "mode=802.3ad resend_igmp=1 updelay=1000 use_carrier=1 miimon=100 downdelay=0 xmit_hash_policy=0 primary_reselect=0 fail_over_mac=0 arp_validate=0 lacp_rate=0 arp_interval=0 ad_select=0"
+  #BondInterfaceOvsOptions: "mode=802.3ad resend_igmp=1 updelay=1000 use_carrier=1 miimon=100 downdelay=0 xmit_hash_policy=0 primary_reselect=0 fail_over_mac=0 lacp_rate=0 ad_select=0"
