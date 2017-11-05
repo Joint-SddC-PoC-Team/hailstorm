@@ -1,0 +1,15 @@
+# Heat environment file which can be used to enable
+# Nuage backend on the compute, configured via puppet
+resource_registry:
+  OS::TripleO::ComputeExtraConfigPre: ../puppet/extraconfig/pre_deploy/compute/nova-nuage.yaml
+  OS::TripleO::Services::ComputeNeutronCorePlugin: ../puppet/services/neutron-compute-plugin-nuage.yaml
+
+parameter_defaults:
+  # next has to be the ctrl_ip from ha_build_vars.yml
+  NuageActiveController: '{{ hostvars['c1'].vm_nics[0].ip }}'
+  NuageStandbyController: '{{ hostvars['c2'].vm_nics[0].ip }}'
+  NovaOVSBridge: 'alubr0'
+  NovaComputeLibvirtType: 'kvm'
+  NovaIPv6: False
+  NuageMetadataProxySharedSecret: 'NuageNetworksSharedSecret'
+  NuageNovaApiEndpoint: 'internalURL'

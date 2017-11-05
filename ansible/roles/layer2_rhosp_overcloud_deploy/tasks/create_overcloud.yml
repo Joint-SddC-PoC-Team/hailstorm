@@ -41,11 +41,10 @@
       with_items: "{{ templates|select|list }}"
 
     - name: create nic configs
-      template: src={{ item }}.j2 dest=~/templates/nic-configs/{{ item }} mode=0644
+      template: src={{ item }}{% if nuage is defined %}-nuage{% endif %}.yaml.j2 dest=~/templates/nic-configs/{{ item }}.yaml mode=0644
       with_items:
-        - "compute.yaml"
-        - "controller.yaml"
-
+        - "compute"
+        - "controller"
 
     - debug:
         msg: "Hint: to follow the creation of the Overcloud login to the director as user stack and run watch_rhosp_creation.sh"

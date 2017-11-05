@@ -1,14 +1,15 @@
 - name: check for work here already done
-  stat: path=/usr/share/openstack-tripleo-heat-templates/puppet/extraconfig/pre_deploy/compute/nova-nuage.yaml
+  #stat: path=/usr/share/openstack-tripleo-heat-templates/puppet/extraconfig/pre_deploy/compute/nova-nuage.yaml
+  stat: path=/usr/share/openstack-tripleo-heat-templates/puppet/services/neutron-plugin-ml2-nuage.yaml
   register: patch_rhosp_for_nuage_done
 
 - block:
     - name: patch RHOSP with nuages patchfile
       patch:
-        src: diff_OSPD11_6.2.0-3
+        src: "{% if current_lifecycle_env.openstack_version == 10 %}diff_OSPD10_5.2.0-15{% elif current_lifecycle_env.openstack_version == 11 %}diff_OSPD11_6.2.0-3{% endif %}"
         basedir: /usr/share
 
-    - name: copy over missing nova-nuage.yaml file
+    - name: copy over (now) missing nova-nuage.yaml file
       copy:
         src: /home/{{ rhosp_stack_user }}/nuage-ospdirector-ML2-SRIOV/openstack-tripleo-heat-templates/puppet/extraconfig/pre_deploy/compute/nova-nuage.yaml
         dest: /usr/share/openstack-tripleo-heat-templates/puppet/extraconfig/pre_deploy/compute

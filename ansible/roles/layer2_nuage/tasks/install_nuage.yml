@@ -8,6 +8,14 @@
   when: has_nuconfiguration.stat.exists == True
 
 - block:
+    - name: Ensure "retries=10" is in section "[ssh_connection]" nuage-metro/ansible.cfg
+      ini_file:
+        path: nuage-metro/ansible.cfg
+        section: ssh_connection
+        option: retries
+        value: 10
+        backup: yes
+
     - name: Phase I) initial build - base variables and hosts
       shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" build.yml -t always
 

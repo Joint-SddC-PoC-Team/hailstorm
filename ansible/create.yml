@@ -8,6 +8,8 @@
 - include: create-03-rhev.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-02-nuage.yml
+  when: (current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")) and nuage is defined
+- include: create-02-osp.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
 - include: create-03-osp.yml
   when: current_lifecycle_env.use_install_host==False or (is_install_host is defined and is_install_host=="yes")
