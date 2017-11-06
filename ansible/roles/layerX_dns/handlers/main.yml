@@ -1,0 +1,19 @@
+- name: create serial
+  shell: date +%Y%m%d$((`date +%-H`*4+`date +%-M`/8))
+  register: bind_zone_serial
+  delegate_to: infrastructure
+  delegate_facts: True
+  run_once: True
+
+- name: update serial
+  lineinfile:
+    dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
+    line: "                          {{ bind_zone_serial.stdout }}        ; Serial"
+    regexp: ".*; Serial$"
+  delegate_to: infrastructure
+  run_once: True
+
+- name: restart named
+  service: name=named enabled=yes state=restarted
+  delegate_to: infrastructure
+  run_once: True

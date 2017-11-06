@@ -78,6 +78,7 @@
       mode: start
       when: cf_is_deployed_on == 'osp'
 
+
 - hosts: cloudforms-group
   gather_facts: false
   remote_user: root
@@ -86,6 +87,9 @@
       tags: [ 'layer3', 'cf', 'rhel']
       mode: destroy
       when: vm_exists is defined and vm_exists == true
+    - role: layerX_dns
+      tags: [ 'layer2', 'cf', 'vm','dnat' ]
+      mode: destroy
 
 - hosts: cf-rhv-vm-group
   gather_facts: false
@@ -165,6 +169,9 @@
       tags: ['layer2', 'ose3', 'ose3-oidc']
       mode: destroy
       oidcClientName: 'ocp-master'
+    - role: layerX_dns
+      tags: [ 'layer2', 'cf', 'vm','dnat' ]
+      mode: destroy
 
 - hosts: ocp-l2-vm-group
   gather_facts: false
@@ -198,7 +205,7 @@
   remote_user: root
   roles:
     - role: layer3_lbaas_on_openstack
-      tags: [ 'layer3', 'ose3-osp', 'ose3-osp-install','ose3-osp-lb' ]
+      tags: [ 'layer3', 'ocp', 'ocp-osp','ocp-osp-lb' ]
       mode: destroy
       when: ocp_is_deployed_on == 'osp'
 
@@ -250,6 +257,9 @@
       tags: [ 'layer2', 'rhsso', 'rhel' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
+    - role: layerX_dns
+      tags: [ 'layer2', 'rhsso', 'vm','dnat' ]
+      mode: destroy
 
 - hosts: rh-sso-l2-vm-group
   gather_facts: false

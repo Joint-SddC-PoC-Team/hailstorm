@@ -12,7 +12,7 @@
       register: temp_floating_ip
 
     - name:  Delete the floating IP for the load balancer
-      shell:  . ~/overcloudrc_v3 &&  openstack floating ip delete {{ (floating_ip.stdout | from_json | first)["Floating IP Address"] }}
+      shell:  . ~/overcloudrc_v3 &&  openstack floating ip delete {{ (temp_floating_ip.stdout | from_json | first)["Floating IP Address"] }}
       register: create_fip
       run_once: True
       when: temp_floating_ip.stdout != '[]'

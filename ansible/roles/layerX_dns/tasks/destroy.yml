@@ -1,0 +1,19 @@
+### IPA
+- block:
+    - shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-del {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ ip }}
+      register: iparecord
+      failed_when: iparecord.rc != 0 and 'DNS resource record not found' not in iparecord.stderr
+  delegate_to: ipa
+
+### DNAT DNS
+- block:
+    - name: add or change host in zone db
+      lineinfile:
+        dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
+        regexp: "^{{ item|regex_escape }}\\d+.*"
+        state: absent
+      notify:
+        - create serial
+        - update serial
+        - restart named
+  delegate_to: infrastructure

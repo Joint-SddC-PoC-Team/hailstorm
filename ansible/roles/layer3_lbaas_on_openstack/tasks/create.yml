@@ -77,6 +77,14 @@
           with_items: "{{ groups[balances] }}"
       when: 'inventory_hostname_short not in (list_lb.stdout|from_json)|map(attribute="name")  | list'
 
+    # we still have to rely on accessing IPA directly since DNS updates take a while to
+    # propagate and resolution seems wonky. At one point in time we might be able to replace
+    # this with
+    #    - name: query IPA for floating ip for {{ hostname }}
+    #   set_fact: dns_floating_ip="{{ lookup('dig', hostname + ' @localhost') }}"
+    #   delegate_to: ipa
+    # and later
+    #   ... when: dns_floating_ip == 'NXDOMAIN' for not resolved
     - name: check if DNS for the floating IP was already registered
       shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-find {{ hailstorm_dns_domain }} --name={{ inventory_hostname_short }}
       register: dnsrecord
@@ -123,12 +131,13 @@
           # delegate_to: infrastructure
           # delegate_facts: True
 
-        - name: register DNS for the floating IP
-          shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ floating_ip }}
-          become_user: root
-          become: True
-          delegate_to: ipa
-          with_items: "{{ ((additional_dns|default('')).split(',') + [inventory_hostname_short])|select|list }}"
+        #THIS IS NOW DONE IN layerX_dns
+        # - name: register DNS for the floating IP
+        #   shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ floating_ip }}
+        #   become_user: root
+        #   become: True
+        #   delegate_to: ipa
+        #   with_items: "{{ ((additional_dns|default('')).split(',') + [inventory_hostname_short])|select|list }}"
 
       when: dnsrecord.rc != 0
 

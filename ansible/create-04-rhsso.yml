@@ -15,20 +15,24 @@
   gather_facts: false
   roles:
     - role: layer3_vm_on_openstack
-      tags: [ 'layer3', 'rhsso', 'vm' ]
+      tags: [ 'layer3', 'rhsso', 'vm', 'dnat' ]
       mode: create
       when: rhsso_is_deployed_on == 'osp'
-
-# write floatign IPs to DNAT DNS
-- hosts: infrastructure
-  remote_user: root
-  gather_facts: false
-  roles:
-    - role: layer2_dnat_dns
-      tags: [ 'layer3', 'rhsso', 'dnat']
-      mode: floating_ip
-      group: "{{ groups['rh-sso-osp-vm-group'] }}"
+    - role: layerX_dns
+      tags: [ 'layer3', 'rhsso', 'vm', 'dnat' ]
+      mode: update_floating_ip
       when: rhsso_is_deployed_on == 'osp'
+
+# # write floatign IPs to DNAT DNS
+# - hosts: infrastructure
+#   remote_user: root
+#   gather_facts: false
+#   roles:
+#     - role: layer2_dnat_dns
+#       tags: [ 'layer3', 'rhsso', 'dnat']
+#       mode: floating_ip
+#       group: "{{ groups['rh-sso-osp-vm-group'] }}"
+#       when: rhsso_is_deployed_on == 'osp'
 
 
 - hosts: rh-sso-rhv-vm-group

@@ -1,0 +1,39 @@
+### IPA
+- block:
+    - name: check existing record for {{ item }}
+      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin 2>/dev/null 1>/dev/null && ipa dnsrecord-show {{ hailstorm_dns_domain }} {{ item }}  | awk '/A record:/{print $3}'
+      register: iparecord
+      failed_when: iparecord.rc != 0 and 'DNS resource record not found' not in iparecord.stderr
+
+    - name: remove previous record for {{ item }}
+      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-del {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ iparecord.stdout }}
+      when: iparecord.rc == 0 and iparecord.stdout != ip and iparecord.stdout != ''
+
+    - name: create new record for {{ item }}
+      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ ip }}
+      register: iparecord2
+      failed_when: iparecord2.rc != 0 and 'no modifications to be performed' not in iparecord2.stderr
+      when: iparecord.rc != 0 or iparecord.stdout != ip
+  delegate_to: ipa
+
+### DNAT DNS
+- block:
+    - set_fact:
+        temp_external_ip: "{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|first).on_host_prefix|ipaddr('address') }}"
+      when: mode=='update_services_network' and external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|length > 0
+
+    - name: add or change {{ item }} in zone db
+      lineinfile:
+        dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
+        line: "{{ item }} 				IN      A       {{ temp_external_ip|default(ip) }}"
+        regexp: "^{{ item|regex_escape }}\\d+.*"
+      when: >
+        mode != 'update_services_network' or
+        external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|length > 0
+      notify:
+        - create serial
+        - update serial
+        - restart named
+  delegate_to: infrastructure
+
+### LAYER1 HOST

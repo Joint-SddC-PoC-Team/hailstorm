@@ -133,6 +133,9 @@ external_network_config:
           - from_port: 123
             to_port: 123
             proto: udp
+          - from_port: 636
+            to_port: 636
+            proto: tcp
       - expose_machine: infrastructure
         on_host_prefix: 10.32.105.72/32
         via_network: services

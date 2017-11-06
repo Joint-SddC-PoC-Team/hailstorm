@@ -7,21 +7,25 @@
       tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]
       mode: create
       when: cf_is_deployed_on == 'osp'
+    - role: layerX_dns
+      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]
+      mode: update_floating_ip
+      when: cf_is_deployed_on == 'osp'
     - role: layer3_vm_on_openstack_etc_hosts_internal_ips
       tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat' ]
       mode: create
       group: "{{ groups['cloudforms-group'] }}"
       when: cf_is_deployed_on == 'osp'
 
-- hosts: infrastructure
-  remote_user: root
-  gather_facts: false
-  roles:
-    - role: layer2_dnat_dns
-      tags: [ 'layer3', 'ose3-osp', 'dnat' ]
-      mode: floating_ip
-      group: "{{ groups['cloudforms-group'] }}"
-      when: cf_is_deployed_on == 'osp'
+# - hosts: infrastructure
+#   remote_user: root
+#   gather_facts: false
+#   roles:
+#     - role: layer2_dnat_dns
+#       tags: [ 'layer3', 'ose3-osp', 'dnat' ]
+#       mode: floating_ip
+#       group: "{{ groups['cloudforms-group'] }}"
+#       when: cf_is_deployed_on == 'osp'
 
 - hosts: cf-rhv-vm-group
   remote_user: root
@@ -35,6 +39,10 @@
       tags: [ 'layer3', 'cf', 'dns', 'cf-dns' ]
       mode: create
       nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}"
+      when: cf_is_deployed_on == 'rhv'
+    - role: layerX_dns
+      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]
+      mode: update_services_network
       when: cf_is_deployed_on == 'rhv'
 
 - hosts: cloudforms-db

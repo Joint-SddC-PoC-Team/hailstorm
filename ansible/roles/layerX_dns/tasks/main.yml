@@ -1,0 +1,27 @@
+- block:
+    - include: create_or_update.yml
+      vars:
+        ip: "{{ floating_ip }}"
+        name: "{{ inventory_hostname_short }}"
+      when: floating_ip|default('') != ''
+      with_items: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
+  when: mode=="update_floating_ip"
+
+- block:
+    - include: create_or_update.yml
+      vars:
+        ip: "{{ (vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}"
+        name: "{{ inventory_hostname_short }}"
+      with_items: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
+  when: mode=="update_services_network"
+
+- block:
+    - include: destroy.yml
+      vars:
+        ip: "{{ ansible_host }}"
+        name: "{{ inventory_hostname_short }}"
+      with_items: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
+  when: mode=="destroy"
+
+
+- meta: flush_handlers

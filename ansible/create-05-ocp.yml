@@ -35,8 +35,17 @@
   remote_user: root
   roles:
     - role: layer3_lbaas_on_openstack
-      tags: [ 'layer3', 'ocp-osp', 'ocp-osp-install', 'ocp-vm', 'ocp-osp-lb' ]
+      tags: [ 'layer3', 'ocp-osp', 'ocp-osp-install', 'ocp-vm', 'ocp-osp-lb', 'dnat' ]
       mode: create
+      when: ocp_is_deployed_on == 'osp'
+
+- hosts: ocp-osp-lbaas-group,ocp-osp-vm-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layerX_dns
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'ocp-osp-lb', 'vm','dnat' ]
+      mode: update_floating_ip
       when: ocp_is_deployed_on == 'osp'
 
 # write VM+LBaaS tenant IPs to /etc/hosts
@@ -50,16 +59,16 @@
       group: "{{ groups['ocp-osp-vm-group']+groups['ocp-osp-lbaas-group'] }}"
       when: ocp_is_deployed_on == 'osp'
 
-# write floatign IPs to DNAT DNS
-- hosts: infrastructure
-  remote_user: root
-  gather_facts: false
-  roles:
-   - role: layer2_dnat_dns
-     tags: [ 'layer3', 'ocp-osp', 'dnat' , 'ocp-vm']
-     mode: floating_ip
-     group: "{{ groups['ocp-osp-lbaas-group'] }}"
-     when: ocp_is_deployed_on == 'osp'
+# # write floatign IPs to DNAT DNS
+# - hosts: infrastructure
+#   remote_user: root
+#   gather_facts: false
+#   roles:
+#    - role: layer2_dnat_dns
+#      tags: [ 'layer3', 'ocp-osp', 'dnat' , 'ocp-vm']
+#      mode: floating_ip
+#      group: "{{ groups['ocp-osp-lbaas-group'] }}"
+#      when: ocp_is_deployed_on == 'osp'
 
 # register wildcard hosts with floating IPs in IPA
 - hosts: ipa
