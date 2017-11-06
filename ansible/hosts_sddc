@@ -176,10 +176,10 @@ rhosp-compute7
 rhosp-director2
 
 [overcloud2-compute-group]
-rhosp-control4
+rhosp-compute8
 
 [overcloud2-controller-group]
-rhosp-compute8
+rhosp-control4
 
 
 #### END OPENSTACK
