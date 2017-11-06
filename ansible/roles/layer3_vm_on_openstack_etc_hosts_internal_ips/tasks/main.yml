@@ -10,7 +10,7 @@
       with_items: "{{ group }}"
 
 
-    - name: create /etc/cloud/templates/hosts.redhat.tmpl entries
+    - name: create /etc/cloud/templates/hosts.redhat.tmpl entries (will fail after first reboot)
       lineinfile:
         dest: /etc/cloud/templates/hosts.redhat.tmpl
         line: "{{ hostvars[item].osp_internal_ip }} {{ item }} {{ item }}.{{ hailstorm_dns_domain }}{% for name in (hostvars[item].additional_dns|default('')).split(',') %}{% if name != '' and name[0] != '*' %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endif %}{% endfor %}"
