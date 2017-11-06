@@ -23,6 +23,7 @@
       haproxy_connect_port: 8443
       haproxy_hostgroup: "nuage-vsd"
       haproxy_name: "nuage_vsd"
+      haproxy_httpcheck: "/nuage/health"
       when: '"haproxy" in hostvars[inventory_hostname_short].roles'
       balance: source
     - role: layer2_haproxy_service
