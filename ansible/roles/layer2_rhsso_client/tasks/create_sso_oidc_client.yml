@@ -1,5 +1,5 @@
 - name: check if sso is available
-  shell: curl -k https//{{ hostvars['rh-sso'].vm_nics[0].ip }}/ || true
+  shell: curl -k https://{{ hostvars['rh-sso'].ansible_host }}:8443/ || true
   register: rhsso_response
   changed_when: false
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
