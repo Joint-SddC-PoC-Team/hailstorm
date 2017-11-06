@@ -77,6 +77,14 @@ firewalld_rules:
    zone: public
    permanent: true
    immediate: true
+ - ELAtcp:
+   port: 9200
+   protocol: tcp
+   state: enabled
+   zone: public
+   permanent: true
+   immediate: true
+
 
 
 tdagent_configs:

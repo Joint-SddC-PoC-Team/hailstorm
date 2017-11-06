@@ -1,9 +1,5 @@
 ---
-- name: include haproxy configuration variables
-  include_vars: 
-    file: ../group_vars/haproxy.yml
 - include: install_and_configure.yml
-  tags: ['haproxy_setup']
-- include: update_haproxy.yml
-  tags: ['haproxy_update']
+  when: mode == "create"
+ 
 

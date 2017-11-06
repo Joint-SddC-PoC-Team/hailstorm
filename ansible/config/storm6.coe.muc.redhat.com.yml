@@ -146,6 +146,9 @@ external_network_config:
           - from_port: 143
             to_port: 143
             proto: tcp
+          - from_port: 443
+            to_port: 443
+            proto: tcp
           - from_port: 993
             to_port: 993
             proto: tcp
@@ -155,6 +158,10 @@ external_network_config:
           - from_port: 465
             to_port: 465
             proto: tcp
+          - from_port: 9200
+            to_port: 9200
+            proto: tcp
+
       - expose_machine: rhevm
         on_host_prefix: 10.32.105.88/32
         via_network: services
