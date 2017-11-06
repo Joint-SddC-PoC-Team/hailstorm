@@ -90,7 +90,7 @@ resources:
             -
               type: ovs_bridge
               name: br-provisioning
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               dns_servers: {get_param: DnsServers}
               addresses:
@@ -143,7 +143,7 @@ resources:
               # Create a bridge which can also be used for VLAN-mode bridge mapping
               type: ovs_bridge
               name: br-tenant
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               addresses:
                 -
@@ -162,7 +162,7 @@ resources:
             -
               type: ovs_bridge
               name: br-admin
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               #use_dhcp: true
               use_dhcp: false
               addresses:
@@ -182,7 +182,7 @@ resources:
               # HAILSTORM: this one is the services network
               type: ovs_bridge
               name: br-services
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               addresses:
                 -

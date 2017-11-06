@@ -98,7 +98,7 @@ resources:
             -
               type: ovs_bridge
               name: br-provisioning
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               dns_servers: {get_param: DnsServers}
               addresses:
@@ -150,7 +150,7 @@ resources:
               # Create a bridge which can also be used for VLAN-mode bridge mapping
               type: ovs_bridge
               name: br-tenant
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               addresses:
                 -
@@ -169,7 +169,7 @@ resources:
             -
               type: ovs_bridge
               name: br-admin
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               #use_dhcp: true
               use_dhcp: false
               addresses:
@@ -189,7 +189,7 @@ resources:
               # HAILSTORM: this one is the services network
               type: ovs_bridge
               name: br-services
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               addresses:
                 -
@@ -209,7 +209,7 @@ resources:
               # HAILSTORM: this one is the guests aka public aka external network
               type: ovs_bridge
               name: br-guests
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
 # don't allocate an IP address to the NIC - otherwise access from OSP instances to the OSP API will not work
 # since the request will enter on the br-services interface and should exit via br-guests and is therefore discarded
@@ -237,7 +237,7 @@ resources:
               # HAILSTORM: this one is bgp1 network
               type: ovs_bridge
               name: br-bgp1
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               members:
                 -
@@ -251,7 +251,7 @@ resources:
               # HAILSTORM: this one is bgp2 network
               type: ovs_bridge
               name: br-bgp2
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              #ovs_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               members:
                 -
