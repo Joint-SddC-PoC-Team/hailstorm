@@ -2,11 +2,11 @@
 ; BIND data file for {{ hailstorm_dns_domain }}
 ;
 $ORIGIN {{ hailstorm_dns_domain }}.
-$TTL    3h
+$TTL    5m
 @       IN      SOA       {{ inventory_hostname_short}}.{{ hailstorm_dns_domain }}. hostmaster.{{ hailstorm_dns_domain }}. (
                           {{ bind_zone_serial.stdout }}        ; Serial
-                          3h       ; Refresh after 3 hours
-                          1h       ; Retry after 1 hour
+                          5m       ; Refresh after 5 minutes
+                          10m       ; Retry after 10 minutes
                           1w       ; Expire after 1 week
                           1h )     ; Negative caching TTL of 1 day
 ;
