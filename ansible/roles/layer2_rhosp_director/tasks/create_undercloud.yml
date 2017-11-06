@@ -8,7 +8,9 @@
   become_user: "{{ rhosp_stack_user }}"
   register: undercloud_conf
 - name: install undercloud (you can grab a coffee now, this takes a while)
-  shell: openstack undercloud install 2>&1 >undercloud_install.log
+  shell: openstack undercloud install
+  # don't try to redirect the log, it ends up in ~/.instack/install-undercloud.log anyway
+  #shell: openstack undercloud install 2>&1 >undercloud_install.log
   become: yes
   become_user: "{{ rhosp_stack_user }}"
   when: undercloud_conf.changed
