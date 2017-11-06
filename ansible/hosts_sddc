@@ -49,7 +49,7 @@ efk             ansible_host=10.116.127.174 activation_key="AK-CV-RHOSP-{{ stage
 
 # the Infrastructure server (DNS, SMTP/IMAP)
 [infrastructure-group]
-infrastructure  ansible_host=10.116.127.155 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" additional_dns="imap,smtp,ntp" roles=["dnat","smtp","haproxy","ntp","syslog"]
+infrastructure  ansible_host=10.116.127.155 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" additional_dns="imap,smtp,ntp,vsd" roles=["dnat","smtp","haproxy","ntp","syslog"]
 #syslog		      ansible_host=10.116.127.9 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" roles=["syslog"]
 
 # bosch-vpn only for COE MUC deployment
@@ -105,6 +105,18 @@ elastic2 ansible_host=10.116.127.160 nic_attachments="[ {{ infrastructure_networ
 elastic3 ansible_host=10.116.127.161 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
 r1 ansible_host=10.116.127.166 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr1"
 r2 ansible_host=10.116.127.168 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr2"
+
+[nuage-vsd]
+vsd1
+vsd2
+vsd3
+
+[nuage-elastic]
+elastic1
+elastic2
+elastic3
+
+
 
 #### END NUAGE
 

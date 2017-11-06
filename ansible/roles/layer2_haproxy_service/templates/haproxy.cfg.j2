@@ -29,13 +29,4 @@ defaults
     timeout check           10s
     maxconn                 3000
 
-backend app
-    {% for host in groups['haproxy_frontend'] %}
-    listen {{ hostvars[host].inventory_hostname }} 0.0.0.0:{{ listenport }}
-    {% endfor %}
 
-    balance     {{ balance }}
-
-    {% for host in groups['haproxy_backend'] %}{% if hostvars[host].vm_nics|default(true,false) %}
-        server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].vm_nics[1].ip }}:{{ httpd_port }}
-    {% endif %}{% endfor %}

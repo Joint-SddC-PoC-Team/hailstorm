@@ -3,19 +3,79 @@
   yum: 
     name: haproxy
     state: present
+  register: install_haproxy
 
-- name: Configure the haproxy cnf file with hosts
+- name: Basic haproxy config after install
   template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg
   notify: restart haproxy
+  when: install_haproxy|changed
+
+- yum: name=policycoreutils-python state=present
+
+- name: Allow listen port in SElinux
+  seport:
+    ports: "{{ haproxy_listen_port }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+
+- name: Configure haproxy for the specificed configuration (http)
+  blockinfile:
+    path: /etc/haproxy/haproxy.cfg
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ haproxy_name }}"
+    content: |
+      frontend front_{{ haproxy_name}} {{ haproxy_listen_ip }}:{{ haproxy_listen_port }}
+         default_backend back_{{ haproxy_name }}
+      backend back_{{ haproxy_name }}
+        {% for host in groups[haproxy_hostgroup] %}{% if hostvars[host].vm_nics|default(true,false) %}
+           server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ haproxy_connect_port }}
+        {% endif %}{% endfor %}
+  register: configure_haproxy_http
+  when: haproxy_listen_proto == "http"
+
+- block: 
+  - name: Create /etc/pki/haproxy
+    file:
+     path: /etc/pki/haproxy
+     state: directory
+     mode: 0755
+  - name: Create haproxy.pem
+    copy:
+     dest:  /etc/pki/haproxy/haproxy.pem
+     content: "{{ ssl_cert }}\n{{ ssl_key }}"
+  - name: Configure haproxy for the specificed configuration (https)
+    blockinfile:
+      path: /etc/haproxy/haproxy.cfg
+      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ haproxy_name }}"
+      content: |
+        frontend front_{{ haproxy_name }}
+           mode http
+           option tcplog
+           bind {{ haproxy_listen_ip }}:{{ haproxy_listen_port }} ssl crt /etc/pki/haproxy/haproxy.pem
+           default_backend back_{{ haproxy_name }}
+        backend back_{{ haproxy_name }}
+           balance {{ balance }}
+          {% for host in groups[haproxy_hostgroup] %}{% if hostvars[host].vm_nics|default(true,false) %}
+             server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].ansible_host }}:{{ haproxy_connect_port }} weight 1 maxconn 100 check ssl verify none
+          {% endif %}{% endfor %}
+    register: configure_haproxy_https
+  when: haproxy_listen_proto == "https"
+
 
 - name: Start the haproxy service
   service: name=haproxy state=started enabled=yes
   changed_when: false
-
+ 
+- name: Restart the haproxy service
+  service: name=haproxy state=restarted 
+  when: configure_haproxy_https|changed or configure_haproxy_http|change
 
 - firewalld:
-    service: http
+    service: "{{ item }}"
     zone: public
     permanent: true
     immediate: true
     state: enabled
+  with_items:
+    - "http"
+    - "https"
