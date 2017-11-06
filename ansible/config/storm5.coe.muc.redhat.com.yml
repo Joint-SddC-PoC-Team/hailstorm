@@ -158,64 +158,64 @@ external_network_config:
           - from_port: 465
             to_port: 465
             proto: tcp
-      - expose_machine: rhevm
-        on_host_prefix: 10.32.105.73/32
-        via_network: services
-        ports:
-          - from_port: 22
-            to_port: 22
-            proto: tcp
-          - from_port: 80
-            to_port: 80
-            proto: tcp
-          - from_port: 443
-            to_port: 443
-            proto: tcp
-          - from_port: 6100
-            to_port: 6100
-            proto: tcp
-      - expose_machine: cloudforms-ui01
-        on_host_prefix: 10.32.105.74/32
-        via_network: services
-        ports:
-          - from_port: 22
-            to_port: 22
-            proto: tcp
-          - from_port: 80
-            to_port: 80
-            proto: tcp
-          - from_port: 443
-            to_port: 443
-            proto: tcp
-      - expose_machine: ose3-lb
-        on_host_prefix: 10.32.105.75/32
-        via_network: services
-        ports:
-          - from_port: 22
-            to_port: 22
-            proto: tcp
-          - from_port: 80
-            to_port: 80
-            proto: tcp
-          - from_port: 443
-            to_port: 443
-            proto: tcp
-          - from_port: 8443
-            to_port: 8443
-            proto: tcp
-      - expose_machine: ose3-infranode1
-        on_host_prefix: 10.32.105.76/32
-        via_network: services
-        ports:
-          - from_port: 22
-            to_port: 22
-            proto: tcp
-          - from_port: 80
-            to_port: 80
-            proto: tcp
-          - from_port: 443
-            to_port: 443
-            proto: tcp
+      # - expose_machine: rhevm
+      #   on_host_prefix: 10.32.105.73/32
+      #   via_network: services
+      #   ports:
+      #     - from_port: 22
+      #       to_port: 22
+      #       proto: tcp
+      #     - from_port: 80
+      #       to_port: 80
+      #       proto: tcp
+      #     - from_port: 443
+      #       to_port: 443
+      #       proto: tcp
+      #     - from_port: 6100
+      #       to_port: 6100
+      #       proto: tcp
+      # - expose_machine: cloudforms-ui01
+      #   on_host_prefix: 10.32.105.74/32
+      #   via_network: services
+      #   ports:
+      #     - from_port: 22
+      #       to_port: 22
+      #       proto: tcp
+      #     - from_port: 80
+      #       to_port: 80
+      #       proto: tcp
+      #     - from_port: 443
+      #       to_port: 443
+      #       proto: tcp
+      # - expose_machine: ose3-lb
+      #   on_host_prefix: 10.32.105.75/32
+      #   via_network: services
+      #   ports:
+      #     - from_port: 22
+      #       to_port: 22
+      #       proto: tcp
+      #     - from_port: 80
+      #       to_port: 80
+      #       proto: tcp
+      #     - from_port: 443
+      #       to_port: 443
+      #       proto: tcp
+      #     - from_port: 8443
+      #       to_port: 8443
+      #       proto: tcp
+      # - expose_machine: ose3-infranode1
+      #   on_host_prefix: 10.32.105.76/32
+      #   via_network: services
+      #   ports:
+      #     - from_port: 22
+      #       to_port: 22
+      #       proto: tcp
+      #     - from_port: 80
+      #       to_port: 80
+      #       proto: tcp
+      #     - from_port: 443
+      #       to_port: 443
+      #       proto: tcp
       - expose_machine: efk
         on_host_prefix: 10.32.105.77/32
         via_network: services
@@ -244,6 +244,9 @@ external_network_config:
       #   via_network: provisioning
       #   ports:
           # webui
+          - from_port: 80
+            to_port: 80
+            proto: tcp
           - from_port: 443
             to_port: 443
             proto: tcp
@@ -311,6 +314,85 @@ external_network_config:
           - from_port: 13041
             to_port: 13041
             proto: tcp
+      - expose_machine: rhosp-director2
+        on_host_prefix: 10.32.105.81/32
+        via_network: services
+        ports:
+          - from_port: 22
+            to_port: 22
+            proto: tcp
+          # webui
+          - from_port: 80
+            to_port: 80
+            proto: tcp
+          - from_port: 443
+            to_port: 443
+            proto: tcp
+          # keystone
+          - from_port: 13000
+            to_port: 13000
+            proto: tcp
+          # heat
+          - from_port: 13004
+            to_port: 13004
+            proto: tcp
+          # ironic
+          - from_port: 13385
+            to_port: 13385
+            proto: tcp
+          # mistral
+          - from_port: 13989
+            to_port: 13989
+            proto: tcp
+          # swift
+          - from_port: 13808
+            to_port: 13808
+            proto: tcp
+          # zaqar-websocket
+          - from_port: 9000
+            to_port: 9000
+            proto: tcp
+          # glance
+          - from_port: 13292
+            to_port: 13292
+            proto: tcp
+          # nova
+          - from_port: 13774
+            to_port: 13774
+            proto: tcp
+          # baremetal introspection
+          - from_port: 13050
+            to_port: 13050
+            proto: tcp
+          # neutron
+          - from_port: 13696
+            to_port: 13696
+            proto: tcp
+          #messaging
+          - from_port: 13888
+            to_port: 13888
+            proto: tcp
+          #cloudformation
+          - from_port: 13800
+            to_port: 13800
+            proto: tcp
+          # metering
+          - from_port: 13777
+            to_port: 13777
+            proto: tcp
+          # event
+          - from_port: 13779
+            to_port: 13779
+            proto: tcp
+          # placement
+          - from_port: 13778
+            to_port: 13778
+            proto: tcp
+          # gnocci - metric
+          - from_port: 13041
+            to_port: 13041
+            proto: tcp
+
       - expose_machine: openstack
         on_host_prefix: 10.32.105.79/32
         via_network: services
@@ -394,16 +476,16 @@ external_network_config:
           - from_port: 22
             to_port: 22
             proto: tcp
-      - expose_machine: rh-sso
-        on_host_prefix: 10.32.105.81/32
-        via_network: services
-        ports:
-          - from_port: 8443
-            to_port: 8443
-            proto: tcp
-          - from_port: 22
-            to_port: 22
-            proto: tcp
+      # - expose_machine: rh-sso
+      #   on_host_prefix: 10.32.105.81/32
+      #   via_network: services
+      #   ports:
+      #     - from_port: 8443
+      #       to_port: 8443
+      #       proto: tcp
+      #     - from_port: 22
+      #       to_port: 22
+      #       proto: tcp
       # cloudforms-osp is on rh-sso IP as they use distinct ports
       # cloudforms-osp is special in the sense that we will not have the needed vm_nics configuration for DNAT
       # from the start as it is created dynamically within OSP; by using the tag cfme_on_osp the vm_nics can be

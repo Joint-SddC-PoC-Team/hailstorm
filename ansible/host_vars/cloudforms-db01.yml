@@ -9,8 +9,8 @@ vm_additional_disks:
   - 107374182400
 
 vm_secgroups:
-    - webserver
-    - default-{{ osp_tenant }}
+    - webserver-{{ cf_tenant }}
+    - default-{{ cf_tenant }}
 
 nic_attachments:
   - "{{ infrastructure_osp_tenant_internal_network }}"

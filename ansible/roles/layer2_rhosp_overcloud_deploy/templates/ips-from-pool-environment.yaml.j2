@@ -22,52 +22,52 @@ parameter_defaults:
   ControllerIPs:
     # Each controller will get an IP from the lists below, first controller, first IP
     management:
-{% for node in groups['rhosp-control'] %}
+{% for node in controller %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_admin.netname)|first).ip }}
 {% endfor %}
     external:
-{% for node in groups['rhosp-control'] %}
+{% for node in controller %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}
 {% endfor %}
     internal_api:
-{% for node in groups['rhosp-control'] %}
+{% for node in controller %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_internal_api.netname)|first).ip }}
 {% endfor %}
     tenant:
-{% for node in groups['rhosp-control'] %}
+{% for node in controller %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_tenant.netname)|first).ip }}
 {% endfor %}
     storage:
-{% for node in groups['rhosp-control'] %}
+{% for node in controller %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_storage.netname)|first).ip }}
 {% endfor %}
     storage_mgmt:
-{% for node in groups['rhosp-control'] %}
+{% for node in controller %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_storage_mgmt.netname)|first).ip }}
 {% endfor %}
   NovaComputeIPs:
     # Each compute will get an IP from the lists below, first compute, first IP
     management:
-{% for node in groups['rhosp-compute'] %}
+{% for node in compute %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_admin.netname)|first).ip }}
 {% endfor %}
     external:
-{% for node in groups['rhosp-compute'] %}
+{% for node in compute %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}
 {% endfor %}
     internal_api:
-{% for node in groups['rhosp-compute'] %}
+{% for node in compute %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_internal_api.netname)|first).ip }}
 {% endfor %}
     tenant:
-{% for node in groups['rhosp-compute'] %}
+{% for node in compute %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_tenant.netname)|first).ip }}
 {% endfor %}
     storage:
-{% for node in groups['rhosp-compute'] %}
+{% for node in compute %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_storage.netname)|first).ip }}
 {% endfor %}
     storage_mgmt:
-{% for node in groups['rhosp-compute'] %}
+{% for node in compute %}
     - {{ (hostvars[node].vm_nics|selectattr('netname','match',infrastructure_network_storage_mgmt.netname)|first).ip }}
 {% endfor %}

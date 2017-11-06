@@ -1,66 +1,71 @@
 ---
-
-#### CLOUDFORMS on OSP ####
-
-# - hosts: cloudforms
-#   remote_user: root
-#   gather_facts: false
-#   roles:
-#     - { role: layer3_cloudforms_rhev_template, tags: [ 'layer3', 'cf', 'cf-template' ], mode: create }
-#     - { role: layer3_vm_on_rhev, tags: [ 'layer3', 'cf', 'vm', 'cf-vm' ], mode: create }
-#     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer3', 'cf', 'dns', 'cf-dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-#     - { role: layer3_cloudforms_config, tags: [ 'layer3', 'cf', 'cf-config' ], mode: create }
-# # RHEL after cloudforms config, to ensure the hostname is set before subscribing
-#     - { role: layer2_rhel, tags: [ 'layer3', 'cf', 'rhel', 'cf-rhel'], mode: create }
-#     - { role: layer2_tdagent, tags: [ 'layer3', 'cf', 'tdagent', 'cf-tdagent'], mode: create }
-#     - { role: layer2_ipa_certificate, tags: ['layer2', 'cf', 'cf-certificate'], mode: create }
-#     - { role: layer3_cloudforms_certificate, tags: ['layer2', 'cf', 'cf-certificate'], mode: create }
-#     - { role: layer3_cloudforms_osp_provider, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-osp' ], mode: create }
-#     - { role: layer3_cloudforms_tower_provider, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-tower' ], mode: create }
-#     - { role: layer3_cloudforms_rhev_provider, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-rhev' ], mode: create }
-#     - { role: layer3_cloudforms_openshift_provider, tags: [ 'layer3', 'cf','cf-provider', 'cf-provider-ocp' ], mode: create }
-
-- hosts: cloudforms-group
+- hosts: cf-osp-vm-group
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ], mode: create }
-#    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer3', 'cf', 'dns', 'cf-dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-    - { role: layer3_vm_on_openstack_etc_hosts_internal_ips, tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat' ], mode: create, group: "{{ groups['cloudforms-group'] }}" }
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]
+      mode: create
+      when: cf_is_deployed_on == 'osp'
+    - role: layer3_vm_on_openstack_etc_hosts_internal_ips
+      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat' ]
+      mode: create
+      group: "{{ groups['cloudforms-group'] }}"
+      when: cf_is_deployed_on == 'osp'
 
 - hosts: infrastructure
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer2_dnat_dns, tags: [ 'layer3', 'ose3-osp', 'dnat' ], mode: floating_ip, group: "{{ groups['cloudforms-group'] }}" }
+    - role: layer2_dnat_dns
+      tags: [ 'layer3', 'ose3-osp', 'dnat' ]
+      mode: floating_ip
+      group: "{{ groups['cloudforms-group'] }}"
+      when: cf_is_deployed_on == 'osp'
+
+- hosts: cf-rhv-vm-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_rhev
+      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]
+      mode: create
+      when: cf_is_deployed_on == 'rhv'
+    - role: layer2_rhel_reconfigure_dns
+      tags: [ 'layer3', 'cf', 'dns', 'cf-dns' ]
+      mode: create
+      nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}"
+      when: cf_is_deployed_on == 'rhv'
 
 - hosts: cloudforms-db
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer3_cloudforms_config_db, tags: [ 'layer3', 'cf', 'cf-config' ], mode: create }
+    - { role: layer3_cloudforms_config_db, tags: [ 'layer3', 'cf', 'cf-config', 'cf-db' ], mode: create }
 
 - hosts: cloudforms-ui
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer3_cloudforms_config_ui, tags: [ 'layer3', 'cf', 'cf-config' ], mode: create }
-    - { role: layer2_ipa_certificate, tags: ['layer2', 'cf', 'cf-certificate'], mode: create, certcn: 'cloudforms.{{ hailstorm_dns_domain }}' }
-    - { role: layer3_cloudforms_certificate, tags: ['layer2', 'cf', 'cf-certificate'], mode: create }
+    - { role: layer3_cloudforms_config_ui, tags: [ 'layer3', 'cf', 'cf-config', 'cf-ui' ], mode: create }
+    - { role: layer2_ipa_certificate, tags: ['layer2', 'cf', 'cf-certificate', 'cf-ui'], mode: create, certcn: 'cloudforms.{{ hailstorm_dns_domain }}' }
+    - { role: layer3_cloudforms_certificate, tags: ['layer2', 'cf', 'cf-certificate', 'cf-ui'], mode: create }
 
 - hosts: cloudforms-wk-osp
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer3_cloudforms_config_wk_osp, tags: [ 'layer3', 'cf', 'cf-config' ], mode: create }
-    - { role: layer3_cloudforms_osp_provider_zone, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-osp' ], mode: create }
+    - { role: layer3_cloudforms_config_wk_osp, tags: [ 'layer3', 'cf', 'cf-config', 'cf-osp' ], mode: create }
+    - { role: layer3_cloudforms_osp_provider_zone, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-osp', 'cf-osp' ], mode: create }
 
-# read floating IP facts into ansible inventory
+# read floating IP facts of the Openshift VMs into ansible inventory
 - hosts: ocp-osp-vm-group
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer3_vm_on_openstack, tags: [ 'layer3', 'cf-provider-ocp' ], mode: readfacts }
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3', 'cf-provider-ocp' ]
+      mode: readfacts
 
 - hosts: cloudforms-wk-ocp
   remote_user: root

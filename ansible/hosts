@@ -146,7 +146,7 @@ rhev
 layer1
 
 # A list of all OpenStack subgroups
-[rhosp-all:children]
+[rhosp-all-group:children]
 rhosp-director
 rhosp-undercloud
 
@@ -180,7 +180,7 @@ ose3-master1
 install-host
 rh-sso
 nuage
-rhosp-all
+rhosp-all-group
 satellite
 rhevh
 ose3
@@ -208,7 +208,7 @@ nuage
 ose3
 satellite
 rhev
-rhosp-all
+rhosp-all-group
 test-rhel6
 test-rhel7
 ipa

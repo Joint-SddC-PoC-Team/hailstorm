@@ -45,7 +45,7 @@
 
 #### OPENSTACK ####
 
-- hosts: rhosp-all
+- hosts: rhosp-all-group
   remote_user: root
   gather_facts: false
   roles:

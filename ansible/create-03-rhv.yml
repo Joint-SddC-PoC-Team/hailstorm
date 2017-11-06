@@ -1,0 +1,69 @@
+---
+#### RHV ####
+
+- hosts: layer1-group
+  remote_user: root
+  gather_facts: false
+  pre_tasks:
+    - setup:
+      tags: [ 'layer1', 'rhv' ]
+  roles:
+    - role: layer1_rhev
+      tags: [ 'rhv', layer1 ]
+      mode: create
+
+# - hosts: rhvm-group
+#   remote_user: root
+#   gather_facts: false
+#   roles:
+#     - { role: layer2_rhel_version_switch, tags: [ 'layer2', 'rhv', 'rhel', 'vm' ], mode: create }
+
+- hosts: rhv-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer2_vms, tags: [ 'layer2', 'rhv', 'vm' ], mode: create }
+    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'rhv', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+    - { role: layer2_rhel, tags: [ 'layer2', 'rhv', 'rhel' ], mode: create }
+
+- hosts: rhvm-group
+  remote_user: root
+  gather_facts: false
+  pre_tasks:
+    - setup:
+      tags: [ 'layer2', 'rhv' ]
+  roles:
+    - { role: layer2_rhevm_engine, tags: [ 'layer2', 'rhv', 'rhvm' ], mode: create }
+    - { role: layer2_rhevdhw_cfme, tags: [ 'layer2', 'rhv', 'rhvm', 'cfme-rhvdwh' ], mode: create }
+    - { role: layer2_tdagent, tags: [ 'layer2', 'rhv', 'tdagent' ], mode: create }
+
+- hosts: rhvh-group
+  remote_user: root
+  gather_facts: false
+  pre_tasks:
+    - setup:
+      tags: [ 'layer2', 'rhv' ]
+  roles:
+    - { role: layer2_rhevh, tags: [ 'layer2', 'rhv', 'rhvh' ], mode: create }
+
+- hosts: rhvm-group
+  remote_user: root
+  gather_facts: false
+  pre_tasks:
+    - setup:
+      tags: [ 'layer2', 'rhv','rhvm', 'rhvm-ldap','rhvm-storage' ]
+  roles:
+    - { role: layer2_rhevm_storage, tags: [ 'layer2', 'rhv', 'rhvm','rhvm-storage' ], mode: create }
+    - { role: layer2_rhevm_ldap, tags: [ 'layer2', 'rhv', 'rhvm', 'rhvm-ldap' ], mode: create }
+    - { role: layer2_rhevm_templates, tags: [ 'layer2', 'rhv', 'rhvm', 'rhvm-templates' ], mode: create }
+    - { role: layer2_ipa_certificate, tags: ['layer2', 'rhv', 'rhvm',  'rhvm-certificate'], mode: create, certcn: "rhv.{{ hailstorm_dns_domain }}" }
+    - { role: layer2_rhevm_certificate, tags: ['layer2', 'rhv', 'rhvm', 'rhvm-certificate'], mode: create }
+
+- hosts: satellite-group
+  remote_user: root
+  gather_facts: false
+  pre_tasks:
+    - setup:
+      tags: [ 'layer2', 'satellite-rhv' ]
+  roles:
+    - { role: layer2_satellite_rhev, tags: [ 'layer2', 'satellite-rhv', 'satellite', 'rhv' ], mode: create }

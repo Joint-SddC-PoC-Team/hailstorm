@@ -24,8 +24,9 @@ disable_registration_against_satellite: "{% if infrastructure_network_master is 
 satellite_version:    "{% if infrastructure_network_master is defined %}6.2{% else %}{{ node_satellite_version }}{% endif %}"
 stage:                "{% if infrastructure_network_master is defined %}DEV{% else %}{{ node_stage }}{% endif %}"
 ocp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
-ocp_tenant: "demo-infra"
-rhsso_tenant: "demo-infra"
+ocp_tenant: "infra-openshift"
+rhsso_tenant: "infra-rh-sso"
+cf_tenant: "infra-cloudforms"
 
 
 ### VIRTUAL NETWORK setup
@@ -150,13 +151,13 @@ infrastructure_network_provisioning:
   forward_mode: 'nat'
   default_gw_host_prefix: 192.168.105.1/24
 #  vlan: 1
-  undercloud_dhcp_start:  192.168.105.10
-  undercloud_dhcp_end:    192.168.105.41
-  undercloud_discovery_start: 192.168.105.42
-  undercloud_discovery_end: 192.168.105.73
-  # the undercloud_public VIP will only be used when not using TLS / hostname
-  undercloud_public:      192.168.105.74
-  undercloud_admin:       192.168.105.75
+  # undercloud_dhcp_start:  192.168.105.10
+  # undercloud_dhcp_end:    192.168.105.41
+  # undercloud_discovery_start: 192.168.105.42
+  # undercloud_discovery_end: 192.168.105.73
+  # # the undercloud_public VIP will only be used when not using TLS / hostname
+  # undercloud_public:      192.168.105.74
+  # undercloud_admin:       192.168.105.75
   # floating_start:         10.116.122.101
   # floating_end:           10.116.122.120
   mac_prefix: "02:00:00:00:69:"
@@ -201,6 +202,8 @@ infrastructure_network_ospf2:
 infrastructure_network_baremetal:
   netname: 'baremetal'
   bridge: 'baremetal'
+  dhcp_start: 192.168.18.10
+  dhcp_end:   192.168.18.29
   default_gw_host_prefix: 192.168.18.1/28
   vlan:       2818
   mac_prefix: "02:00:00:00:18:"

@@ -15,7 +15,6 @@
           project_domain_name: hailstorm
           username: "admin"
           password: "{{ root_password }}"
-      tags: ['overcloud-config-tenants','overcloud-config-users','overcloud-config-security','overcloud-create-flavors']
     - set_fact:
         os_auth_hailstorm_{{ item.name|replace("-","_") }}:
           auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
@@ -29,7 +28,6 @@
       with_items:
         - "{{ osp_projects }}"
         - name: admin
-      tags: ['overcloud-config-tenants','overcloud-config-users','overcloud-config-security','overcloud-create-flavors']
 
     - include: adapt_to_keystone_v3.yml
       tags: ['overcloud-config-keystone']

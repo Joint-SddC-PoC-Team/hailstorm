@@ -7,6 +7,15 @@
       shell: oc delete secrets router-certs -n default
     - name: create certificate file
       copy: content="{{ wildcard_cert }}\n{{ wildcard_key }}" dest="~/wildcard.crt"
+    - name: oadm policy add-scc-to-user hostnetwork -z router
+      command: oadm policy add-scc-to-user hostnetwork -z router -n default
+      when: "'router' not in rc.stdout"
     - name: recreate router
-      shell: oadm router --default-cert=wildcard.crt --selector='region=infra'
+      shell: >
+        oc adm router router
+        --default-cert=wildcard.crt --selector='region=infra'
+        --replicas={{ groups['ocp-infra-group']|length }}
+        --service-account=router
+        --selector='region=infra'
+        -n default
   when: wildcard_key is defined and wildcard_cert is defined

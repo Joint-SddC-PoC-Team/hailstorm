@@ -24,7 +24,7 @@ openshift_https_proxy=https://{{ proxy_username }}:{{ proxy_password }}@{{ proxy
 openshift_no_proxy=*.{{ hailstorm_dns_domain }}
 {% endif %}
 
-{% if groups['ocp-osp-vm-group']|length > 0 %}
+{% if cf_is_deployed_on == 'osp' %}
 #openstack cloudprovider
 openshift_cloudprovider_kind=openstack
 openshift_cloudprovider_openstack_auth_url=https://openstack.{{ hailstorm_dns_domain }}:13000/v3
@@ -128,6 +128,6 @@ openshift_logging_es_nodeselector={"region":"infra"}
 
 # Specify load balancer host
 [lb]
-{% for lb in groups["ocp-l2-lb-group"] %}
+{% for lb in groups["ocp-l2-or-rhv-lb-group"] %}
 {{ hostvars[lb].hostname }}
 {% endfor %}

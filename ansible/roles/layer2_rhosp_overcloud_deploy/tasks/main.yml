@@ -12,6 +12,9 @@
       tags: ['prep-director']
     - include: register_overcloud_nodes.yml
       tags: ['register']
+  when: mode=="create" or mode=="prepare"
+
+- block:
     - include: create_overcloud.yml
       tags: ['overcloud-deploy']
       vars:

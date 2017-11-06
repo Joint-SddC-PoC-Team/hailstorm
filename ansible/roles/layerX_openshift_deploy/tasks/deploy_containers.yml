@@ -24,21 +24,44 @@
     --images='registry.access.redhat.com/openshift3/ose-${component}:${version}'
   when: "'docker-registry' not in rc.stdout"
 
-- name: check existing pvc
-  shell: oc get pvc -n default
-  register: pvc
-  changed_when: false
+# use PVC when not running on OpenStack
+- block:
+    - name: check existing pvc
+      shell: oc get pvc -n default
+      register: pvc
+      changed_when: false
 
-- name: create pvc
-  shell: "oc create -f - <<EOF
-         {{ lookup('template','pvc.yaml.j2') }}"
-  with_items:
-    - name: docker-registry
-      size: 5Gi
-      accessmode: ReadWriteOnce
-      #TODO - change back to ReadWriteMany when other storage classes are avialable
-  when: "'docker-registry' not in pvc.stdout"
+    - name: create pvc
+      shell: "oc create -f - <<EOF
+             {{ lookup('template','pvc.yaml.j2') }}"
+      with_items:
+        - name: docker-registry
+          size: 5Gi
+          accessmode: ReadWriteOnce
+          #TODO - change back to ReadWriteMany when other storage classes are avialable
+      when: "'docker-registry' not in pvc.stdout"
 
-- name: add pvc to registry
-  command: oc -n default volume deploymentconfigs/docker-registry --add --name=registry-storage -t pvc --claim-name=docker-registry --overwrite
-  when: "'docker-registry' not in pvc.stdout"
+    - name: add pvc to registry
+      command: oc -n default volume deploymentconfigs/docker-registry --add --name=registry-storage -t pvc --claim-name=docker-registry --overwrite
+      when: "'docker-registry' not in pvc.stdout"
+  when: cf_is_deployed_on != 'osp'
+
+# use Swift backend when running on OpenStack
+# see https://docs.openshift.com/container-platform/3.6/install_config/registry/extended_registry_configuration.html#advanced-overriding-the-registry-configuration
+- block:
+    - name: check if configmap exists
+      shell: oc get configmap -n default
+      register: configmap
+    - name: create configmap file
+      template: src=docker-registry-swift.yaml.j2 dest=~/docker-registry-swift.yaml
+      when: "'registry-config' not in configmap.stdout"
+    - name: create configmap
+      command: oc -n default create configmap registry-config --from-file=docker-registry-swift.yaml
+      when: "'registry-config' not in configmap.stdout"
+    - name: mount configmap into registry
+      shell: oc -n default volume dc/docker-registry --add --type=configmap --configmap-name=registry-config -m /etc/docker/registry/
+      when: "'registry-config' not in configmap.stdout"
+    - name: point env path to configmap
+      shell: oc -n default set env dc/docker-registry REGISTRY_CONFIGURATION_PATH=/etc/docker/registry/docker-registry-swift.yaml
+      when: "'registry-config' not in configmap.stdout"
+  when: cf_is_deployed_on == 'osp'
