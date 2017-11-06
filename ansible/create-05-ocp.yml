@@ -82,7 +82,7 @@
      when: ocp_is_deployed_on == 'osp'
 
 
- # --- FOR OPENSHIFT ON RHV ---
+# --- FOR OPENSHIFT ON RHV ---
 - hosts: ocp-rhv-vm-group
   remote_user: root
   gather_facts: false
@@ -110,7 +110,8 @@
 
 
 # reread OSP VM facts, in case we skipped with ocp-vm/ocp-prep
-- hosts: ocp-osp-vm-group
+# reread rhsso vm facts, in case it is running on osp
+- hosts: ocp-osp-vm-group,rh-sso-osp-vm-group
   remote_user: root
   gather_facts: false
   roles:
