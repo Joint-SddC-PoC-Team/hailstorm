@@ -2,7 +2,7 @@ heat_template_version: 2015-04-30
 
 description: >
   Software Config to drive os-net-config to configure multiple interfaces
-  for the controller role.
+  for the compute role.
 
 parameters:
   ControlPlaneIp:
@@ -38,10 +38,6 @@ parameters:
     description: The ovs_options string for the bond interface. Set things like
                  lacp=active and/or bond_mode=balance-slb using this option.
     type: string
-  ExternalNetworkVlanID:
-    default: 10
-    description: Vlan ID for the external network traffic.
-    type: number
   InternalApiNetworkVlanID:
     default: 20
     description: Vlan ID for the internal_api network traffic.
@@ -70,10 +66,6 @@ parameters:
   ControlPlaneDefaultRoute: # Override this via parameter_defaults
     description: The subnet CIDR of the control plane network.
     type: string
-  ExternalInterfaceDefaultRoute:
-    default: '10.0.0.1'
-    description: default route for the external network
-    type: string
 # For RHOSP8 - see https://access.redhat.com/documentation/en/red-hat-openstack-platform/version-8/director-installation-and-usage/#sect-Major-Upgrading_the_Overcloud
   ManagementInterfaceDefaultRoute:
     default: ''
@@ -96,9 +88,9 @@ resources:
         os_net_config:
           network_config:
             -
-              type: ovs_bridge
+              type: linux_bond
               name: br-provisioning
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               dns_servers: {get_param: DnsServers}
               addresses:
@@ -109,12 +101,11 @@ resources:
                       - - {get_param: ControlPlaneIp}
                         - {get_param: ControlPlaneSubnetCidr}
               routes:
-              # HAILSTORM: don't set the default route on the provisioning network, we need it on the service nw
-              #  -
-              #    ip_netmask: 0.0.0.0/0
-              #    next_hop: {get_param: ControlPlaneDefaultRoute}
-              #    # Optionally have this interface as default route
-              #    default: true
+                -
+                  ip_netmask: 0.0.0.0/0
+                  next_hop: {get_param: ControlPlaneDefaultRoute}
+                  # Optionally have this interface as default route
+                  default: true
                 -
                   ip_netmask: 169.254.169.254/32
                   next_hop: {get_param: EC2MetadataIp}
@@ -132,6 +123,7 @@ resources:
               addresses:
                 -
                   ip_netmask: {get_param: StorageIpSubnet}
+{% if current_lifecycle_env.osp_storage_backend == 'ceph_hyperconverged' %}
             -
               type: interface
               name: nic3
@@ -139,6 +131,7 @@ resources:
               addresses:
                 -
                   ip_netmask: {get_param: StorageMgmtIpSubnet}
+{% endif %}
             -
               type: interface
               name: nic4
@@ -148,9 +141,9 @@ resources:
                   ip_netmask: {get_param: InternalApiIpSubnet}
             -
               # Create a bridge which can also be used for VLAN-mode bridge mapping
-              type: ovs_bridge
+              type: linux_bond
               name: br-tenant
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               addresses:
                 -
@@ -167,9 +160,9 @@ resources:
             # out the default route on the External interface. This will
             # make the External API unreachable from remote subnets.
             -
-              type: ovs_bridge
+              type: linux_bond
               name: br-admin
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               #use_dhcp: true
               use_dhcp: false
               addresses:
@@ -187,79 +180,19 @@ resources:
             #      next_hop: {get_param: ManagementInterfaceDefaultRoute}
             -
               # HAILSTORM: this one is the services network
-              type: ovs_bridge
+              type: linux_bond
               name: br-services
-              ovs_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               addresses:
                 -
                   ip_netmask: {get_param: ExternalIpSubnet}
-              routes:
-                -
-                  ip_netmask: 0.0.0.0/0
-                  next_hop: {get_param: ExternalInterfaceDefaultRoute }
-                  default: yes
               members:
                 -
                   type: interface
                   name: nic7
                   # force the MAC address of the bridge to this interface
                   primary: true
-            -
-              # HAILSTORM: this one is the guests aka public aka external network
-              type: ovs_bridge
-              name: br-guests
-              ovs_options: {get_param: BondInterfaceOvsOptions}
-              use_dhcp: false
-# don't allocate an IP address to the NIC - otherwise access from OSP instances to the OSP API will not work
-# since the request will enter on the br-services interface and should exit via br-guests and is therefore discarded
-# (unless we make a special kernel config)
-              members:
-                -
-                  type: interface
-                  name: nic8
-                  # force the MAC address of the bridge to this interface
-                  primary: true
-            -
-              # HAILSTORM: this one is the baremetal network
-              type: ovs_bridge
-              name: br-baremetal
-              use_dhcp: true
-              members:
-                -
-                  type: interface
-                  name: nic9
-                  # force the MAC address of the bridge to this interface
-                  primary: true
-
-{# BEGIN COMMENTED OUT % if infrastructure_network_bgp1 is defined %}
-            -
-              # HAILSTORM: this one is bgp1 network
-              type: ovs_bridge
-              name: br-bgp1
-              ovs_options: {get_param: BondInterfaceOvsOptions}
-              use_dhcp: false
-              members:
-                -
-                  type: interface
-                  name: nic9
-                  # force the MAC address of the bridge to this interface
-                  primary: true
-{% endif %}
-{% if infrastructure_network_bgp2 is defined %}
-            -
-              # HAILSTORM: this one is bgp2 network
-              type: ovs_bridge
-              name: br-bgp2
-              ovs_options: {get_param: BondInterfaceOvsOptions}
-              use_dhcp: false
-              members:
-                -
-                  type: interface
-                  name: nic10
-                  # force the MAC address of the bridge to this interface
-                  primary: true
-{% endif % END COMMENTED OUT ###}
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.
