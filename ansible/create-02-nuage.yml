@@ -9,10 +9,11 @@
       mode: create
 
 #### director
-- hosts: rhosp-director
-  remote_user: root
-  gather_facts: false
-  roles:
-    - role: layer2_rhosp_undercloud_configure_nuage
-      tags: ['layer2', 'nuage', 'undercloud-config-nuage']
-      mode: create
+# moved to create-03-osp.yml
+#- hosts: rhosp-director
+#  remote_user: root
+#  gather_facts: false
+#  roles:
+#    - role: layer2_rhosp_undercloud_configure_nuage
+#      tags: ['layer2', 'nuage', 'undercloud-config-nuage']
+#      mode: create

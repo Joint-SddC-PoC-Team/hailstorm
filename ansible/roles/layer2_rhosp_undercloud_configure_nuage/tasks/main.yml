@@ -14,4 +14,6 @@
 - block:
     - include: delete_nuage_repo.yml
       tags: ['undercloud-config-nuage']
+    - include: revert_nuage_image.yml
+      tags: ['undercloud-config-nuage']
   when: mode=="destroy"

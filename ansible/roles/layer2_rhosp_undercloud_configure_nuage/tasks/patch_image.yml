@@ -15,6 +15,11 @@
         path: rhel_unsubscribe
         state: absent
 
+    - name: Unregister nuageimage from satellite
+      command: hammer host delete --name nuageimage
+      delegate_to: satellite
+      ignore_errors: True # Maybe the node was not correctly registered, so better ignore errors and continue
+
     - name: upload new image
       shell: source ~/stackrc && cd ~/images && openstack overcloud image upload --image-path /home/{{ rhosp_stack_user }}/images/ --update-existing
   become: true
