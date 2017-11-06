@@ -22,8 +22,9 @@
           retries: 5
           delay: 5
 
-        - name: Assign security group webserver to the load balancer
-          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron port-update --security-group webserver "{{ vip_port_id }}"
+        - name: Assign security groups to the load balancer
+          shell: . ~/overcloudrc_v3_hailstorm && OS_PROJECT_NAME={{ osp_tenant }} neutron port-update --security-group "{{ item }}" "{{ vip_port_id }}"
+          with_items: "{{ vm_secgroups|default([]) }}"
 
         - name: Create listener HTTP
           #run_once: true

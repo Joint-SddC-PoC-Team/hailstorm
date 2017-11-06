@@ -222,8 +222,8 @@ ocp-node2      Xansible_host=10.116.127.26 jump_host=ocp-bastion openshift_node_
 #ocp-l2-lb         activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" Xadditional_dns="openshift" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.medium" osp_image="RHEL7"
 
 [ocp-osp-lbaas-group]
-ocp-osp-master-lbaas   additional_dns="openshift" osp_tenant="{{ ocp_tenant }}" balances="ocp-master-group"
-ocp-osp-infra-lbaas    additional_dns="*.apps" osp_tenant="{{ ocp_tenant }}" balances="ocp-infra-group"
+ocp-osp-master-lbaas   additional_dns="openshift" osp_tenant="{{ ocp_tenant }}" balances="ocp-master-group" vm_secgroups="['loadbalancer-{{ ocp_tenant }}']"
+ocp-osp-infra-lbaas    additional_dns="*.apps" osp_tenant="{{ ocp_tenant }}" balances="ocp-infra-group" vm_secgroups="['loadbalancer-{{ ocp_tenant }}']"
 
 [ocp-osp-bastion-group]
 ocp-bastion  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" pool_regex="{{ rhel_subscription_pool_regex }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.small" osp_image="RHEL7"
