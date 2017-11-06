@@ -10,7 +10,7 @@
     - name: add or change host in zone db
       lineinfile:
         dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
-        regexp: "^{{ item|regex_escape }}\\d+.*"
+        regexp: "^{{ item|regex_escape }}\\s+.*"
         state: absent
       notify:
         - create serial
