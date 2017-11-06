@@ -5,6 +5,9 @@ node_disable_registration_against_satellite: false
 node_satellite_version: 6.2
 node_stage: DEV
 
+# either nat or none
+node_network_forward_mode: nat
+
 # if this attribute is present, the binaries (except for the SSH keys)
 # will be copied from the layer1 host instead of the control host
 # you need to ensure they are there before running the playbook
