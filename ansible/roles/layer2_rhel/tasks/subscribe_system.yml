@@ -64,7 +64,10 @@
         activationkey: "{{ activation_key }}"
         pool: "{{ pool_regex }}"
         consumer_name: "{{ hostname }}"
-
+      register: rh_sub
+      retries: 5
+      until: not rh_sub|failed 
+      delay: 5
     - name: install katello-agent
       yum:
         name: katello-agent
