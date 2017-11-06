@@ -42,7 +42,6 @@
       tags: ['layer2', 'rhosp', 'undercloud' ]
       mode: create
 
-
 - hosts: overcloud2-director-group
   remote_user: root
   gather_facts: false
