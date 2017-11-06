@@ -76,21 +76,15 @@
     src: "../../../binary/{{ nuage_metro_bins }}"
     dest: "~{{ nuage_user }}"
     use_ssh_args: yes
-- name: correct ownership
-  file:
-    path: "~{{ nuage_user }}/{{ nuage_metro_bins }}"
-    owner: "{{ nuage_user }}"
-    group: "{{ nuage_user }}"
-    recurse: yes
-- name: move the bins to ~
-  shell: rsync -aviPHAXS ~{{ nuage_user }}/{{ nuage_metro_bins }}/* ~{{ nuage_user }}/ && rm -Rf ~{{ nuage_user }}/{{ nuage_metro_bins }}
-
 # (2) copy over everything that is missing from the {{ layer1_ansible_host }}
 - include: copy_nuage_bins.yml file={{item}}
   with_items:
-    - nuage-metro-latest.tar.gz
     - binaries
     - licenses
+    - "{{ nuage_metro_bins }}"
+
+- name: move the bins to ~
+  shell: rsync -aviPHAXS ~{{ nuage_user }}/{{ nuage_metro_bins }}/* ~{{ nuage_user }}/ && rm -Rf ~{{ nuage_user }}/{{ nuage_metro_bins }}
 
 - name: correct ownership again
   file:
