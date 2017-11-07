@@ -89,7 +89,7 @@
       when: vm_exists is defined and vm_exists == true
     - role: layerX_dns
       tags: [ 'layer2', 'cf', 'vm','dnat' ]
-      mode: destroy
+      mode: destroy_floating_ip
 
 - hosts: cf-rhv-vm-group
   gather_facts: false

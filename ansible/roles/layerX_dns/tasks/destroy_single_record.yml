@@ -16,4 +16,5 @@
         - create serial
         - update serial
         - restart named
+  when: not skip_dnat_dns|default(false,true)
   delegate_to: infrastructure

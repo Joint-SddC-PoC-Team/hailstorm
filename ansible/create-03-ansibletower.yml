@@ -17,6 +17,9 @@
   gather_facts: false
   roles:
     - { role: layer2_vms, tags: [ 'layer2', 'tower', 'vm' ], mode: create }
+    - role: layerX_dns
+      tags: [ 'layer2', 'tower', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'tower', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer2', 'tower', 'rhel' ], mode: create }
     - { role: layer2_ansibletower, tags: [ 'layer2', 'tower', 'tower-install' ], mode: create }

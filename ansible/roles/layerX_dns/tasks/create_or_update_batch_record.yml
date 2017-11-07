@@ -1,0 +1,8 @@
+### LAYER1 HOST
+- block:
+    - name: add or change {{ item }} in layer1 /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ ip }} {% for n in names %}{% if n != '' and n[0] != '*' %} {{ n }} {{ n }}.{{ hailstorm_dns_domain }}{% endif %}{% endfor %}"
+        regexp: "{{ ip }} {% for n in names %}{% if n != '' and n[0] != '*' %} {{ n }} {{ n }}.{{ hailstorm_dns_domain }}{% endif %}{% endfor %}.*$"
+  delegate_to: layer1

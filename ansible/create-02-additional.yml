@@ -9,11 +9,62 @@
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'infrastructure', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer2', 'infrastructure', 'rhel' ], mode: create }
     - { role: layer2_dnat_dns, tags: [ 'layer2', 'infrastructure', 'dnat' ], mode: create, when: '"dnat" in hostvars[inventory_hostname_short].roles'  }
+    - role: layerX_dns
+      tags: [ 'layer2', 'infrastructure', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
     - { role: layer2_smtp_imap, tags: [ 'layer2', 'infrastructure', 'smtp'], mode: create, when: '"smtp" in hostvars[inventory_hostname_short].roles' }
     - { role: layer2_ntp, tags: [ 'layer2', 'infrastructure', 'ntp'], mode: create, when: '"ntp" in hostvars[inventory_hostname_short].roles' }
     - { role: layer2_syslog, tags: [ 'layer2', 'infrastructure', 'syslog'], mode: create, when: '"syslog" in hostvars[inventory_hostname_short].roles' }
     - { role: layer2_tdagent, tags: [ 'layer2', 'tdagent', 'infrastructure'], mode: create }
 #    - { role: layer2_haproxy_service, tags: [ ''layer2', 'infrastructure', 'haproxy' ], mode: create,  when: '"haproxy" in hostvars[inventory_hostname_short].roles' }
+
+
+#### REAPPLY DNS CONFIG NOW THAT INFRASTRUCTURE IS AVAILABLE ####
+
+- hosts: satellite-group
+  remote_user: root
+  gather_facts: false
+  #pre_tasks:
+  #  - setup:
+  #    tags: [ 'layer2','satellite' ]
+  roles:
+    - role: layerX_dns
+      tags: [ 'layer2', 'satellite', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
+
+- hosts: ipa-group
+  remote_user: root
+  gather_facts: false
+  #pre_tasks:
+  #  - setup:
+  #    tags: [ 'layer2','satellite' ]
+  roles:
+    - role: layerX_dns
+      tags: [ 'layer2', 'ipa', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
+
+- hosts: install-host-group
+  remote_user: root
+  gather_facts: false
+  #pre_tasks:
+  #  - setup:
+  #    tags: [ 'layer2','satellite' ]
+  roles:
+    - role: layerX_dns
+      tags: [ 'layer2', 'install-host', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
+
+- hosts: proxy-group
+  remote_user: root
+  gather_facts: false
+  #pre_tasks:
+  #  - setup:
+  #    tags: [ 'layer2','satellite' ]
+  roles:
+    - role: layerX_dns
+      tags: [ 'layer2', 'proxy-host', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
+
 
 #### VIRT-WHO host (either infrastrcture or satellite)
 
@@ -30,16 +81,21 @@
   gather_facts: false
   roles:
     - { role: layer2_vms, tags: [ 'layer2', 'bosch-vpn', 'vm'], mode: create }
+    - role: layerX_dns
+      tags: [ 'layer2', 'bosch-vpn', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'bosch-vpn', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer2', 'bosch-vpn', 'rhel' ], mode: create }
     - { role: layer2_cisco_anyconnect_client, tags: [ 'layer2', 'bosch-vpn', 'anyconnect' ], mode: create }
-
 
 - hosts: efk
   remote_user: root
   gather_facts: false
   roles:
     - { role: layer2_vms, tags: [ 'layer2', 'efk', 'vm' ], mode: create }
+    - role: layerX_dns
+      tags: [ 'layer2', 'efk', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'efk', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer2', 'efk', 'rhel'], mode: create }
     - { role: layer2_efk_rhosp_optools, tags: [ 'layer2', 'efk', 'efk-install'], mode: create, when: "current_lifecycle_env.openstack_version < 10" }

@@ -17,6 +17,9 @@
   gather_facts: false
   roles:
     - { role: layer2_vms, tags: [ 'layer2', 'rhosp', 'vm' ], mode: create }
+    - role: layerX_dns
+      tags: [ 'layer2', 'nuage', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
 
 - hosts: rhosp-director-group
   remote_user: root
@@ -61,7 +64,7 @@
   remote_user: root
   gather_facts: false
   roles:
-    #### Nuage part and just for first director 
+    #### Nuage part and just for first director
     # moved from create-02-nuage.yml
     - role: layer2_rhosp_undercloud_configure_nuage
       tags: ['layer2', 'nuage', 'undercloud-config-nuage']

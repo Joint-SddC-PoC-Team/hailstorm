@@ -9,6 +9,10 @@
       tags: [ 'layer2', 'rhsso', 'vm' ]
       mode: create
       when: rhsso_is_deployed_on == 'baremetal'
+    - role: layerX_dns
+      tags: [ 'layer2', 'nuage', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
+      when: rhsso_is_deployed_on == 'baremetal'
 
 - hosts: rh-sso-osp-vm-group
   remote_user: root

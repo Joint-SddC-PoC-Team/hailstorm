@@ -5,10 +5,11 @@
       register: iparecord
       failed_when: iparecord.rc != 0 and 'DNS resource record not found' not in iparecord.stderr
       changed_when: false
-      
+
+    # TODO - IPA can return multiple IPs in the output, how to deal?
     - name: remove previous record for {{ item }}
       shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-del {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ iparecord.stdout }}
-      when: iparecord.rc == 0 and iparecord.stdout != ip and iparecord.stdout != ''
+      when: item != 'ipa' and iparecord.rc == 0 and iparecord.stdout != ip and iparecord.stdout != ''
 
     - name: create new record for {{ item }}
       shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ ip }}
@@ -17,13 +18,13 @@
       when: iparecord.rc != 0 or iparecord.stdout != ip
   delegate_to: ipa
 
+- set_fact:
+    temp_external_ip: "{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|first).on_host_prefix|ipaddr('address') }}"
+  when: mode=='update_services_network' and external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|list|length > 0
+
+
 ### DNAT DNS
 - block:
-    - set_fact:
-        temp_external_ip: "{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|first).on_host_prefix|ipaddr('address') }}"
-      when: mode=='update_services_network' and external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|length > 0
-
-    - debug: msg="{{ item|regex_escape }}"
     - name: add or change {{ item }} in zone db
       lineinfile:
         dest: "/etc/named/zones/master/db.{{ hailstorm_dns_domain }}"
@@ -31,11 +32,10 @@
         regexp: "^{{ item|regex_escape }}\\s+.*"
       when: >
         mode != 'update_services_network' or
-        external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|length > 0
+        external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|list|length > 0
       notify:
         - create serial
         - update serial
         - restart named
+  when: not skip_dnat_dns|default(false,true)
   delegate_to: infrastructure
-
-### LAYER1 HOST

@@ -1,4 +1,12 @@
 ---
+- hosts: nuage
+  remote_user: root
+  gather_facts: false
+  roles:
+  - role: layerX_dns
+    tags: [ 'layer2', 'nuage', 'dns', 'dnsupdate', 'dnat' ]
+    mode: update_services_network
+
 #### install-host
 - hosts: install-host
   remote_user: root
@@ -7,7 +15,6 @@
     - role: layer2_nuage
       tags: [ 'layer2', 'nuage' ]
       mode: create
-
 
 - hosts: infrastructure-group
   remote_user: root

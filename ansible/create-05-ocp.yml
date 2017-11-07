@@ -88,8 +88,12 @@
   gather_facts: false
   roles:
     - role: layer3_vm_on_rhev
-      tags: [ 'layer3', 'ocp', 'ocp-l2', 'vm', 'ocp-vm']
+      tags: [ 'layer3', 'ocp', 'ocp-rhv', 'vm', 'ocp-vm']
       mode: create
+      when: ocp_is_deployed_on == 'rhv'
+    - role: layerX_dns
+      tags: [ 'layer3', 'ocp', 'ocp-rhv', 'vm','dnat' ]
+      mode: update_services_network
       when: ocp_is_deployed_on == 'rhv'
 
 # --- FOR OPENSHIFT ON EITHER LAYER2 OR OSP ---
