@@ -3,10 +3,17 @@
       tags: ["nuage_prepare"]
     - include: install_nuage.yml
       tags: ["nuage_install"]
-
   when: mode=="create"
 
 - block:
+    - name: check for user {{ nuage_user }}
+      getent:
+        database: passwd
+        key: "{{ nuage_user }}"
+        fail_key: false
+    - debug:
+        var: getent_passwd
     - include: destroy_nuage.yml
       tags: ["nuage_destroy"]
+      when: getent_passwd.nuage is not none
   when: mode=="destroy"
