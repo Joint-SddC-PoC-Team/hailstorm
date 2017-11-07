@@ -220,17 +220,20 @@ resources:
                   name: nic8
                   # force the MAC address of the bridge to this interface
                   primary: true
-            -
-              # HAILSTORM: this one is the baremetal network
-              type: ovs_bridge
-              name: br-baremetal
-              use_dhcp: true
-              members:
-                -
-                  type: interface
-                  name: nic9
-                  # force the MAC address of the bridge to this interface
-                  primary: true
+#### COMMENTED OUT - this nic is only required for the baremetal use case
+#### at this point we don't have a dedicated pool of IP addresses managed by OSP
+#### and enabling DHCP overwrites /etc/resolv.conf, leading to subscriptions to break              
+#            -
+#              # HAILSTORM: this one is the baremetal network
+#              type: ovs_bridge
+#              name: br-baremetal
+#              use_dhcp: true
+#              members:
+#                -
+#                  type: interface
+#                  name: nic9
+#                  # force the MAC address of the bridge to this interface
+#                  primary: true
 
 {# BEGIN COMMENTED OUT % if infrastructure_network_bgp1 is defined %}
             -
