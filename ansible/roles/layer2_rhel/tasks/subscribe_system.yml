@@ -57,6 +57,11 @@
   when: not disable_registration_against_satellite and activation_key is defined and (rhsm_target.stdout != hostvars['satellite'].hostname or (subscription_status.stdout != 'Current' and subscription_status.stdout != 'Insufficient'))
 
 - block:
+    - setup:
+    - name: Change hostname to register against satellite if hostname is localhost
+      hostname:
+        name: "{{inventory_hostname_short }}.{{ hailstorm_dns_domain }}"
+      when: ansible_nodename == "localhost.localdomain"
     - name: register system using activation key against satellite
       redhat_subscription:
         state: present
