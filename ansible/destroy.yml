@@ -411,6 +411,14 @@
       tags: [ 'layer2', 'rhosp', 'vm','dnat' ]
       mode: destroy_services_network
 
+- hosts: openstack
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layerX_dns
+      tags: [ 'layer2', 'rhosp', 'vm','dnat' ]
+      mode: destroy_services_network
+
 #### END OPENSTACK+CEPH
 
 

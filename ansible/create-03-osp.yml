@@ -12,7 +12,7 @@
     - role: layer1_ceph_inventory
       tags: [ 'layer2', 'ceph', 'overcloud', 'overcloud-ceph' ]
 
-- hosts: rhosp-all-group
+- hosts: rhosp-all-group,openstack
   remote_user: root
   gather_facts: false
   roles:
