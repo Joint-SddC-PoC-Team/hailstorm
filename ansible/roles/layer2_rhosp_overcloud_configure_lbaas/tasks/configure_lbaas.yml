@@ -12,13 +12,23 @@
     path: /etc/neutron/neutron_lbaas.conf
     line: "service_provider=LOADBALANCERV2:Haproxy:neutron_lbaas.drivers.haproxy.plugin_driver.HaproxyOnHostPluginDriver:default"
     insertafter: "^#service_provider"
+    backup: yes
   notify: restart_neutron
 
+- name: check for LBaaS v2 plugin in service_plugins under neutron.conf
+  command: awk /^service_plugins=.*$/ /etc/neutron/neutron.conf
+  register: check_lbaas_configured
+  changed_when: False
+          
 - name: configre LBaaS v2 plugin in service_plugins under neutron.conf
   lineinfile:
     path: /etc/neutron/neutron.conf
-    line: "service_plugins=router,qos,trunk,neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2"
-    regexp: "^service_plugins"
+    line: 'service_plugins=\1,neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2'
+    regexp: '^service_plugins=(.*)$'
+    state: present
+    backrefs: yes
+    backup: yes
+  when: not (check_lbaas_configured.stdout | search("neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2"))
   notify: restart_neutron
 
 - name: Enable Automatic Failover
@@ -26,15 +36,15 @@
     path: /etc/neutron/neutron_lbaas.conf
     line: "allow_automatic_lbaas_agent_failover=True"
     insertafter: "^#allow_automatic_lbaas_agent_failover"
+    backup: yes
   notify: restart_neutron
-
- 
 
 - name: Configure lbaas_agent.ini
   lineinfile:
     path: /etc/neutron/lbaas_agent.ini
     line: "ovs_use_veth = False"
     insertafter: "^#ovs_use_veth"
+    backup: yes
   notify: restart_neutron
 
 - name: Configure lbaas_agent.ini
@@ -42,6 +52,7 @@
     path: /etc/neutron/lbaas_agent.ini
     line: "interface_driver =neutron.agent.linux.interface.OVSInterfaceDriver"
     insertafter: "^#interface_driver"
+    backup: yes
   notify: restart_neutron
 
 - name: Configure services_lbaas.conf
@@ -49,6 +60,7 @@
     path: /etc/neutron/services_lbaas.conf
     line: "user_group = haproxy"
     insertafter: '^\[haproxy\]'
+    backup: yes
   notify: restart_neutron
 
 #- name: Disable neutron-lbaas-agent.service

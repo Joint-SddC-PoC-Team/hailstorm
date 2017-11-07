@@ -1,3 +1,7 @@
+- name: check for image already patched
+  stat: path=/home/{{ rhosp_stack_user }}/images/overcloud-full.qcow2.preNuage
+  register: nuage_image_patched
+
 - block:
     - name: unpack nuage github helper files
       unarchive:
@@ -21,3 +25,4 @@
         state: absent
   become: true
   become_user: "{{ rhosp_stack_user }}"
+  when: nuage_image_patched.stat.exists == False

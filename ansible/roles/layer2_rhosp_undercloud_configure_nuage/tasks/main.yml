@@ -1,12 +1,12 @@
 - block:
     - include: create_nuage_repo.yml
       tags: ['undercloud-config-nuage']
-    - include: patch_rhosp_for_nuage.yml
-      tags: ['undercloud-patch-nuage']
     - include: prepare_image.yml
       tags: ['prepare-nuage-image']
     - include: patch_image.yml
       tags: ['patch-nuage-image']
+    - include: patch_rhosp_for_nuage.yml
+      tags: ['undercloud-patch-nuage']
     - include: register_cms_id.yml
       tags: ['register_nuage_cms_id']
   when: mode=="create"
