@@ -8,7 +8,16 @@
 # - name: run katello-installer
 #   shell: katello-installer --foreman-admin-username admin --foreman-admin-password {{ root_password }} {% if http_proxy is defined %}--katello-proxy-url {{ http_proxy.protocol }}://{{ http_proxy.proxyname }} --katello-proxy-port {{ http_proxy.port }}{% endif %} && touch /.katello-is-installed  creates=/.katello-is-installed
 - name: run satellite-installer
-  shell: "{% if satellite_version != '6.1' %}satellite-installer --scenario satellite{% else %}katello-installer{% endif %} --foreman-admin-username admin --foreman-admin-password {{ root_password }} {% if http_proxy is defined %}--katello-proxy-url {{ http_proxy.protocol }}://{{ http_proxy.proxyname }} --katello-proxy-port {{ http_proxy.port }}{% endif %} && touch /.katello-is-installed  creates=/.katello-is-installed"
+  shell: >
+    {% if satellite_version != '6.1' %}satellite-installer --scenario satellite{% else %}katello-installer{% endif %}
+    --foreman-admin-username admin
+    --foreman-admin-password {{ root_password }}
+    {% if http_proxy is defined %}
+    --katello-proxy-url {{ http_proxy.protocol }}://{{ http_proxy.proxyname }}
+    --katello-proxy-port {{ http_proxy.port }}
+    {% if http_proxy.username|default('') != '' %} --katello-proxy-username={{ http_proxy.username }}{% endif %}
+    {% if http_proxy.password|default('') != '' %} --katello-proxy-password={{ http_proxy.password }}{% endif %}
+    && touch /.katello-is-installed  creates=/.katello-is-installed
   register: katello_installed
 
 # create hammer-config-file
