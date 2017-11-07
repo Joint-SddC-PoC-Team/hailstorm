@@ -17,6 +17,7 @@
     --katello-proxy-port {{ http_proxy.port }}
     {% if http_proxy.username|default('') != '' %} --katello-proxy-username={{ http_proxy.username }}{% endif %}
     {% if http_proxy.password|default('') != '' %} --katello-proxy-password={{ http_proxy.password }}{% endif %}
+    {% endif %}
     && touch /.katello-is-installed  creates=/.katello-is-installed
   register: katello_installed
 
