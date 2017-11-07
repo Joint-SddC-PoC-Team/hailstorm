@@ -11,7 +11,7 @@
       "true"
     ],
     "usersDn": [
-      "cn=compat,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}"
+      "cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}"
     ],
     "connectionPooling": [
       "true"
@@ -30,7 +30,7 @@
       "uid"
     ],
     "bindDn": [
-      "uid=rhsso-bind-user,cn=users,cn=compat,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}"
+      "uid=rhsso-bind-user,cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}"
     ],
     "bindCredential": [
       "{{ root_password }}"
