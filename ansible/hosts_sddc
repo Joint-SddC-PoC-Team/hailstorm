@@ -11,7 +11,7 @@ storm5.coe.muc.redhat.com node_bridge_config="{ 'guests':{'nic':'em1','host_pref
 storm6.coe.muc.redhat.com node_bridge_config="{ 'guests':{'nic':'em1','host_prefix':'10.32.105.6/20','default_gw':'10.32.111.254', 'additional':'DEFROUTE=\"yes\"\nDNS1=10.32.96.1\nDNS2=10.32.96.30\nDOMAIN=coe.muc.redhat.com'}{% if infrastructure_network_master is defined %}, 'admin':{'nic':'p2p1','host_prefix':'10.116.127.246/24'}, 'services':{'nic':'p2p1'}, 'internal_api':{'nic':'p2p1'}, 'tenant':{'nic':'p2p1'}, 'storage':{'nic':'p2p1'}, 'storage_mgmt':{'nic':'p2p1'}, 'provisioning':{'nic':'em3'}, 'bgp1':{'nic':'p2p1'}, 'bgp2':{'nic':'p2p1'}, 'ospf1':{'nic':'p2p1'}, 'ospf2':{'nic':'p2p1'}, 'baremetal':{'nic':'p2p1'}{% endif %} }"
 
 [sddc:vars]
-ansible_ssh_common_args="-i ./binary/{{ hailstorm_ssh_priv_key_file }}"
+ansible_ssh_common_args="-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no"
 
 # the layer1 group should only contain a single server called layer1
 [layer1-group]
