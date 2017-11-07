@@ -6,12 +6,12 @@
 
 - name: configure VIRT-WHO for rhevm
   template: src=virt-who_rhevm.j2 dest=/etc/virt-who.d/{{ item }}.conf
-  with_items: "{{ groups['rhevm'] }}"
+  with_items: "{{ groups['rhvm-group'] }}"
 
 - name: configure VIRT-WHO for OSP
   template: src=virt-who_libvirt.j2 dest=/etc/virt-who.d/{{ item.hostname }}.conf
   with_items: >
-    [{% for computenode in groups['rhosp-compute'] %}
+    [{% for computenode in groups['overcloud-compute-group'] %}
     {
       "username": "heat-admin",
       "hostname": "{{ computenode }}",
