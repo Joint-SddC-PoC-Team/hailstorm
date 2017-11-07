@@ -31,6 +31,7 @@
     - role: layerX_dns
       tags: [ 'layer2', 'satellite', 'dns', 'dnsupdate', 'dnat' ]
       mode: update_services_network
+    - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
 
 - hosts: ipa-group
   remote_user: root
@@ -42,6 +43,7 @@
     - role: layerX_dns
       tags: [ 'layer2', 'ipa', 'dns', 'dnsupdate', 'dnat' ]
       mode: update_services_network
+    - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
 
 - hosts: install-host-group
   remote_user: root
@@ -53,6 +55,7 @@
     - role: layerX_dns
       tags: [ 'layer2', 'install-host', 'dns', 'dnsupdate', 'dnat' ]
       mode: update_services_network
+    - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
 
 - hosts: proxy-group
   remote_user: root
@@ -64,6 +67,7 @@
     - role: layerX_dns
       tags: [ 'layer2', 'proxy-host', 'dns', 'dnsupdate', 'dnat' ]
       mode: update_services_network
+    - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
 
 
 #### VIRT-WHO host (either infrastrcture or satellite)
@@ -87,6 +91,7 @@
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'bosch-vpn', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer2', 'bosch-vpn', 'rhel' ], mode: create }
     - { role: layer2_cisco_anyconnect_client, tags: [ 'layer2', 'bosch-vpn', 'anyconnect' ], mode: create }
+    - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
 
 - hosts: efk
   remote_user: root
@@ -101,3 +106,4 @@
     - { role: layer2_efk_rhosp_optools, tags: [ 'layer2', 'efk', 'efk-install'], mode: create, when: "current_lifecycle_env.openstack_version < 10" }
     - { role: layer2_ipa_certificate, tags: ['layer2', 'efk', 'efk-certificate'], mode: create, when: "current_lifecycle_env.openstack_version >= 10" }
     - { role: layer2_efk_centos_opstools, tags: [ 'layer2', 'efk', 'efk-install'], mode: create, when: "current_lifecycle_env.openstack_version >= 10" }
+    - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }

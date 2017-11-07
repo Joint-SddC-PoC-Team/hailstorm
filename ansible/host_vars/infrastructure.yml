@@ -1,9 +1,9 @@
 ---
-mem: 2048
+mem: 4096
 vcpu: 2
 disk:
   path: "{{ inventory_hostname_short }}.qcow2"
-  size: 30
+  size: 40
   format: qcow2
   # partition_table:
   #   lvmpv: 29500
@@ -12,7 +12,7 @@ disk:
   #   root: 10000
   physvols:
     boot: 500
-    rhel: 29500
+    rhel: 39500
   logvols:
     - name: swap
       fstype: swap
@@ -26,6 +26,10 @@ disk:
       fstype: "{{ fstype }}"
       mountpoint: /home
       size: 2048
+    - name: varlog
+      fstype: "{{ fstype }}"
+      mountpoint: /var/log
+      size: 20000
 
 repos:
   - rhel-7-server-rpms
@@ -84,6 +88,22 @@ firewalld_rules:
    zone: public
    permanent: true
    immediate: true
+ - SYSLOGtcp:
+   port: 514
+   protocol: tcp
+   state: enabled
+   zone: public
+   permanent: true
+   immediate: true
+ - SYSLOGudp:
+   port: 514
+   protocol: udp 
+   state: enabled
+   zone: public
+   permanent: true
+   immediate: true
+
+
 
 
 
