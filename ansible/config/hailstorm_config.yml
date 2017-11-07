@@ -16,6 +16,7 @@ lifecycle_environments:
     label: 'development'
     content_view_date_filter:
       "*": "2017-10-27"
+      "CV-OS-RHEL7-SERVER": "2017-10-28"
       "CV-RHOSP": "2017-10-01"
     errata_for_demo_scenario:
       - RHSA-2017:0286
@@ -378,6 +379,8 @@ satellite_content_config:
         repository: "EPEL-7"
       - product: "td-agent"
         repository: "td-agent"
+      - product: "CentOS-7"
+        repository: "opstools"
 
   # for HANA
   # - content_view: "CV-OS-RHEL7.2-EUS-SAP"

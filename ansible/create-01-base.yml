@@ -24,24 +24,6 @@
       prompt: "what is your Red Hat Subscription Manager password?"
       private: yes
 
-# - hosts: cloudforms-osp
-#   remote_user: root
-#   gather_facts: false
-#   # DONE: this is ugly as we first have to look for running OSP and running CFME, before we should continue here to avoid unneeded --skip-tags and --tags
-#   tasks:
-#     - name: check if openstack is available
-#       shell: curl -k {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://{{ hostvars['openstack'].vm_nics[0].ip }}/ || true
-#       register: openstack_available
-#       changed_when: false
-#       delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
-#       tags:
-#         - cfme_on_osp
-#     - block:
-#         - include: roles/layer3_vm_on_openstack/tasks/set_floating_ip_as_fact.yml
-#         - include: roles/layer3_vm_on_openstack/tasks/set_vm_nics_facts.yml
-#         - debug: var=vm_nics
-#       when: openstack_available.stdout|length > 0
-
 - hosts: layer1-group
   remote_user: root
   gather_facts: false
@@ -56,15 +38,16 @@
       tags: [ 'layer1', 'dnat', 'layer1-dnat' ]
       mode: create
       when: infrastructure_network_master is not defined or infrastructure_network_master == layer1_ansible_host
-    - role: layer1_etc_hosts
-      mode: create
-      tags: [ 'layer1', 'layer1-etc-hosts' ]
+    # - role: layer1_etc_hosts
+    #   mode: create
+    #   tags: [ 'layer1', 'layer1-etc-hosts' ]
     - role: layer1_ceph_inventory
       tags: [ 'layer2', 'ceph', 'ipa' ]
       when: current_lifecycle_env.osp_storage_backend == "ceph_ownvms"
     - role: layer1_nuage
       mode: create
       tags: [ 'layer1', 'nuage' ]
+
 #### SATELLITE ####
 
 - hosts: satellite-group
@@ -93,6 +76,11 @@
 #    - { role: layer2_ipa, tags: [ 'layer2', 'ipa' ], mode: create }
     - { role: layer2_ipa, tags: [ 'layer2', 'ipa' ], mode: create }
     - { role: layer2_tdagent, tags: [ 'layer2', 'ipa', 'tdagent', 'ipa-tdagent'], mode: create }
+    - role: layerX_dns
+      tags: [ 'layer2', 'satellite', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
+      skip_dnat_dns: True
+
 
 #### SATELLITE (again) ####
 
@@ -103,7 +91,11 @@
   #  - setup:
   #    tags: [ 'layer2','satellite' ]
   roles:
-   - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'satellite', 'dns', 'satellite-dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+    - role: layerX_dns
+      tags: [ 'layer2', 'satellite', 'dns', 'dnsupdate', 'dnat' ]
+      mode: update_services_network
+      skip_dnat_dns: True
+    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'satellite', 'dns', 'satellite-dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
 #   - { role: layer2_tdagent, tags: [ 'layer2', 'satellite', 'tdagent', 'satellite-tdagent' ], mode: create }
 #   - { role: layer2_ipa_certificate, tags: ['layer2', 'satellite', 'satellite_cert'], mode: create }
 #   - { role: layer2_satellite_certificate, tags: ['layer2', 'satellite', 'satellite_cert'], mode: create }
@@ -120,10 +112,15 @@
   gather_facts: false
   roles:
      - { role: layer2_vms, tags: [ 'layer2', 'proxy', 'vm' ], mode: create }
+     - role: layerX_dns
+       tags: [ 'layer2', 'proxy', 'dns', 'dnsupdate', 'dnat' ]
+       mode: update_services_network
+       skip_dnat_dns: True
      - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'proxy', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
      - { role: layer2_rhel, tags: [ 'layer2', 'proxy', 'rhel' ], mode: create }
-     - { role: layerX_ipa_client, tags: [ 'layer2', 'proxy',  'ipa-client'], mode: create }
-     - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
+    ### proxy should be neither IPA client nor syslog client since it is not part of the system itself, but system context
+    #  - { role: layerX_ipa_client, tags: [ 'layer2', 'proxy',  'ipa-client'], mode: create }
+    #  - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
      - { role: layer2_proxy, tags: [ 'layer2', 'proxy', 'proxy-config' ], mode: create }
 
 
@@ -134,6 +131,10 @@
   gather_facts: false
   roles:
    - { role: layer2_vms, tags: [ 'layer2', 'install-host', 'vm' ], mode: create }
+   - role: layerX_dns
+     tags: [ 'layer2', 'install-host', 'dns', 'dnsupdate', 'dnat' ]
+     mode: update_services_network
+     skip_dnat_dns: True
    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'install-host', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
    - { role: layer2_rhel, tags: [ 'layer2', 'install-host', 'rhel' ], mode: create }
    - { role: layerX_ipa_client, tags: [ 'layer2', 'install-host',  'ipa-client' ], mode: create }

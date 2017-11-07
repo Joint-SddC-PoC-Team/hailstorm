@@ -1,27 +1,58 @@
 - block:
-    - include: create_or_update.yml
+    - include: create_or_update_single_record.yml
       vars:
         ip: "{{ floating_ip }}"
         name: "{{ inventory_hostname_short }}"
       when: floating_ip|default('') != ''
       with_items: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
+    - include: create_or_update_batch_record.yml
+      when: floating_ip|default('') != ''
+      vars:
+        ip: "{{ floating_ip }}"
+        names: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
   when: mode=="update_floating_ip"
 
 - block:
-    - include: create_or_update.yml
+    - include: create_or_update_single_record.yml
       vars:
         ip: "{{ (vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}"
         name: "{{ inventory_hostname_short }}"
       with_items: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
+
+    - include: create_or_update_batch_record.yml
+      vars:
+        ip: "{{  (vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}"
+        names: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
   when: mode=="update_services_network"
 
 - block:
-    - include: destroy.yml
+    - include: destroy_single_record.yml
+      when: ansible_host|default('') != ''
       vars:
-        ip: "{{ ansible_host }}"
+        ip: "{{ (vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}"
         name: "{{ inventory_hostname_short }}"
       with_items: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
-  when: mode=="destroy"
 
+    - include: destroy_batch_record.yml
+      when: ansible_host|default('') != ''
+      vars:
+        ip: "{{ (vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}"
+        names: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
+  when: mode=="destroy_services_network"
 
-- meta: flush_handlers
+- block:
+    - include: destroy_single_record.yml
+      when: floating_ip|default('') != ''
+      vars:
+        ip: "{{ floating_ip }}"
+        name: "{{ inventory_hostname_short }}"
+      with_items: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
+
+    - include: destroy_batch_record.yml
+      when: floating_ip|default('') != ''
+      vars:
+        ip: "{{ floating_ip }}"
+        names: "{{ ([inventory_hostname_short]+(additional_dns|default('')).split(','))|select|list }}"
+  when: mode=="destroy_floating_ip"
+
+#- meta: flush_handlers

@@ -1,22 +1,18 @@
-- name: find existing dns records
-  shell: echo "{{ ipa_admin_password }}" | ( kinit admin &&  ipa dnsrecord-find "{{ hailstorm_dns_domain }}" ) | grep "Record name:" | cut -c 16-
-  register: dns_records
-  changed_when: false
-
-
-
-
-- name: add dns records
-  shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item.name }} --a-rec {{ item.ip }}
-  when: item.name != 'localhost' and item.name not in dns_records.stdout_lines
-  with_items: "{{ lookup('template','a_records.j2') }}"
-  ignore_errors: true
+# - name: find existing dns A records
+#   shell: echo "{{ ipa_admin_password }}" | ( kinit admin &&  ipa dnsrecord-find "{{ hailstorm_dns_domain }}" ) | grep "Record name:" | cut -c 16-
+#   register: dns_records
+#   changed_when: false
+#
+# - name: add dns A records
+#   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item.name }} --a-rec {{ item.ip }}
+#   when: item.name != 'localhost' and item.name not in dns_records.stdout_lines
+#   with_items: "{{ lookup('template','a_records.j2') }}"
+#   ignore_errors: true
 
 - name: find existing ptr records
   shell:  echo "{{ ipa_admin_password }}" | ( kinit admin && for zone in $(ipa dnszone-find |grep "Zone name"|grep arpa|cut -c14-); do ipa dnsrecord-find $zone | grep "PTR record:"| cut -c15- | sed "s/, /\\n/g"; done)
   register: ptr_records
   changed_when: false
-
 
 - name: add ptr records
   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ item.ip | ipaddr('revdns') | regex_replace('^\d+\.(.*)$', '\1') }} {{ item.ip.split('.')[3] }} --ptr-rec={{ item.name }}.{{ hailstorm_dns_domain }}.

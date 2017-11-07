@@ -204,7 +204,7 @@ infrastructure_network_baremetal:
   bridge: 'baremetal'
   dhcp_start: 192.168.18.10
   dhcp_end:   192.168.18.29
-  default_gw_host_prefix: 192.168.18.1/28
+  default_gw_host_prefix: 192.168.18.1/24
   vlan:       2818
   mac_prefix: "02:00:00:00:18:"
 

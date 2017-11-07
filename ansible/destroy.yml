@@ -22,6 +22,9 @@
     - role: layer2_vms
       tags: [ 'layer2','dev-client', 'ose3', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'dev-client', 'vm','dnat' ]
+      mode: destroy_services_network
 
 - hosts: lookbusy-rhev-group
   gather_facts: false
@@ -38,6 +41,9 @@
       tags: [ 'layer3','lookbusy-rhev','lookbusy', 'vm' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
+    - role: layerX_dns
+      tags: [ 'layer3', lookbusy-rhev','lookbusy', 'vm','dnat' ]
+      mode: destroy_services_network
 
 
 - hosts: lookbusy-osp-group
@@ -55,8 +61,9 @@
       tags: [ 'layer3','lookbusy-osp','lookbusy', 'vm' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
-
-
+    - role: layerX_dns
+      tags: [ 'layer3', lookbusy-osp','lookbusy', 'vm','dnat' ]
+      mode: destroy_floating_ip
 
 ### BEGIN CLOUDFORMS
 
@@ -78,7 +85,6 @@
       mode: start
       when: cf_is_deployed_on == 'osp'
 
-
 - hosts: cloudforms-group
   gather_facts: false
   remote_user: root
@@ -87,9 +93,6 @@
       tags: [ 'layer3', 'cf', 'rhel']
       mode: destroy
       when: vm_exists is defined and vm_exists == true
-    - role: layerX_dns
-      tags: [ 'layer2', 'cf', 'vm','dnat' ]
-      mode: destroy
 
 - hosts: cf-rhv-vm-group
   gather_facts: false
@@ -103,6 +106,9 @@
       tags: [ 'layer3', 'cf', 'cf-template' ]
       mode: destroy
       when: cf_is_deployed_on == 'rhv'
+    - role: layerX_dns
+      tags: [ 'layer2', 'cf', 'vm','dnat' ]
+      mode: destroy_services_network
 
 - hosts: cf-osp-vm-group
   gather_facts: false
@@ -112,6 +118,9 @@
       tags: [ 'layer2', 'cf', 'vm' ]
       mode: destroy
       when: cf_is_deployed_on == 'osp' and vm_exists is defined and vm_exists == true
+    - role: layerX_dns
+      tags: [ 'layer2', 'cf', 'vm','dnat' ]
+      mode: destroy_floating_ip
 
 #### END CLOUDFORMS
 
@@ -169,9 +178,7 @@
       tags: ['layer2', 'ose3', 'ose3-oidc']
       mode: destroy
       oidcClientName: 'ocp-master'
-    - role: layerX_dns
-      tags: [ 'layer2', 'cf', 'vm','dnat' ]
-      mode: destroy
+
 
 - hosts: ocp-l2-vm-group
   gather_facts: false
@@ -190,6 +197,9 @@
       tags: [ 'layer3', 'ocp', 'vm']
       mode: destroy
       when: ocp_is_deployed_on == 'rhv' and vm_exists is defined and vm_exists == true
+    - role: layerX_dns
+      tags: [ 'layer3', 'ocp', 'vm','dnat' ]
+      mode: destroy_services_network
 
 - hosts: ocp-osp-vm-group
   gather_facts: false
@@ -199,6 +209,9 @@
       tags: [ 'layer2', 'ocp', 'vm' ]
       mode: destroy
       when: ocp_is_deployed_on == 'osp' and vm_exists is defined and vm_exists == true
+    - role: layerX_dns
+      tags: [ 'layer2', 'ocp', 'vm','dnat' ]
+      mode: destroy_floating_ip
 
 - hosts: ocp-osp-lbaas-group
   gather_facts: false
@@ -208,6 +221,9 @@
       tags: [ 'layer3', 'ocp', 'ocp-osp','ocp-osp-lb' ]
       mode: destroy
       when: ocp_is_deployed_on == 'osp'
+    - role: layerX_dns
+      tags: [ 'layer2', 'ocp', 'ocp-osp', 'vm','dnat' ]
+      mode: destroy_floating_ip
 
 #### END OPENSHIFT
 
@@ -257,9 +273,6 @@
       tags: [ 'layer2', 'rhsso', 'rhel' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
-    - role: layerX_dns
-      tags: [ 'layer2', 'rhsso', 'vm','dnat' ]
-      mode: destroy
 
 - hosts: rh-sso-l2-vm-group
   gather_facts: false
@@ -269,6 +282,9 @@
       tags: [ 'layer2', 'rhsso', 'vm', 'rhsso-install' ]
       mode: destroy
       when: rhsso_is_deployed_on == 'baremetal' and vm_exists is defined and vm_exists == true
+    - role: layerX_dns
+      tags: [ 'layer2', 'rhsso', 'vm','dnat' ]
+      mode: destroy_services_network
 
 - hosts: rh-sso-rhv-vm-group
   gather_facts: false
@@ -278,6 +294,9 @@
       tags: [ 'layer3', 'rhsso', 'vm', 'rhsso-install' ]
       mode: destroy
       when: rhsso_is_deployed_on == 'rhv' and vm_exists is defined and vm_exists == true
+    - role: layerX_dns
+      tags: [ 'layer2', 'rhsso', 'vm','dnat' ]
+      mode: destroy_services_network
 
 - hosts: rh-sso-osp-vm-group
   gather_facts: false
@@ -287,6 +306,9 @@
       tags: [ 'layer3', 'rhsso', 'vm', 'rhsso-install' ]
       mode: destroy
       when: rhsso_is_deployed_on == 'osp' and vm_exists is defined and vm_exists == true
+    - role: layerX_dns
+      tags: [ 'layer2', 'rhsso', 'vm','dnat' ]
+      mode: destroy_floating_ip
 
 #### END RH SSO
 
@@ -331,6 +353,9 @@
     - role: layer2_vms
       tags: [ 'layer2','rhev', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'rhev', 'vm','dnat' ]
+      mode: destroy_services_network
 
 #### END RHV
 
@@ -382,6 +407,9 @@
     - role: layer2_vms
       tags: [ 'layer2','rhosp', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'rhosp', 'vm','dnat' ]
+      mode: destroy_services_network
 
 #### END OPENSTACK+CEPH
 
@@ -421,6 +449,9 @@
     - role: layer2_vms
       tags: [ 'layer2','tower', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'tower', 'vm','dnat' ]
+      mode: destroy_services_network
 
 #### END TOWER
 
@@ -440,6 +471,9 @@
     - role: layer2_vms
       tags: [ 'layer2','storage-console', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'storage-console', 'vm','dnat' ]
+      mode: destroy_services_network
 - hosts: layer1
   remote_user: root
   gather_facts: false
@@ -471,6 +505,9 @@
     - role: layer2_vms
       tags: [ 'layer2','ceph', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'ceph', 'vm','dnat' ]
+      mode: destroy_services_network
 
 #### END CEPH STANDALONE
 
@@ -492,7 +529,9 @@
       tags: [ 'layer2','efk', 'vm' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
-
+    - role: layerX_dns
+      tags: [ 'layer2', 'efk', 'vm','dnat' ]
+      mode: destroy_services_network
 #### END EFK
 
 
@@ -512,6 +551,9 @@
     - role: layer2_vms
       tags: [ 'layer2','infrastructure', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'infrastructure', 'vm','dnat' ]
+      mode: destroy_services_network
 
 #### END INFRASTRUCTURE
 
@@ -542,6 +584,9 @@
     - role: layer2_vms
       tags: [ 'layer2','install-host', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'install-host', 'vm','dnat' ]
+      mode: destroy_services_network
 
 #### END INSTALL-HOST
 
@@ -565,6 +610,9 @@
     - role: layer2_vms
       tags: [ 'layer2','ipa', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'ipa', 'vm','dnat' ]
+      mode: destroy_services_network
 
 #### END IPA
 
@@ -589,6 +637,10 @@
     - role: layer2_vms
       tags: [ 'layer2','satellite', 'vm' ]
       mode: destroy
+      when: destroy_satellite is defined and destroy_satellite
+    - role: layerX_dns
+      tags: [ 'layer2', 'satellite', 'vm','dnat' ]
+      mode: destroy_services_network
       when: destroy_satellite is defined and destroy_satellite
 
 #### END SATELLITE
@@ -617,6 +669,9 @@
     - role: layer2_vms
       tags: [ 'layer2','proxy', 'vm' ]
       mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'proxy', 'vm','dnat' ]
+      mode: destroy_services_network
 
 #### END PROXY
 
