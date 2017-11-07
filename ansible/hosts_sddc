@@ -45,7 +45,7 @@ install-host    ansible_host=10.116.127.154 activation_key="AK-CV-OS-RHEL7-SERVE
 
 # Elasticsearch, FluentD, Kibana
 [efk-group]
-efk             ansible_host=10.116.127.174 activation_key="AK-CV-RHOSP-{{ stage }}"
+efk             ansible_host=10.116.127.174 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
 # the Infrastructure server (DNS, SMTP/IMAP)
 [infrastructure-group]
