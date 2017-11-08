@@ -208,6 +208,17 @@ infrastructure_network_baremetal:
   vlan:       2818
   mac_prefix: "02:00:00:00:18:"
 
+
+infrastructure_network_nuage_vsr:
+  netname: 'nuage_vsr'
+  bridge: 'nuage_vsr'
+  # dhcp_start: 192.168.18.10
+  # dhcp_end:   192.168.18.29
+  default_gw_host_prefix: 192.168.16.1/24
+  vlan:       2816
+  mac_prefix: "02:00:00:00:16:"
+
+
 infrastructure_osp_tenant_internal_network:
   netname: "internal_{{ osp_tenant }}"
   dhcp: true
@@ -226,3 +237,4 @@ infrastructure_networks:
   - "{{ infrastructure_network_ospf1 }}"
   - "{{ infrastructure_network_ospf2 }}"
   - "{{ infrastructure_network_baremetal }}"
+  - "{{ infrastructure_network_nuage_vsr }}"
