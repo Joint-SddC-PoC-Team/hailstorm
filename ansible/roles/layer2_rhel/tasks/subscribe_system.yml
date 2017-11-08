@@ -43,11 +43,22 @@
   when: (not disable_registration_against_satellite) and activation_key is defined and (subscription_status.stdout == 'Current' or subscription_status.stdout == 'Insufficient') and rhsm_target.stdout != hostvars['satellite'].hostname
 
 - block:
-    - name: add entries to /etc/hosts
+    - name: add entries to /etc/hosts (for services network)
       lineinfile: dest=/etc/hosts line="{{ item }}"
       with_items:
         - "{{ hostvars['satellite'].vm_nics[0].ip }} satellite {{ hostvars['satellite'].hostname }}"
       when: hostvars['satellite'].vm_nics[0].netname in (vm_nics|map(attribute="netname")|list)
+
+    - name: add entries to /etc/hosts (for DNAT IP)
+      lineinfile: dest=/etc/hosts line="{{ item }}"
+      with_items:
+        - "{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','satellite')|first).on_host_prefix|ipaddr('address') }} satellite {{ hostvars['satellite'].hostname }}"
+      when: >
+        hostvars['satellite'].vm_nics[0].netname not in (vm_nics|map(attribute='netname')|list)
+        and
+        external_network_config is defined
+        and
+        external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','satellite')|list|length > 0
 
     - name: install katello-ca-consumer-latest
       # yum module can't do localinstall...
@@ -71,7 +82,7 @@
         consumer_name: "{{ hostname }}"
       register: rh_sub
       retries: 5
-      until: not rh_sub|failed 
+      until: not rh_sub|failed
       delay: 5
     - name: install katello-agent
       yum:
