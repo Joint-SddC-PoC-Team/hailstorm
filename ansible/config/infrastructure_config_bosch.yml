@@ -52,23 +52,23 @@ infrastructure_network_services:
   floating_end:           10.116.127.179
   mac_prefix: "02:00:00:00:01:"
 
-# # guests is an external network for virtual machine guests, not to be confused with the OpenStack tentant network; it is as a matter of fact OpenStacks br-ex without the public API endpoints
-# # SDDC: BGP2 breakout?
-# infrastructure_network_guests:
-#   netname: 'guests'
-#   bridge:                 "guests"
-#   mac_prefix:             "{% if infrastructure_network_master is defined %}52:54:00:48:04:{% else %}{{ external_network_config.guest_network_bridging_mac_prefix }}{% endif %}"
-#   forward_mode:           "bridge"
-#
-#   #BOSCH
-#   default_gw_host_prefix: "10.32.111.254/20"
-#   #vlan                   -1
-#   floating_start:         "{% if infrastructure_network_master is defined %}10.32.105.160{% else %}{{ external_network_config.guest_network_osp_floating_start }}{% endif %}"
-#   floating_end:           "{% if infrastructure_network_master is defined %}10.32.105.179{% else %}{{ external_network_config.guest_network_osp_floating_end }}{% endif %}"
-#   dns_server:             "10.32.96.1"
-#   # the following are only relevant when forward_mode == 'nat'
-#   #dhcp_start: 10.116.121.2
-#   #dhcp_end:   10.116.121.128
+# guests is an external network for virtual machine guests, not to be confused with the OpenStack tentant network; it is as a matter of fact OpenStacks br-ex without the public API endpoints
+# SDDC: BGP2 breakout?
+infrastructure_network_guests:
+  netname: 'guests'
+  bridge:                 "guests"
+  mac_prefix:             "{% if infrastructure_network_master is defined %}52:54:00:48:04:{% else %}{{ external_network_config.guest_network_bridging_mac_prefix }}{% endif %}"
+  forward_mode:           "bridge"
+
+  #BOSCH
+  default_gw_host_prefix: "10.32.111.254/20"
+  #vlan                   -1
+  floating_start:         "{% if infrastructure_network_master is defined %}10.32.105.160{% else %}{{ external_network_config.guest_network_osp_floating_start }}{% endif %}"
+  floating_end:           "{% if infrastructure_network_master is defined %}10.32.105.179{% else %}{{ external_network_config.guest_network_osp_floating_end }}{% endif %}"
+  dns_server:             "10.32.96.1"
+  # the following are only relevant when forward_mode == 'nat'
+  #dhcp_start: 10.116.121.2
+  #dhcp_end:   10.116.121.128
 
 # this is meant as a way to connect to the machines in a way like an out-of-band management network, so RACs should be here or in RHSOP-Provisioning; in OpenStack this is the Management Network
 infrastructure_network_admin:

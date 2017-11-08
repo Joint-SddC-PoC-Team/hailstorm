@@ -4,7 +4,9 @@
 # because it depends on the rollout scenario (all-in-one vs. multi-node) which interfaces
 # are being bridged and whether or not additional IPs need to be configured (e.g. for admin IP to the ndoes)
 [sddc]
-FE-SDDC-RH10r ansible_host=10.116.127.149 node_bridge_config="{ 'services':{'nic':'em1','host_prefix':'10.116.127.149/24','default_gw':'10.116.127.254', 'additional':'DEFROUTE=\"yes\"\nDNS1=10.116.57.11\nDOMAIN=rh-sddc.test-bosch.com'}, 'admin':{'nic':'p2p1','host_prefix':'192.168.23.149/24'}, 'services':{'nic':'p2p1'}, 'internal_api':{'nic':'p2p1'}, 'tenant':{'nic':'p2p1'}, 'storage':{'nic':'p2p1'}, 'storage_mgmt':{'nic':'p2p1'}, 'provisioning':{'nic':'em3'}, 'bgp1':{'nic':'p2p1'}, 'bgp2':{'nic':'p2p1'}, 'ospf1':{'nic':'p2p1'}, 'ospf2':{'nic':'p2p1'}, 'baremetal':{'nic':'p2p1'}, 'nuage_vsr':{'nic':'p2p1'} }"
+FE-SDDC-RH10r ansible_host=10.116.127.149 node_bridge_config="{ 'services':{'nic':'services-bond','host_prefix':'10.116.127.149/24','default_gw':'10.116.127.254', 'additional':'DEFROUTE=\"yes\"\nDNS1=10.116.57.11\nDOMAIN=rh-sddc.test-bosch.com'}, 'admin':{'nic':'james-bond','host_prefix':'192.168.23.149/24'}, 'internal_api':{'nic':'james-bond'}, 'tenant':{'nic':'james-bond'}, 'storage':{'nic':'james-bond'}, 'storage_mgmt':{'nic':'james-bond'}, 'provisioning':{'nic':'provisioning-bond'}, 'bgp1':{'nic':'james-bond'}, 'bgp2':{'nic':'james-bond'}, 'ospf1':{'nic':'james-bond'}, 'ospf2':{'nic':'james-bond'}, 'baremetal':{'nic':'james-bond'}, 'nuage_vsr':{'nic':'james-bond'} }"
+FE-SDDC-RH11r ansible_host=10.116.127.150 node_bridge_config="{ 'services':{'nic':'services-bond','host_prefix':'10.116.127.150/24','default_gw':'10.116.127.254', 'additional':'DEFROUTE=\"yes\"\nDNS1=10.116.57.11\nDOMAIN=rh-sddc.test-bosch.com'}, 'admin':{'nic':'james-bond','host_prefix':'192.168.23.150/24'}, 'internal_api':{'nic':'james-bond'}, 'tenant':{'nic':'james-bond'}, 'storage':{'nic':'james-bond'}, 'storage_mgmt':{'nic':'james-bond'}, 'provisioning':{'nic':'provisioning-bond'}, 'bgp1':{'nic':'james-bond'}, 'bgp2':{'nic':'james-bond'}, 'ospf1':{'nic':'james-bond'}, 'ospf2':{'nic':'james-bond'}, 'baremetal':{'nic':'james-bond'}, 'nuage_vsr':{'nic':'james-bond'} }"
+FE-SDDC-RH12r ansible_host=10.116.127.151 node_bridge_config="{ 'services':{'nic':'services-bond','host_prefix':'10.116.127.151/24','default_gw':'10.116.127.254', 'additional':'DEFROUTE=\"yes\"\nDNS1=10.116.57.11\nDOMAIN=rh-sddc.test-bosch.com'}, 'admin':{'nic':'james-bond','host_prefix':'192.168.23.151/24'}, 'internal_api':{'nic':'james-bond'}, 'tenant':{'nic':'james-bond'}, 'storage':{'nic':'james-bond'}, 'storage_mgmt':{'nic':'james-bond'}, 'provisioning':{'nic':'provisioning-bond'}, 'bgp1':{'nic':'james-bond'}, 'bgp2':{'nic':'james-bond'}, 'ospf1':{'nic':'james-bond'}, 'ospf2':{'nic':'james-bond'}, 'baremetal':{'nic':'james-bond'}, 'nuage_vsr':{'nic':'james-bond'} }"
 
 [sddc:vars]
 ansible_ssh_common_args="-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no"
@@ -20,18 +22,18 @@ layer1          ansible_host=192.168.23.1 node_bridge_config='{{ hostvars[layer1
 #### BEGIN BASE SERVICES
 
 [satellite-group]
-satellite       ansible_host=10.116.127.152
+satellite       l1host="FE-SDDC-RH10r" ansible_host=10.116.127.152
 
 # the IPA server
 [ipa-group]
-ipa             ansible_host=10.116.127.153 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+ipa             l1host="FE-SDDC-RH10r" ansible_host=10.116.127.153 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
 # proxy only for COE MUC deployment
 [proxy-group]
 #proxy           ansible_host=10.116.127.8 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
 [install-host-group]
-install-host    ansible_host=10.116.127.154 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+install-host    l1host="FE-SDDC-RH10r" ansible_host=10.116.127.154 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
 #### END BASE SERVICES
 
@@ -41,7 +43,7 @@ install-host    ansible_host=10.116.127.154 activation_key="AK-CV-OS-RHEL7-SERVE
 
 # Elasticsearch, FluentD, Kibana
 [efk-group]
-efk             ansible_host=10.116.127.174 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+efk             l1host="FE-SDDC-RH12r" ansible_host=10.116.127.174 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
 # the Infrastructure server (DNS, SMTP/IMAP)
 [infrastructure-group]
@@ -89,18 +91,18 @@ layer1-group
 #### BEGIN NUAGE
 
 [nuage]
-vsd1 ansible_host=10.116.127.156 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','1 100 5222']" additional_dns="xmpp"
-vsd2 ansible_host=10.116.127.157 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','2 100 5222']" additional_dns="xmpp"
-vsd3 ansible_host=10.116.127.158 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','3 100 5222']" additional_dns="xmpp"
-c1 ansible_host=10.116.127.162 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc1"
-c2 ansible_host=10.116.127.163 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc2"
-c3 ansible_host=10.116.127.164 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc3"
-c4 ansible_host=10.116.127.165 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc4"
-elastic1 ansible_host=10.116.127.159 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-elastic2 ansible_host=10.116.127.160 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-elastic3 ansible_host=10.116.127.161 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-r1 ansible_host=10.116.127.166 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr1"
-r2 ansible_host=10.116.127.168 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr2"
+vsd1 l1host="FE-SDDC-RH10r" ansible_host=10.116.127.156 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','1 100 5222']" additional_dns="xmpp"
+vsd2 l1host="FE-SDDC-RH11r" ansible_host=10.116.127.157 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','2 100 5222']" additional_dns="xmpp"
+vsd3 l1host="FE-SDDC-RH12r" ansible_host=10.116.127.158 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','3 100 5222']" additional_dns="xmpp"
+c1 l1host="FE-SDDC-RH11r" ansible_host=10.116.127.162 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc1"
+c2 l1host="FE-SDDC-RH12r" ansible_host=10.116.127.163 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc2"
+c3 l1host="FE-SDDC-RH11r" ansible_host=10.116.127.164 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc3"
+c4 l1host="FE-SDDC-RH12r" ansible_host=10.116.127.165 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc4"
+elastic1 l1host="FE-SDDC-RH10r" ansible_host=10.116.127.159 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+elastic2 l1host="FE-SDDC-RH11r" ansible_host=10.116.127.160 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+elastic3 l1host="FE-SDDC-RH12r" ansible_host=10.116.127.161 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+r1 l1host="FE-SDDC-RH11r" ansible_host=10.116.127.166 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr1"
+r2 l1host="FE-SDDC-RH12r" ansible_host=10.116.127.168 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr2"
 
 [nuage-vsd]
 vsd1
@@ -112,8 +114,6 @@ elastic1
 elastic2
 elastic3
 
-
-
 #### END NUAGE
 
 
@@ -121,26 +121,26 @@ elastic3
 #### BEGIN OPENSTACK
 
 [rhosp-director-group]
-rhosp-director  ansible_host=10.116.127.172 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director" provisioning_admin_vip="192.168.105.74" provisioning_dhcp_start="192.168.105.10" provisioning_dhcp_end="192.168.105.25" provisioning_discovery_start="192.168.105.26" provisioning_discovery_end="192.168.105.41"
-rhosp-director2  ansible_host=10.116.127.175 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director2" provisioning_admin_vip="192.168.105.75" provisioning_dhcp_start="192.168.105.42" provisioning_dhcp_end="192.168.105.57" provisioning_discovery_start="192.168.105.58" provisioning_discovery_end="192.168.105.73"
+rhosp-director  l1host="FE-SDDC-RH11r" ansible_host=10.116.127.172 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director" provisioning_admin_vip="192.168.105.74" provisioning_dhcp_start="192.168.105.10" provisioning_dhcp_end="192.168.105.25" provisioning_discovery_start="192.168.105.26" provisioning_discovery_end="192.168.105.41"
+rhosp-director2 l1host="FE-SDDC-RH12r" ansible_host=10.116.127.175 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director2" provisioning_admin_vip="192.168.105.75" provisioning_dhcp_start="192.168.105.42" provisioning_dhcp_end="192.168.105.57" provisioning_discovery_start="192.168.105.58" provisioning_discovery_end="192.168.105.73"
 
 # The group of all osp compute nodes
 [rhosp-compute]
-rhosp-compute1  ansible_host=10.116.127.143 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-compute2  ansible_host=10.116.127.144 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-compute3  ansible_host=10.116.127.145 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-compute4  ansible_host=10.116.127.146 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-compute5  ansible_host=10.116.127.147 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-compute6  ansible_host=10.116.127.148 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-compute7  ansible_host=10.116.127.149 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-compute8  ansible_host=10.116.127.150 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-compute1  ansible_host=10.116.127.143 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-compute2  ansible_host=10.116.127.144 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-compute3  ansible_host=10.116.127.145 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-compute4  ansible_host=10.116.127.146 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-compute5  ansible_host=10.116.127.147 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-compute6  ansible_host=10.116.127.148 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-compute7  ansible_host=10.116.127.149 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-compute8  ansible_host=10.116.127.150 activation_key="AK-CV-RHOSP-{{ stage }}"
 
 # The group of all osp control nodes
 [rhosp-control]
-rhosp-control1  ansible_host=10.116.127.140 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-control2  ansible_host=10.116.127.141 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-control3  ansible_host=10.116.127.142 activation_key="AK-CV-RHOSP-{{ stage }}"
-rhosp-control4  ansible_host=10.116.127.151 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-control1  ansible_host=10.116.127.140 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-control2  ansible_host=10.116.127.141 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-control3  ansible_host=10.116.127.142 activation_key="AK-CV-RHOSP-{{ stage }}"
+#rhosp-control4  ansible_host=10.116.127.151 activation_key="AK-CV-RHOSP-{{ stage }}"
 
 # A list of all OpenStack subgroups
 [rhosp-all-group:children]
@@ -197,16 +197,16 @@ rhosp-control4
 #### BEGIN RH-SSO
 
 [rh-sso-group]
-rh-sso Xansible_host=10.116.127.7 activation_key="AK-CV-RH-SSO-{{ stage }}" additional_dns="sso" osp_tenant="{{ rhsso_tenant }}" osp_flavor="m1.medium" osp_image="RHEL7"
+rh-sso activation_key="AK-CV-RH-SSO-{{ stage }}" additional_dns="sso"
 
 [rh-sso-l2-vm-group]
-#rh-sso
+#rh-sso ansible_host=10.116.127.7
 
 [rh-sso-osp-vm-group]
-rh-sso
+rh-sso osp_tenant="{{ rhsso_tenant }}" osp_flavor="m1.medium" osp_image="RHEL7"
 
 [rh-sso-rhv-vm-group]
-#rh-sso
+#rh-sso ansible_host=10.116.127.7
 
 #### END RH-SSO
 
@@ -313,7 +313,7 @@ cloudforms-group
 #### BEGIN ANSIBLE TOWER
 
 [tower]
-#tower          ansible_host=10.116.127.38 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+#tower          l1host="FE-SDDC-RH10r" ansible_host=10.116.127.38 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
 [ansible-jump-host]
 ansible-jump-demo-vms  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-vms" osp_flavor="m1.small" osp_image="RHEL7"
