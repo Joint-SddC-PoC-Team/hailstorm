@@ -1,0 +1,468 @@
+#### BEGIN LAYER 1 CONFIGURATION
+
+# we define the node_bridge_config vars here and not in the host-specific config file,
+# because it depends on the rollout scenario (all-in-one vs. multi-node) which interfaces
+# are being bridged and whether or not additional IPs need to be configured (e.g. for admin IP to the ndoes)
+[sddc]
+FE-SDDC-RH10r ansible_host=10.116.127.149 node_bridge_config="{ 'services':{'nic':'em1','host_prefix':'10.116.127.149/24','default_gw':'10.116.127.254', 'additional':'DEFROUTE=\"yes\"\nDNS1=10.116.57.11\nDOMAIN=rh-sddc.test-bosch.com'}, 'admin':{'nic':'p2p1','host_prefix':'192.168.23.149/24'}, 'services':{'nic':'p2p1'}, 'internal_api':{'nic':'p2p1'}, 'tenant':{'nic':'p2p1'}, 'storage':{'nic':'p2p1'}, 'storage_mgmt':{'nic':'p2p1'}, 'provisioning':{'nic':'em3'}, 'bgp1':{'nic':'p2p1'}, 'bgp2':{'nic':'p2p1'}, 'ospf1':{'nic':'p2p1'}, 'ospf2':{'nic':'p2p1'}, 'baremetal':{'nic':'p2p1'}, 'nuage_vsr':{'nic':'p2p1'} }"
+
+[sddc:vars]
+ansible_ssh_common_args="-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no"
+
+# the layer1 group should only contain a single server called layer1
+[layer1-group]
+layer1          ansible_host=192.168.23.1 node_bridge_config='{{ hostvars[layer1_ansible_host].node_bridge_config }}'
+
+#### END LAYER 1 CONFIGURATION
+
+
+
+#### BEGIN BASE SERVICES
+
+[satellite-group]
+satellite       ansible_host=10.116.127.152
+
+# the IPA server
+[ipa-group]
+ipa             ansible_host=10.116.127.153 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+
+# proxy only for COE MUC deployment
+[proxy-group]
+#proxy           ansible_host=10.116.127.8 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+
+[install-host-group]
+install-host    ansible_host=10.116.127.154 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+
+#### END BASE SERVICES
+
+
+
+#### BEGIN ADDITIONAL L2 VMS
+
+# Elasticsearch, FluentD, Kibana
+[efk-group]
+efk             ansible_host=10.116.127.174 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+
+# the Infrastructure server (DNS, SMTP/IMAP)
+[infrastructure-group]
+infrastructure  ansible_host=10.116.127.155 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" additional_dns="imap,smtp,ntp,vsd" roles=["dnat","smtp","haproxy","ntp","syslog"]
+#syslog		      ansible_host=10.116.127.9 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" roles=["syslog"]
+
+# bosch-vpn only for COE MUC deployment
+[bosch-vpn-group]
+#bosch-vpn       l1host="layer1" ansible_host=10.116.127.19 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+
+# which system will host virt-who -> this should not be satellite since virt-who reports to subscription-manager which reports to RHN (which doesn't know the Default Organization) on satellite
+[virt-who]
+infrastructure
+
+#### END ADDITIONAL L2 VMS
+
+
+
+#### BEGIN RED HAT VIRTUALIZATION
+
+# the single node that is RHEV-Manager
+[rhvm-group]
+#rhvm           ansible_host=10.116.127.XXX activation_key="AK-CV-RHEV-MANAGER-{{ stage }}" additional_dns="rhv"
+
+# the nodes that are RHEV-Hypervisor
+[rhvh-group]
+#rhvh1          ansible_host=10.116.127.XXX activation_key="AK-CV-RHEV-HYPERVISOR-{{ stage }}"
+#rhvh2          ansible_host=10.116.127.XXX activation_key="AK-CV-RHEV-HYPERVISOR-{{ stage }}"
+#rhvh3          ansible_host=10.116.127.XXX activation_key="AK-CV-RHEV-HYPERVISOR-{{ stage }}"
+
+# the list of groups that make up RHEV
+[rhv-group:children]
+rhvm-group
+rhvh-group
+
+# all RHEV nodes and the layer1 host to ensure there's a common view on the storage domain
+[layer1-rhv-group:children]
+rhv-group
+layer1-group
+
+#### END RED HAT VIRTUALIZATION
+
+
+
+#### BEGIN NUAGE
+
+[nuage]
+vsd1 ansible_host=10.116.127.156 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','1 100 5222']" additional_dns="xmpp"
+vsd2 ansible_host=10.116.127.157 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','2 100 5222']" additional_dns="xmpp"
+vsd3 ansible_host=10.116.127.158 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','3 100 5222']" additional_dns="xmpp"
+c1 ansible_host=10.116.127.162 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc1"
+c2 ansible_host=10.116.127.163 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc2"
+c3 ansible_host=10.116.127.164 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc3"
+c4 ansible_host=10.116.127.165 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc4"
+elastic1 ansible_host=10.116.127.159 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+elastic2 ansible_host=10.116.127.160 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+elastic3 ansible_host=10.116.127.161 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+r1 ansible_host=10.116.127.166 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr1"
+r2 ansible_host=10.116.127.168 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr2"
+
+[nuage-vsd]
+vsd1
+vsd2
+vsd3
+
+[nuage-elastic]
+elastic1
+elastic2
+elastic3
+
+
+
+#### END NUAGE
+
+
+
+#### BEGIN OPENSTACK
+
+[rhosp-director-group]
+rhosp-director  ansible_host=10.116.127.172 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director" provisioning_admin_vip="192.168.105.74" provisioning_dhcp_start="192.168.105.10" provisioning_dhcp_end="192.168.105.25" provisioning_discovery_start="192.168.105.26" provisioning_discovery_end="192.168.105.41"
+rhosp-director2  ansible_host=10.116.127.175 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director2" provisioning_admin_vip="192.168.105.75" provisioning_dhcp_start="192.168.105.42" provisioning_dhcp_end="192.168.105.57" provisioning_discovery_start="192.168.105.58" provisioning_discovery_end="192.168.105.73"
+
+# The group of all osp compute nodes
+[rhosp-compute]
+rhosp-compute1  ansible_host=10.116.127.143 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-compute2  ansible_host=10.116.127.144 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-compute3  ansible_host=10.116.127.145 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-compute4  ansible_host=10.116.127.146 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-compute5  ansible_host=10.116.127.147 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-compute6  ansible_host=10.116.127.148 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-compute7  ansible_host=10.116.127.149 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-compute8  ansible_host=10.116.127.150 activation_key="AK-CV-RHOSP-{{ stage }}"
+
+# The group of all osp control nodes
+[rhosp-control]
+rhosp-control1  ansible_host=10.116.127.140 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-control2  ansible_host=10.116.127.141 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-control3  ansible_host=10.116.127.142 activation_key="AK-CV-RHOSP-{{ stage }}"
+rhosp-control4  ansible_host=10.116.127.151 activation_key="AK-CV-RHOSP-{{ stage }}"
+
+# A list of all OpenStack subgroups
+[rhosp-all-group:children]
+rhosp-director-group
+rhosp-undercloud
+
+# The groups that make up the osp undercloud (i.e. compute, control and potentially storage)
+[rhosp-undercloud:children]
+rhosp-compute
+rhosp-control
+
+# a group required to store a common configuration for IPMI emulation between the layer1 host and the osp-director
+[layer1-rhosp:children]
+rhosp-director-group
+layer1-group
+
+# virtual IPs - these will not be instantiated through Ansible (but need them for DNS records, DNAT, etc)
+[vips]
+openstack         ansible_host=10.116.127.173 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+openstack2        ansible_host=10.116.127.176 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+
+[overcloud-director-group]
+rhosp-director
+
+[overcloud-controller-group]
+rhosp-control1
+rhosp-control2
+rhosp-control3
+
+[overcloud-compute-group]
+rhosp-compute1
+rhosp-compute2
+rhosp-compute3
+rhosp-compute4
+rhosp-compute5
+rhosp-compute6
+rhosp-compute7
+
+
+[overcloud2-director-group]
+rhosp-director2
+
+[overcloud2-compute-group]
+rhosp-compute8
+
+[overcloud2-controller-group]
+rhosp-control4
+
+
+#### END OPENSTACK
+
+
+
+#### BEGIN RH-SSO
+
+[rh-sso-group]
+rh-sso Xansible_host=10.116.127.7 activation_key="AK-CV-RH-SSO-{{ stage }}" additional_dns="sso" osp_tenant="{{ rhsso_tenant }}" osp_flavor="m1.medium" osp_image="RHEL7"
+
+[rh-sso-l2-vm-group]
+#rh-sso
+
+[rh-sso-osp-vm-group]
+rh-sso
+
+[rh-sso-rhv-vm-group]
+#rh-sso
+
+#### END RH-SSO
+
+
+
+#### BEGIN OPENSHIFT
+
+[ocp-master-group]
+ocp-master1  Xansible_host=10.116.127.20 jump_host=ocp-bastion openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-master2  Xansible_host=10.116.127.21 jump_host=ocp-bastion openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-master3  Xansible_host=10.116.127.22 jump_host=ocp-bastion openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+
+[ocp-node-group]
+ocp-infranode1 Xansible_host=10.116.127.23 jump_host=ocp-bastion openshift_node_labels="{'region': 'infra', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-infranode2 Xansible_host=10.116.127.24 jump_host=ocp-bastion openshift_node_labels="{'region': 'infra', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-node1      Xansible_host=10.116.127.25 jump_host=ocp-bastion openshift_node_labels="{'region': 'primary', 'zone': 'east', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-node2      Xansible_host=10.116.127.26 jump_host=ocp-bastion openshift_node_labels="{'region': 'primary', 'zone': 'west', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+
+# comment out the entry if you do not want a load balancer VM set up
+[ocp-l2-or-rhv-lb-group]
+#ocp-l2-lb         activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" Xadditional_dns="openshift" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.medium" osp_image="RHEL7"
+
+[ocp-osp-lbaas-group]
+ocp-osp-master-lbaas   additional_dns="openshift" osp_tenant="{{ ocp_tenant }}" balances="ocp-master-group" vm_secgroups="['loadbalancer-{{ ocp_tenant }}']"
+ocp-osp-infra-lbaas    additional_dns="*.apps" osp_tenant="{{ ocp_tenant }}" balances="ocp-infra-group" vm_secgroups="['loadbalancer-{{ ocp_tenant }}']"
+
+[ocp-osp-bastion-group]
+ocp-bastion  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" pool_regex="{{ rhel_subscription_pool_regex }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.small" osp_image="RHEL7"
+
+[ocp-infra-group]
+ocp-infranode1
+ocp-infranode2
+
+[ocp-common-group:children]
+ocp-master-group
+ocp-node-group
+
+# if this group contains any members, OSP setup and integration (i.e. cinder storage) will be configured
+[ocp-osp-vm-group:children]
+ocp-master-group
+ocp-node-group
+ocp-osp-bastion-group
+
+[ocp-l2-vm-group:children]
+ocp-l2-or-rhv-lb-group
+#ocp-master-group
+#ocp-node-group
+
+[ocp-rhv-vm-group:children]
+#ocp-l2-or-rhv-lb-group
+#ocp-master-group
+#ocp-node-group
+
+# the node where the ansible playbook will run
+[ocp-installer-group]
+ocp-master1
+
+#### END OPENSHIFT
+
+
+#### BEGIN CLOUDFORMS
+
+#[cloudforms]
+#cloudforms      ansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}"
+
+#zone 919000000000001
+[cloudforms-db]
+cloudforms-db01       jump_host=cloudforms-ui01 Xansible_host=10.116.127.201 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="db" db=true extra_disks=true osp_tenant="{{ cf_tenant }}" osp_flavor="m1.xlarge" osp_image="Cloudforms"
+
+#zone 919000000000002
+[cloudforms-ui]
+cloudforms-ui01   Xansible_host=10.116.127.202 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false osp_tenant="{{ cf_tenant }}" osp_flavor="cf.xlarge" osp_image="Cloudforms" additional_dns="cloudforms"
+#cloudforms        Xansible_host=10.116.127.17 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="ui" ui=true extra_disks=false osp_tenant="{{ cf_tenant }}" osp_flavor="cf.xlarge" osp_image="Cloudforms"
+
+#zone 919000000000003
+[cloudforms-wk-ocp]
+cloudforms-wk-ocp01   jump_host=cloudforms-ui01 Xansible_host=10.116.127.203 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-ocp" wk-ocp=true extra_disks=false osp_tenant="{{ cf_tenant }}" osp_flavor="cf.xlarge" osp_image="Cloudforms"
+
+#zone 919000000000004
+[cloudforms-wk-osp]
+cloudforms-wk-osp01  jump_host=cloudforms-ui01 Xansible_host=10.116.127.204 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-osp" wk-osp=true extra_disks=false osp_tenant="{{ cf_tenant }}" osp_flavor="cf.xlarge" osp_image="Cloudforms"
+
+#zone 919000000000005
+[cloudforms-wk-rhev]
+#cloudforms-wk-rhev01  jump_host=cloudforms-ui01 Xansible_host=10.116.127.205 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" type="wk-rhev" wk-rhev=true extra_disks=false osp_tenant="{{ cf_tenant }}" osp_flavor="cf.xlarge" osp_image="Cloudforms"
+
+[cloudforms-group:children]
+cloudforms-db
+cloudforms-ui
+cloudforms-wk-ocp
+cloudforms-wk-osp
+cloudforms-wk-rhev
+
+[cf-osp-vm-group:children]
+cloudforms-group
+
+[cf-rhv-vm-group:children]
+#cloudforms-group
+
+#### END CLOUDFORMS
+
+
+
+#### BEGIN ANSIBLE TOWER
+
+[tower]
+#tower          ansible_host=10.116.127.38 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+
+[ansible-jump-host]
+ansible-jump-demo-vms  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-vms" osp_flavor="m1.small" osp_image="RHEL7"
+#ansible-jump-demo-infra  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
+
+#### END ANSIBLE TOWER
+
+
+
+#### BEGIN DEMO CONTENT
+
+[dev-client-group]
+#dev-client     ansible_host=10.116.127.37 activation_key="AK-CV-RHOSE3-CLIENT-{{ stage }}"
+
+[lookbusy-rhev-group]
+#lookbusy-rhev   ansible_host=10.116.127.39 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" rhev_image="RHEL7" nic_attachments="[ {{ infrastructure_network_services }},{{ infrastructure_network_admin }} ]"
+
+# layer 3 openstack
+[lookbusy-osp-group]
+lookbusy-osp    activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
+
+[lookbusy-group:children]
+lookbusy-osp-group
+lookbusy-rhev-group
+
+#### END DEMO CONTENT
+
+
+
+#### BEGIN STORAGE (OBSOLETE)
+
+[ceph]
+#will be filled in dynamically via layer2_ceph_inventory role
+#ceph1 ansible_host=10.116.127.2 activation_key="AK-CV-CEPH-{{ stage }}"
+#ceph2 ansible_host=10.116.127.3 activation_key="AK-CV-CEPH-{{ stage }}"
+#ceph3 ansible_host=10.116.127.4 activation_key="AK-CV-CEPH-{{ stage }}"
+#ceph4 ansible_host=10.116.127.5 activation_key="AK-CV-CEPH-{{ stage }}"
+
+[storage-console]
+#storage-console ansible_host=10.116.127.9 activation_key="AK-CV-CEPH-{{ stage }}"
+
+#### END STORAGE (OBSOLETE)
+
+
+[laptop]
+localhost              ansible_connection=local openshift_master_api_host_and_port='openshift.{{ hailstorm_dns_domain }}:443'
+
+
+#### BEGIN ADDITIONAL GROUPS
+
+
+# All layer2 node groups that are installed with RHEL7
+[rhel7:children]
+proxy-group
+satellite-group
+ipa-group
+install-host-group
+infrastructure-group
+bosch-vpn-group
+efk-group
+rh-sso-group
+rhosp-all-group
+rhvh-group
+ocp-l2-or-rhv-lb-group
+ocp-master-group
+ocp-node-group
+ocp-osp-bastion-group
+cloudforms-group
+lookbusy-group
+dev-client-group
+tower
+ansible-jump-host
+storage-console
+
+# All layer2 node groups that are installed with RHEL6
+[rhel6:children]
+#test-rhel6
+
+# everything on layer2
+[layer2:children]
+proxy-group
+satellite-group
+ipa-group
+install-host-group
+infrastructure-group
+bosch-vpn-group
+nuage
+rh-sso-l2-vm-group
+ocp-l2-vm-group
+rhv-group
+rhosp-all-group
+efk-group
+dev-client-group
+tower
+storage-console
+
+# to let it participate in the calculation of ansible_host
+# and the ssh proxy command used to communicate with all layer2/3 hosts
+[accessible_via_underlay:children]
+layer2
+vips
+lookbusy-rhev-group
+bosch-vpn-group
+cf-rhv-vm-group
+cf-osp-vm-group
+rh-sso-rhv-vm-group
+rh-sso-l2-vm-group
+ocp-l2-vm-group
+ocp-rhv-vm-group
+
+[accessible_via_floating_ip:children]
+ansible-jump-host
+lookbusy-osp-group
+ocp-osp-vm-group
+cf-osp-vm-group
+rh-sso-osp-vm-group
+
+[accessible_via_services_network:children]
+nuage
+
+# to let it participate in the calculation of vm_nics
+[automated_vmnics_calculation:children]
+accessible_via_floating_ip
+accessible_via_underlay
+accessible_via_services_network
+
+# A group to capture all nodes with standard 3-NIC network layout (services, admin, storage)
+[niclayout-standard:children]
+install-host-group
+nuage
+satellite-group
+infrastructure-group
+ipa-group
+efk-group
+rhvm-group
+lookbusy-rhev-group
+dev-client-group
+tower
+storage-console
+bosch-vpn-group
+rh-sso-rhv-vm-group
+rh-sso-l2-vm-group
+ocp-l2-vm-group
+ocp-rhv-vm-group
+
+[haproxy_frontend]
+infrastructure
+
+[haproxy_backend]
+ocp-master1
+ocp-master2
+ocp-master3

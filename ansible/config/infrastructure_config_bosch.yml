@@ -1,0 +1,231 @@
+#if infrastructure_network_master is defined, the multi-node network config will be set up
+#infrastructure_network_master: storm4.coe.muc.redhat.com
+
+# This is to make the various roles the layer1 host plays obvious
+# layer1 roles used for delegation - here we use the host name and let ansible resolve the connection info through the inventory
+
+infrastructure_delegate_host_used_to_test_if_layer2_host_is_available: "{{ infrastructure_network_master|default('layer1') }}"
+infrastructure_delegate_nfs_server: "layer1"
+infrastructure_delegate_kvm_host: "{{ l1host|default(layer1_ansible_host) }}"
+infrastructure_delegate_rhel7_host_used_to_perform_xpath_select_on_curl_results: "layer1"
+infrastructure_delegate_local_content_host: "layer1"
+infrastructure_delegate_kickstart_nfs_server: "{{ infrastructure_network_master|default('layer1') }}"
+#the following hosts are not used for delegation, but used directly
+infrastructure_address_ssh_jump_host: "{{ infrastructure_network_master|default(layer1_ansible_host) }}"
+# Use dediciated ntp server if role ntp was defined to one infrastucture server
+infrastructure_server_with_ntp_role: "{% for host in groups['infrastructure-group'] %}{% if 'ntp' in hostvars[host].roles %}{{ hostvars[host].vm_nics[0].ip }}{% endif %}{% endfor %}"
+infrastructure_address_ntp_server: "{% if infrastructure_server_with_ntp_role == '' %}{{ infrastructure_network_services.default_gw_host_prefix | ipaddr('address') }}{% else %}{{ infrastructure_server_with_ntp_role }}{% endif %}"
+
+infrastructure_address_default_dns: "{{ infrastructure_network_services.default_gw_host_prefix | ipaddr('address') }}"
+infrastructure_address_nfs_server: "{{ infrastructure_network_storage.default_gw_host_prefix | ipaddr('address') }}"
+
+hailstorm_dns_domain: "{% if infrastructure_network_master is defined %}rh-sddc.test-bosch.com{% else %}{{ node_hailstorm_dns_domain }}{% endif %}"
+disable_registration_against_satellite: "{% if infrastructure_network_master is defined %}False{% else %}{{ node_disable_registration_against_satellite }}{% endif %}"
+satellite_version:    "{% if infrastructure_network_master is defined %}6.2{% else %}{{ node_satellite_version }}{% endif %}"
+stage:                "{% if infrastructure_network_master is defined %}DEV{% else %}{{ node_stage }}{% endif %}"
+ocp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
+ocp_tenant: "infra-openshift"
+rhsso_tenant: "infra-rh-sso"
+cf_tenant: "infra-cloudforms"
+
+
+### VIRTUAL NETWORK setup
+# dhcp_start/end: pool configured in the underlay for DHCP
+# osp_overcloud_start/end: allocation pools configured in the undercloud networks for the overcloud, where the virtual IPs are allocated from
+# floating_start/end: allocation pools configured in the overcloud networks for instances
+
+
+# services is an external network to access all public services (accept for storage that has its own net), so this can be seen as a carved out part of OpenStacks br-ex for the public services
+infrastructure_network_services:
+  netname: 'services'
+  bridge: 'services'
+  forward_mode: 'bridge'
+  default_gw_host_prefix: 10.116.127.254/24
+  vlan:                   2813
+  nuage_start:            10.116.127.156
+  nuage_end:              10.116.127.171
+  osp_overcloud_start:    10.116.127.175
+  osp_overcloud_end:      10.116.127.175
+  # dhcp_start:             10.116.127.10
+  # dhcp_end:               10.116.127.20
+  floating_start:         10.116.127.177
+  floating_end:           10.116.127.179
+  mac_prefix: "02:00:00:00:01:"
+
+# # guests is an external network for virtual machine guests, not to be confused with the OpenStack tentant network; it is as a matter of fact OpenStacks br-ex without the public API endpoints
+# # SDDC: BGP2 breakout?
+# infrastructure_network_guests:
+#   netname: 'guests'
+#   bridge:                 "guests"
+#   mac_prefix:             "{% if infrastructure_network_master is defined %}52:54:00:48:04:{% else %}{{ external_network_config.guest_network_bridging_mac_prefix }}{% endif %}"
+#   forward_mode:           "bridge"
+#
+#   #BOSCH
+#   default_gw_host_prefix: "10.32.111.254/20"
+#   #vlan                   -1
+#   floating_start:         "{% if infrastructure_network_master is defined %}10.32.105.160{% else %}{{ external_network_config.guest_network_osp_floating_start }}{% endif %}"
+#   floating_end:           "{% if infrastructure_network_master is defined %}10.32.105.179{% else %}{{ external_network_config.guest_network_osp_floating_end }}{% endif %}"
+#   dns_server:             "10.32.96.1"
+#   # the following are only relevant when forward_mode == 'nat'
+#   #dhcp_start: 10.116.121.2
+#   #dhcp_end:   10.116.121.128
+
+# this is meant as a way to connect to the machines in a way like an out-of-band management network, so RACs should be here or in RHSOP-Provisioning; in OpenStack this is the Management Network
+infrastructure_network_admin:
+  netname: 'admin'
+  bridge: 'admin'
+  forward_mode: 'nat'
+  default_gw_host_prefix: 192.168.23.1/24
+  vlan:       2823
+  # need dhcp for kickstart
+  dhcp_start: 192.168.23.10
+  dhcp_end:   192.168.23.29
+  osp_overcloud_start: 192.168.23.74
+  osp_overcloud_end:   192.168.23.75
+  # floating_start:         10.116.127.170
+  # floating_end:           10.116.127.179
+  mac_prefix: "02:00:00:00:23:"
+
+
+# here all internal api calls should happen of products communicating with each other
+infrastructure_network_internal_api:
+  netname: 'internal_api'
+  bridge: 'internal_api'
+  forward_mode: 'nat'
+  default_gw_host_prefix: 192.168.14.1/24
+  vlan:       2814
+  osp_overcloud_start: 192.168.14.74
+  osp_overcloud_end:   192.168.14.75
+  mac_prefix: "02:00:00:00:14:"
+
+# this is the real tenant network where all tenant traffic is encapsulated by the sdn solution
+infrastructure_network_tenant:
+  netname: 'tenant'
+  bridge: 'tenant'
+  forward_mode: 'nat'
+  default_gw_host_prefix: 192.168.12.1/24
+  vlan:       2812
+  osp_overcloud_start: 192.168.12.74
+  osp_overcloud_end:   192.168.12.75
+  nuage_start:         192.168.12.156
+  nuage_end:           192.168.12.171
+  mac_prefix: "02:00:00:00:12:"
+
+# this is a network for accessing the storage systems (aka public APIs); if applicable the storage systems on their own should not utilize this network, e.g. for syncing; for that the Storage Management network should be used like it is done in OpenStack
+infrastructure_network_storage:
+  netname: 'storage'
+  bridge: 'storage'
+  forward_mode: 'nat'
+  default_gw_host_prefix: 192.168.11.1/24
+  vlan:       2811
+  osp_overcloud_start: 192.168.11.74
+  osp_overcloud_end:   192.168.11.75
+  # dhcp_start: 10.116.125.172
+  # dhcp_end:   10.116.125.254
+  mac_prefix: "02:00:00:00:11:"
+
+# the Storage Management network should be used for all storage systems for their internal processes like syning and communication; for public endpoints use the Storage Network
+infrastructure_network_storage_mgmt:
+  netname: 'storage_mgmt'
+  bridge: 'storage_mgmt'
+  forward_mode: 'nat'
+  default_gw_host_prefix: 192.168.17.1/24
+  vlan:       2817
+  osp_overcloud_start: 192.168.17.74
+  osp_overcloud_end:   192.168.17.75
+  mac_prefix: "02:00:00:00:17:"
+
+# this is the provisioning network of OpenStack, although it could be used for all provisioning (like Satellite) as none of the systems should listen to requests of unknown machines; by that they should not interfere
+infrastructure_network_provisioning:
+  netname: 'provisioning'
+  bridge: 'provisioning'
+  forward_mode: 'nat'
+  default_gw_host_prefix: 192.168.105.1/24
+#  vlan: 1
+  # undercloud_dhcp_start:  192.168.105.10
+  # undercloud_dhcp_end:    192.168.105.41
+  # undercloud_discovery_start: 192.168.105.42
+  # undercloud_discovery_end: 192.168.105.73
+  # # the undercloud_public VIP will only be used when not using TLS / hostname
+  # undercloud_public:      192.168.105.74
+  # undercloud_admin:       192.168.105.75
+  # floating_start:         10.116.122.101
+  # floating_end:           10.116.122.120
+  mac_prefix: "02:00:00:00:69:"
+
+# for SDDC external networks, aka provider networks
+# BGP1
+infrastructure_network_bgp1:
+  netname: 'bgp1'
+  bridge: 'bgp1'
+  forward_mode: 'nat'
+  default_gw_host_prefix: 10.116.111.17/28
+  vlan:       2803
+  mac_prefix: "02:00:00:00:03:"
+
+# BGP2
+infrastructure_network_bgp2:
+  netname: 'bgp2'
+  bridge: 'bgp2'
+  forward_mode: 'nat'
+  default_gw_host_prefix: 10.116.111.49/28
+  vlan:       2804
+  # floating_start:         10.116.111.50
+  # floating_end:           10.116.111.62
+  mac_prefix: "02:00:00:00:04:"
+
+# OSPF1
+infrastructure_network_ospf1:
+  netname: 'ospf1'
+  bridge: 'ospf1'
+  default_gw_host_prefix: 10.116.111.1/28
+  vlan:       2801
+  mac_prefix: "02:00:00:00:01:"
+
+# OSPF2
+infrastructure_network_ospf2:
+  netname: 'ospf2'
+  bridge: 'ospf2'
+  default_gw_host_prefix: 10.116.111.33/28
+  vlan:       2802
+  mac_prefix: "02:00:00:00:02:"
+
+infrastructure_network_baremetal:
+  netname: 'baremetal'
+  bridge: 'baremetal'
+  dhcp_start: 192.168.18.10
+  dhcp_end:   192.168.18.29
+  default_gw_host_prefix: 192.168.18.1/24
+  vlan:       2818
+  mac_prefix: "02:00:00:00:18:"
+
+
+infrastructure_network_nuage_vsr:
+  netname: 'nuage_vsr'
+  bridge: 'nuage_vsr'
+  # dhcp_start: 192.168.18.10
+  # dhcp_end:   192.168.18.29
+  default_gw_host_prefix: 192.168.16.1/24
+  vlan:       2816
+  mac_prefix: "02:00:00:00:16:"
+
+
+infrastructure_osp_tenant_internal_network:
+  netname: "internal_{{ osp_tenant }}"
+  dhcp: true
+
+infrastructure_networks:
+  - "{{ infrastructure_network_services }}"
+#  - "{{ infrastructure_network_guests }}"
+  - "{{ infrastructure_network_admin }}"
+  - "{{ infrastructure_network_internal_api }}"
+  - "{{ infrastructure_network_tenant }}"
+  - "{{ infrastructure_network_storage }}"
+  - "{{ infrastructure_network_storage_mgmt }}"
+  - "{{ infrastructure_network_provisioning }}"
+  - "{{ infrastructure_network_bgp1 }}"
+  - "{{ infrastructure_network_bgp2 }}"
+  - "{{ infrastructure_network_ospf1 }}"
+  - "{{ infrastructure_network_ospf2 }}"
+  - "{{ infrastructure_network_baremetal }}"
+  - "{{ infrastructure_network_nuage_vsr }}"
