@@ -54,4 +54,4 @@ nuage_user: "nuage"
 # directory under ansible/binary, where the nuage binaries are stored
 nuage_metro_bins: "nuage"
 # bridges for the external network on the KVM host
-ports_to_hv_bridges: "['bgp1', 'bgp2', 'ospf1', 'ospf2']"
+ports_to_hv_bridges: "['nuage_vsr', 'bgp1', 'bgp2', 'ospf1', 'ospf2']"
