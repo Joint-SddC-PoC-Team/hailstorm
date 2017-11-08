@@ -1,0 +1,21 @@
+- name: patch /etc/default/openvswitch
+  lineinfile:
+    path: /etc/default/openvswitch
+    state: present
+    line: "{{ item }}"
+    backup: yes
+  with_items:
+    - "ACTIVE_CONTROLLER={{ hostvars['c1'].vm_nics[0].ip }}"
+    - "STANDBY_CONTROLLER={{ hostvars['c2'].vm_nics[0].ip }}"
+  notify: restart_openvswitch
+
+- name: copy over selinux rule for nuage
+  copy:
+    src: ovslocal6.pp
+    dest: /root/ovslocal6.pp
+
+- name: add nuage openvswitch selinux rules
+  command: semodule -i /root/ovslocal6.pp
+
+- name: Flush handlers  
+  meta: flush_handlers
