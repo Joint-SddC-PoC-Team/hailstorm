@@ -1,0 +1,16 @@
+- name: install lbaas ui packages
+  yum: name=openstack-neutron-lbaas-ui state=present
+- name: set enable_lb to True
+  blockinfile:
+    path: /etc/openstack-dashboard/local_settings.d/_99_hailstorm.py
+    block: |
+      OPENSTACK_NEUTRON_NETWORK = {
+        'enable_lb': True,
+        'enable_quotas': True,
+        'enable_security_group': True
+      }
+  register: lbaasblock
+
+- name: restart httpd
+  service: name=httpd state=restarted
+  when: lbaasblock|changed

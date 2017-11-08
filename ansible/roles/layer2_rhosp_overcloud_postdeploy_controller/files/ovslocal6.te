@@ -1,0 +1,17 @@
+
+module ovslocal6 1.0;
+
+require {
+	type tmp_t;
+	type openvswitch_t;
+	class sock_file { create unlink };
+	class netlink_xfrm_socket { connect create getattr getopt setopt };
+}
+
+#============= openvswitch_t ==============
+
+#!!!! This avc is allowed in the current policy
+allow openvswitch_t self:netlink_xfrm_socket { connect create getattr getopt setopt };
+
+#!!!! WARNING 'openvswitch_t' is not allowed to write or create to tmp_t.  Change the label to openvswitch_tmp_t.
+allow openvswitch_t tmp_t:sock_file { create unlink };

@@ -4,19 +4,7 @@
       template: src=sudoers_sensu.j2 dest=/etc/sudoers.d/sensu
     - include: fix_bugs.yml
     ## enable lbaas UI
-    - name: install lbaas ui packages
-      yum: name=openstack-neutron-lbaas-ui state=present
-    - name: set enable_lb to True
-      blockinfile:
-        path: /etc/openstack-dashboard/local_settings.d/_99_hailstorm.py
-        block: |
-          OPENSTACK_NEUTRON_NETWORK = {
-            'enable_lb': True,
-            'enable_quotas': True,
-            'enable_security_group': True
-          }
-      register: lbaasblock
-    - name: restart httpd
-      service: name=httpd state=restarted
-      when: lbaasblock|changed
+    - include: add_nuage_vrs.yml
+      when: nuage is defined
+    - include: add_lbaas_ui.yml
   when: mode=="create"
