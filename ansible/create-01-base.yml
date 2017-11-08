@@ -37,7 +37,10 @@
     - role: layer1_dnat
       tags: [ 'layer1', 'dnat', 'layer1-dnat' ]
       mode: create
-      when: infrastructure_network_master is not defined or infrastructure_network_master == layer1_ansible_host
+      when: >
+        external_network_config is defined
+        and
+        (infrastructure_network_master is not defined or infrastructure_network_master == layer1_ansible_host)
     # - role: layer1_etc_hosts
     #   mode: create
     #   tags: [ 'layer1', 'layer1-etc-hosts' ]
