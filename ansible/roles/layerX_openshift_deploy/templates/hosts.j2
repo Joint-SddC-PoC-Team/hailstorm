@@ -18,9 +18,9 @@ osm_default_subdomain={{ ocp_apps_dns_domain }}
 openshift_master_default_subdomain={{ ocp_apps_dns_domain }}
 osm_default_node_selector="region=primary"
 
-{% if proxy_host|default('') != '' and proxy_port|default('') != '' and proxy_username|default('') != '' and proxy_password|default('') != '' %}
-openshift_http_proxy=https://{{ proxy_username }}:{{ proxy_password }}@{{ proxy_host }}:{{ proxy_port }}/
-openshift_https_proxy=https://{{ proxy_username }}:{{ proxy_password }}@{{ proxy_host }}:{{ proxy_port }}/
+{% if http_proxy is defined %}
+openshift_http_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxy_name }}:{{ http_proxy.port }}/
+openshift_https_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxy_name }}:{{ http_proxy.port }}/
 openshift_no_proxy=*.{{ hailstorm_dns_domain }}
 {% endif %}
 
