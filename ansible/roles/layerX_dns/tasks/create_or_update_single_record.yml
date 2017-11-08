@@ -20,7 +20,7 @@
 
 - set_fact:
     temp_external_ip: "{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|first).on_host_prefix|ipaddr('address') }}"
-  when: mode=='update_services_network' and external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|list|length > 0
+  when: mode=='update_services_network' and external_network_config is defined and external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|list|length > 0
 
 
 ### DNAT DNS
@@ -32,7 +32,8 @@
         regexp: "^{{ item|regex_escape }}\\s+.*"
       when: >
         mode != 'update_services_network' or
-        external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|list|length > 0
+        (external_network_config is defined and
+        external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','^' + name + '$')|list|length > 0)
       notify:
         - create serial
         - update serial
