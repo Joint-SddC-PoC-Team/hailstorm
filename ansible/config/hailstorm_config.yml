@@ -140,7 +140,7 @@ cf_is_deployed_on: "{% if groups['cf-osp-vm-group']|length > 0 %}osp{% elif grou
 
 # RED HAT SUBSCRIPTIONS
 satellite_subscription_pool_regex: "^(Red Hat Satellite Employee Subscription|Red Hat Satellite)$"
-rhel_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Enterprise Linux Server, Standard.*|EPEL-7|CentOS-7|td-agent)$"
+rhel_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Enterprise Linux Server, Standard.*|EPEL.7|CentOS.7|td.agent)$"
 rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure|td-agent|Red Hat JBoss Enterprise Application Platform.*)$"
 #sap_subscription_pool_regex: "^(Employee SKU|Red Hat Enterprise Linux Server for SAP HANA.*)$"
 rhev_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Virtualization.*|Red Hat Enterprise Linux Server, Standard.*|td-agent)$"
@@ -195,7 +195,7 @@ ose3_additional_packages: docker
 #   "7": https://packages.treasuredata.com/2/redhat/7/x86_64/td-agent-2.2.0-0.x86_64.rpm
 #   "6": https://packages.treasuredata.com/2/redhat/6/x86_64/td-agent-2.2.0-0.x86_64.rpm
 
-epel_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+#epel_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 #epel_rpm: http://ftp.tu-chemnitz.de/pub/linux/fedora-epel/epel-release-latest-7.noarch.rpm
 
 cfme_rhconsulting_scripts_repo: https://github.com/rhtconsulting/cfme-rhconsulting-scripts.git

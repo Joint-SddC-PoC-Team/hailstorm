@@ -31,10 +31,12 @@ disk:
 pool_regex: "{{ rhosp_subscription_pool_regex }}"
 repos:
   - rhel-7-server-rpms
-  - rhel-7-server-openstack-{{ current_lifecycle_env.openstack_version }}-optools-rpms
-  - rhel-7-server-openstack-{{ current_lifecycle_env.openstack_version }}-rpms
+  # - rhel-7-server-openstack-{{ current_lifecycle_env.openstack_version }}-optools-rpms
+  # - rhel-7-server-openstack-{{ current_lifecycle_env.openstack_version }}-rpms
   - rhel-7-server-optional-rpms
   - rhel-7-server-extras-rpms
+  - "{{ satellite_repo_name_epel }}"
+  - "{{ satellite_repo_name_opstools }}"
 
 #packages: elasticsearch,fluentd,rubygem-fluent-plugin-elasticsearch,kibana,httpd
 #

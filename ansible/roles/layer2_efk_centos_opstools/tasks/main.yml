@@ -13,14 +13,14 @@
         - name: ipa-ca.pem
           value: "{{ ssl_cacert }}"
 
-    - name: Enable EPEL
-      command: subscription-manager repos --enable="{{ satellite_repo_name_epel }}"
+    # - name: Enable EPEL
+    #   command: subscription-manager repos --enable="{{ satellite_repo_name_epel }}"
 
     - name: install additional packages
       yum: name=ansible,git,python-urllib3,python-requests,python-pip,python-netaddr state=latest
 
-    - name: Disable EPEL
-      command: subscription-manager repos --disable="{{ satellite_repo_name_epel }}"
+    # - name: Disable EPEL
+    #   command: subscription-manager repos --disable="{{ satellite_repo_name_epel }}"
 
 
     - name: clone opstools repo
