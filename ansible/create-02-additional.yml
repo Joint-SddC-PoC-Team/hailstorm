@@ -91,7 +91,7 @@
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'bosch-vpn', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer2', 'bosch-vpn', 'rhel' ], mode: create }
     - { role: layer2_cisco_anyconnect_client, tags: [ 'layer2', 'bosch-vpn', 'anyconnect' ], mode: create }
-    - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
+    - { role: layerX_syslog_client, tags: [ 'layer2', 'bosch-vpn', 'syslog',  'syslog-client'], mode: create }
 
 - hosts: efk
   remote_user: root
