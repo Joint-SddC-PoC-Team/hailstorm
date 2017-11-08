@@ -1,5 +1,5 @@
 # BASIC CONFIG
-root_password: 0pen_$ource
+root_password: 0pen_5ource
 
 # BINARY FILES
 hailstorm_ssh_pub_key_file: hailstorm.pub

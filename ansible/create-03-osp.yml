@@ -12,13 +12,18 @@
     - role: layer1_ceph_inventory
       tags: [ 'layer2', 'ceph', 'overcloud', 'overcloud-ceph' ]
 
-- hosts: rhosp-all-group,openstack
+- hosts: rhosp-all-group
   remote_user: root
   gather_facts: false
   roles:
     - { role: layer2_vms, tags: [ 'layer2', 'rhosp', 'vm' ], mode: create }
+
+- hosts: rhosp-all-group,openstack
+  remote_user: root
+  gather_facts: false
+  roles:
     - role: layerX_dns
-      tags: [ 'layer2', 'nuage', 'dns', 'dnsupdate', 'dnat' ]
+      tags: [ 'layer2', 'rhosp', 'dns', 'dnsupdate', 'dnat' ]
       mode: update_services_network
 
 - hosts: rhosp-director-group
