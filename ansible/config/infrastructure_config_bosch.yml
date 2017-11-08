@@ -41,7 +41,7 @@ infrastructure_network_services:
   bridge: 'services'
   forward_mode: 'bridge'
   default_gw_host_prefix: 10.116.127.254/24
-  vlan:                   2813
+  #vlan:                   2813
   nuage_start:            10.116.127.156
   nuage_end:              10.116.127.171
   osp_overcloud_start:    10.116.127.175
