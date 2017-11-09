@@ -28,8 +28,19 @@
     - name: Phase III) build configs - configs for all products are created here
       shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" build.yml
 
+    - debug:
+        msg: "Hint: To follow the creation of the Nuage appliances, login to the install-host as root and run tail -f /home/nuage/nuage-metro/ansible.log."
+        verbosity: 0
+
     - name: Phase IV) install
       shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" install_vcs.yml
+
+    - name: Phase V) configure VSRs
+      shell: "sshpass -p admin ssh admin@{{ hostvars['{{ item }}'].vm_nics[0].ip }} < ~/vsr/good_{{ item }}.cfg > ~/vsr/good_{{ item }}.cfg.log"
+      with_items:
+        - r1
+        - r2
+    
   when: has_nuconfiguration.stat.exists == False
   become: yes
   become_user: "{{ nuage_user }}"

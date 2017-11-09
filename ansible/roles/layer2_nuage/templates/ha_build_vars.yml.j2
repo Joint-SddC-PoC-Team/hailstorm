@@ -205,9 +205,9 @@ myvsrs:
       mgmt_ip: "{{ hostvars['r1'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['r1'].vm_nics[0].default_gw }}",
       mgmt_netmask_prefix: "{{ (hostvars['r1'].vm_nics[0].ip ~ '/' ~ hostvars['r1'].vm_nics[0].netmask) | ipaddr('prefix') }}",
-      mgmt_static_route_list: [ 192.168.1.0/24 ],
+      mgmt_static_route_list: [ 0.0.0.0/1 ],
       mgmt_to_hv_bridge: "{{ hostvars['r1'].nic_attachments[0].bridge }}",
-      ports_to_hv_bridges: {{ ports_to_hv_bridges }},
+      ports_to_hv_bridges: {{ ports_to_hv_bridges_vsr1 }},
       license_file: '/home/{{ nuage_user }}/licenses/NOKIA_BOSCH_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
       deploy_cfg_file: '/home/{{ nuage_user }}/vsr/config1.txt'}
   - { hostname: "{{ hostvars['r2'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
@@ -216,9 +216,9 @@ myvsrs:
       mgmt_ip: "{{ hostvars['r2'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['r2'].vm_nics[0].default_gw }}",
       mgmt_netmask_prefix: "{{ (hostvars['r2'].vm_nics[0].ip ~ '/' ~ hostvars['r2'].vm_nics[0].netmask) | ipaddr('prefix') }}",
-      mgmt_static_route_list: [ 192.168.1.0/24 ],
+      mgmt_static_route_list: [ 0.0.0.0/1 ],
       mgmt_to_hv_bridge: "{{ hostvars['r2'].nic_attachments[0].bridge }}",
-      ports_to_hv_bridges: {{ ports_to_hv_bridges }},
+      ports_to_hv_bridges: {{ ports_to_hv_bridges_vsr2 }},
       license_file: '/home/{{ nuage_user }}/licenses/NOKIA_RED HAT_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
       deploy_cfg_file: '/home/{{ nuage_user }}/vsr/config2.txt'}
 ###
@@ -245,12 +245,10 @@ images_path: "/var/lib/libvirt/images/"
 # NTP configuration
 # Note: Must be in dotted-decimal format
 # here -> IPA or AD
-# TODO: IPA from Hailstorm
 ntp_server_list:
   - {{ hostvars['ipa'].vm_nics[0].ip }}
 # DNS configuration
 # here -> IPA or AD
-# TODO: IPA from Hailstorm
 # TODO: DNS-Entries and Service-Entries have to be figured out and handled separately
 dns_server_list:
   - {{ hostvars['ipa'].vm_nics[0].ip }}
