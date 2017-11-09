@@ -22,6 +22,13 @@
       tags: [ 'layer3', 'rhsso', 'vm', 'dnat' ]
       mode: create
       when: rhsso_is_deployed_on == 'osp'
+    - role: layerX_etc_hosts
+      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'etc-hosts' ]
+      mode: create
+      hosts:
+        - satellite
+        - ipa
+      when: rhsso_is_deployed_on == 'osp'
     - role: layerX_dns
       tags: [ 'layer3', 'rhsso', 'vm', 'dnat' ]
       mode: update_floating_ip

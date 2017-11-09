@@ -1,0 +1,14 @@
+- name: add entries to /etc/hosts (for services network)
+  lineinfile: dest=/etc/hosts line="{{ (hostvars[item].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }} {{ item }} {{ hostvars[item].hostname }}"
+  with_items: "{{ hosts }}"
+  when: infrastructure_network_services.netname in (vm_nics|map(attribute="netname")|list)
+
+- name: add satellite entries to /etc/hosts (for DNAT IP)
+  lineinfile: dest=/etc/hosts line="{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match',item)|first).on_host_prefix|ipaddr('address') }} {{ item }} {{ hostvars[item].hostname }}"
+  with_items: "{{ hosts }}"
+  when: >
+    infrastructure_network_services.netname not in (vm_nics|map(attribute='netname')|list)
+    and
+    external_network_config is defined
+    and
+    external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match',item)|list|length > 0

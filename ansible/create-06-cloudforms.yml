@@ -4,8 +4,15 @@
   gather_facts: false
   roles:
     - role: layer3_vm_on_openstack
-      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]
+      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat' ]
       mode: create
+      when: cf_is_deployed_on == 'osp'
+    - role: layerX_etc_hosts
+      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'etc-hosts' ]
+      mode: create
+      hosts:
+        - satellite
+        - ipa
       when: cf_is_deployed_on == 'osp'
     - role: layerX_dns
       tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]

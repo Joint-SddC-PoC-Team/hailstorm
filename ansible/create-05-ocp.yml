@@ -58,6 +58,13 @@
       mode: create
       group: "{{ groups['ocp-osp-vm-group']+groups['ocp-osp-lbaas-group'] }}"
       when: ocp_is_deployed_on == 'osp'
+    - role: layerX_etc_hosts
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'etc-hosts' ]
+      mode: create
+      hosts:
+        - satellite
+        - ipa
+      when: ocp_is_deployed_on == 'osp'
 
 # # write floatign IPs to DNAT DNS
 # - hosts: infrastructure
