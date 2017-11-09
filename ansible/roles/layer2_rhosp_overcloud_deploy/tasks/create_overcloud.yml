@@ -47,10 +47,10 @@
         - "controller"
 
     - debug:
-        msg: "Hint: to follow the creation of the Overcloud login to the director as user stack and run watch_rhosp_creation.sh"
+        msg: "Hint: To follow the creation of the Overcloud, login to the director as user stack and run watch_rhosp_creation.sh."
         verbosity: 0
     - debug:
-        msg: "Hint: to debug a failed creation use osp-collect.sh on the director as user stack"
+        msg: "Hint: To debug a failed creation use osp-collect.sh on the director as user stack."
         verbosity: 0
     - name: deploy overcloud (even more coffee!)
       shell: >

@@ -56,19 +56,19 @@ vsd_operations_list:
 myvsds:
   - { hostname: "{{ hostvars['vsd1'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
        target_server_type: "kvm",
-       target_server: "{{ layer1_ansible_host }}",
+       target_server: "{{ hostvars['vsd1'].l1host }}",
        mgmt_ip: "{{ hostvars['vsd1'].vm_nics[0].ip }}",
        mgmt_gateway: "{{ hostvars['vsd1'].vm_nics[0].default_gw }}",
        mgmt_netmask: "{{ hostvars['vsd1'].vm_nics[0].netmask }}" }
   - { hostname: "{{ hostvars['vsd2'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
        target_server_type: "kvm",
-       target_server: "{{ layer1_ansible_host }}",
+       target_server: "{{ hostvars['vsd2'].l1host }}",
        mgmt_ip: "{{ hostvars['vsd2'].vm_nics[0].ip }}",
        mgmt_gateway: "{{ hostvars['vsd2'].vm_nics[0].default_gw }}",
        mgmt_netmask: "{{ hostvars['vsd2'].vm_nics[0].netmask }}" }
   - { hostname: "{{ hostvars['vsd3'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
        target_server_type: "kvm",
-       target_server: "{{ layer1_ansible_host }}",
+       target_server: "{{ hostvars['vsd3'].l1host }}",
        mgmt_ip: "{{ hostvars['vsd3'].vm_nics[0].ip }}",
        mgmt_gateway: "{{ hostvars['vsd3'].vm_nics[0].default_gw }}",
        mgmt_netmask: "{{ hostvars['vsd3'].vm_nics[0].netmask }}" }
@@ -93,7 +93,7 @@ vsc_operations_list:
 myvscs:
   - { hostname: "{{ hostvars['c1'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
-      target_server: "{{ layer1_ansible_host }}",
+      target_server: "{{ hostvars['c1'].l1host }}",
       mgmt_ip: "{{ hostvars['c1'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['c1'].vm_nics[0].default_gw }}",
       mgmt_netmask_prefix: "{{ (hostvars['c1'].vm_nics[0].ip ~ '/' ~ hostvars['c1'].vm_nics[0].netmask) | ipaddr('prefix') }}",
@@ -105,7 +105,7 @@ myvscs:
       vsc_mgmt_static_route_list: [ 0.0.0.0/1 ] }
   - { hostname: "{{ hostvars['c2'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
-      target_server: "{{ layer1_ansible_host }}",
+      target_server: "{{ hostvars['c2'].l1host }}",
       mgmt_ip: "{{ hostvars['c2'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['c2'].vm_nics[0].default_gw }}",
       mgmt_netmask_prefix: "{{ (hostvars['c2'].vm_nics[0].ip ~ '/' ~ hostvars['c2'].vm_nics[0].netmask) | ipaddr('prefix') }}",
@@ -117,7 +117,7 @@ myvscs:
       vsc_mgmt_static_route_list: [ 0.0.0.0/1 ] }
   - { hostname: "{{ hostvars['c3'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
-      target_server: "{{ layer1_ansible_host }}",
+      target_server: "{{ hostvars['c3'].l1host }}",
       mgmt_ip: "{{ hostvars['c3'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['c3'].vm_nics[0].default_gw }}",
       mgmt_netmask_prefix: "{{ (hostvars['c3'].vm_nics[0].ip ~ '/' ~ hostvars['c3'].vm_nics[0].netmask) | ipaddr('prefix') }}",
@@ -129,7 +129,7 @@ myvscs:
       vsc_mgmt_static_route_list: [ 0.0.0.0/1 ] }
   - { hostname: "{{ hostvars['c4'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
-      target_server: "{{ layer1_ansible_host }}",
+      target_server: "{{ hostvars['c4'].l1host }}",
       mgmt_ip: "{{ hostvars['c4'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['c4'].vm_nics[0].default_gw }}",
       mgmt_netmask_prefix: "{{ (hostvars['c4'].vm_nics[0].ip ~ '/' ~ hostvars['c4'].vm_nics[0].netmask) | ipaddr('prefix') }}",
@@ -163,21 +163,21 @@ vstat_operations_list:
 myvstats:
   - { hostname: "{{ hostvars['elastic1'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
-      target_server: "{{ layer1_ansible_host }}",
+      target_server: "{{ hostvars['elastic1'].l1host }}",
       mgmt_ip: "{{ hostvars['elastic1'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['elastic1'].vm_nics[0].default_gw }}",
       mgmt_netmask: "{{ hostvars['elastic1'].vm_nics[0].netmask }}",
       vsd_fqdn: "{{ vsd_fqdn_global }}" }
   - { hostname: "{{ hostvars['elastic2'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
-      target_server: "{{ layer1_ansible_host }}",
+      target_server: "{{ hostvars['elastic2'].l1host }}",
       mgmt_ip: "{{ hostvars['elastic2'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['elastic2'].vm_nics[0].default_gw }}",
       mgmt_netmask: "{{ hostvars['elastic2'].vm_nics[0].netmask }}",
       vsd_fqdn: "{{ vsd_fqdn_global }}" }
   - { hostname: "{{ hostvars['elastic3'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
-      target_server: "{{ layer1_ansible_host }}",
+      target_server: "{{ hostvars['elastic3'].l1host }}",
       mgmt_ip: "{{ hostvars['elastic3'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['elastic3'].vm_nics[0].default_gw }}",
       mgmt_netmask: "{{ hostvars['elastic3'].vm_nics[0].netmask }}",
@@ -201,24 +201,24 @@ vsr_operations_list:
 myvsrs:
   - { hostname: "{{ hostvars['r1'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
-      target_server: "{{ layer1_ansible_host }}",
+      target_server: "{{ hostvars['r1'].l1host }}",
       mgmt_ip: "{{ hostvars['r1'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['r1'].vm_nics[0].default_gw }}",
       mgmt_netmask_prefix: "{{ (hostvars['r1'].vm_nics[0].ip ~ '/' ~ hostvars['r1'].vm_nics[0].netmask) | ipaddr('prefix') }}",
-      mgmt_static_route_list: [ 192.168.1.0/24 ],
+      mgmt_static_route_list: [ 0.0.0.0/1 ],
       mgmt_to_hv_bridge: "{{ hostvars['r1'].nic_attachments[0].bridge }}",
-      ports_to_hv_bridges: {{ ports_to_hv_bridges }},
+      ports_to_hv_bridges: {{ ports_to_hv_bridges_vsr1 }},
       license_file: '/home/{{ nuage_user }}/licenses/NOKIA_BOSCH_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
       deploy_cfg_file: '/home/{{ nuage_user }}/vsr/config1.txt'}
   - { hostname: "{{ hostvars['r2'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
-      target_server: "{{ layer1_ansible_host }}",
+      target_server: "{{ hostvars['r2'].l1host }}",
       mgmt_ip: "{{ hostvars['r2'].vm_nics[0].ip }}",
       mgmt_gateway: "{{ hostvars['r2'].vm_nics[0].default_gw }}",
       mgmt_netmask_prefix: "{{ (hostvars['r2'].vm_nics[0].ip ~ '/' ~ hostvars['r2'].vm_nics[0].netmask) | ipaddr('prefix') }}",
-      mgmt_static_route_list: [ 192.168.1.0/24 ],
+      mgmt_static_route_list: [ 0.0.0.0/1 ],
       mgmt_to_hv_bridge: "{{ hostvars['r2'].nic_attachments[0].bridge }}",
-      ports_to_hv_bridges: {{ ports_to_hv_bridges }},
+      ports_to_hv_bridges: {{ ports_to_hv_bridges_vsr2 }},
       license_file: '/home/{{ nuage_user }}/licenses/NOKIA_RED HAT_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
       deploy_cfg_file: '/home/{{ nuage_user }}/vsr/config2.txt'}
 ###
@@ -245,12 +245,10 @@ images_path: "/var/lib/libvirt/images/"
 # NTP configuration
 # Note: Must be in dotted-decimal format
 # here -> IPA or AD
-# TODO: IPA from Hailstorm
 ntp_server_list:
   - {{ hostvars['ipa'].vm_nics[0].ip }}
 # DNS configuration
 # here -> IPA or AD
-# TODO: IPA from Hailstorm
 # TODO: DNS-Entries and Service-Entries have to be figured out and handled separately
 dns_server_list:
   - {{ hostvars['ipa'].vm_nics[0].ip }}
