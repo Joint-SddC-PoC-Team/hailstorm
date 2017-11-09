@@ -12,10 +12,8 @@ infrastructure_delegate_local_content_host: "layer1"
 infrastructure_delegate_kickstart_nfs_server: "{{ infrastructure_network_master|default('layer1') }}"
 #the following hosts are not used for delegation, but used directly
 infrastructure_address_ssh_jump_host: "{{ infrastructure_network_master|default(layer1_ansible_host) }}"
-
 infrastructure_address_ntp_server: "10.116.127.250"
-
-infrastructure_address_default_dns: "{{ infrastructure_network_services.default_gw_host_prefix | ipaddr('address') }}"
+infrastructure_address_default_dns: "10.116.57.11"
 infrastructure_address_nfs_server: "{{ infrastructure_network_storage.default_gw_host_prefix | ipaddr('address') }}"
 
 hailstorm_dns_domain: "{% if infrastructure_network_master is defined %}rh-sddc.test-bosch.com{% else %}{{ node_hailstorm_dns_domain }}{% endif %}"
