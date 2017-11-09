@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# force the hostname even if turned off for cloud-init
+hostnamectl set-hostname cloudforms-ui01.rh-sddc.test-bosch.com
+
 {% for nic in vm_nics %}
 {% if nic.ip|default("") != "" %}
 echo -e NAME=\"{{nic.dev}}\"\\nONBOOT=yes\\nBOOTPROTO=\"static\"\\nDEVICE={{nic.dev}}\\nIPADDR=\"{{ nic.ip }}\"\\nNETMASK=\"{{ nic.netmask }}\"{% if name_service_via is defined and name_service_via.netname == nic.netname %}\\nDNS1=\"{{ name_service_via.default_gw_host_prefix | ipaddr('address')  }}\"{% endif %}{% if default_route_via.netname == nic.netname %}\\nGATEWAY=\"{{ default_route_via.default_gw_host_prefix | ipaddr('address')  }}\"{% endif %} >/etc/sysconfig/network-scripts/ifcfg-{{nic.dev}}
