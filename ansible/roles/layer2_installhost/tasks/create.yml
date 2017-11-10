@@ -75,7 +75,7 @@
   with_nested:
      - [["cffi", "1.11.2"],["cryptography","2.0"]]
      - "{{current_lifecycle_env.ansible_available_versions}}"
-  when: use_local_pip is defined
+  when: use_local_pip is defined and use_local_pip
 
 - name: Install cryptography=2.0 with pip because latest version fails
   pip:
@@ -84,7 +84,7 @@
     version=2.0
     virtualenv="/opt/ansible-{{ item }}"
   with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
-  when: use_local_pip is not defined
+  when: use_local_pip is not defined or not use_local_pip
 
 - name: Install ansible inside the virtualenv
   pip:
@@ -94,14 +94,14 @@
     virtualenv="/opt/ansible-{{ item }}"
   with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
 
-- name: Install pip packages to be able to use ansible modules inside virtualenv
-  pip:
-    name="{{ item }}"
-    state=present
-  with_items:
-    - shade
-    - nailgun
-    - vspk
+# - name: Install pip packages to be able to use ansible modules inside virtualenv
+#   pip:
+#     name="{{ item }}"
+#     state=present
+#   with_items:
+#     - shade
+#     - nailgun
+#     - vspk
 
 - name: Install pip packages to be able to use ansible modules inside virtualenv
   pip:
@@ -111,7 +111,7 @@
   with_nested:
     - ['pip', 'shade', 'nailgun', 'vspk']
     - "{{current_lifecycle_env.ansible_available_versions}}"
-  when: use_local_pip is not defined
+  when: use_local_pip is not defined or not use_local_pip
 
 - name: Install pip packages to be able to use ansible modules inside virtualenv
   pip:
@@ -123,4 +123,4 @@
   with_nested:
     - ['pip', 'shade', 'nailgun', 'vspk']
     - "{{current_lifecycle_env.ansible_available_versions}}"
-  when: use_local_pip is defined
+  when: use_local_pip is defined and use_local_pip
