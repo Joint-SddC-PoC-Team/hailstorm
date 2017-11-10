@@ -18,24 +18,47 @@
    state: restarted
   when: chrony_conf|changed
 
-#appliance_console_cli --host=cloudforms.example.com --region=919 --internal --password="redhat01" --key --force-key --dbdisk=/dev/vdb --sshpassword="redhat01"
-- name: perform appliance basic configuration
-  shell: >
-    LC_CTYPE= appliance_console_cli
-    --host={{ hostname }}
-    --region=919
-    --internal
-    --password="{{ root_password }}"
-    --key --force-key
-    --dbdisk=/dev/vdb
-    --tmpdisk=/dev/vdc
-    --sshpassword="{{ root_password }}"
-    creates=/var/www/miq/vmdb/log/appliance_console.log
+- block:
+    - name: Configure Appliance as Master Database
+      shell: >
+        LC_CTYPE=
+        appliance_console_cli
+        --host={{ hostname }}
+        --region=919
+        --internal
+        --password="{{ root_password }}"
+        --key --force-key
+        --dbdisk=/dev/vdb
+        --tmpdisk=/dev/vdc
+        --sshpassword="{{ root_password }}"
+        creates=/var/www/miq/vmdb/log/appliance_console.log
 
-- name: wait for cfme web ui to become available
-#  wait_for: host={{ hostvars[cfmehostname.stdout].vm_nics[0].ip }} port=443 timeout=600
-  wait_for: host="{{ (vm_nics|selectattr('netname','match', infrastructure_network_services.netname)|first).ip }}" port=443 timeout=600
-  delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+    - name: wait for cfme web ui to become available
+      wait_for: host="{{ ansible_host }}" port=443 timeout=600
+      delegate_to: "{{ jump_host|default(infrastructure_delegate_host_used_to_test_if_layer2_host_is_available) }}"
+  when: cf_type=="db"
+
+- block:
+    - name: Join appliance to the Master Region 919
+      shell: >
+        LC_CTYPE= appliance_console_cli
+        --fetch-key=cloudforms-db01.{{ hailstorm_dns_domain }}
+        --sshlogin=root
+        --sshpassword="{{ root_password }}"
+        --hostname=cloudforms-db01.{{ hailstorm_dns_domain }}
+        --password="{{ root_password }}"
+        creates=/var/www/miq/vmdb/log/appliance_console.log
+
+    - name: wait for cfme web ui to become available
+      wait_for: host="{{ ansible_host }}" port=443 timeout=600
+      delegate_to: "{{ jump_host|default(infrastructure_delegate_host_used_to_test_if_layer2_host_is_available) }}"
+  when: cf_type!="db"
+
+- name: Create Zone
+  command: "/var/www/miq/vmdb/bin/rails runner 'Zone.create(:name => \"{{cf_zone}}\", :description => \"{{ cf_zone }} Zone\")'"
+
+- name: Move appliance to Zone
+  command: "/var/www/miq/vmdb/bin/rails runner 'MiqServer.my_server.set_config(:server => {:zone => \"{{ cf_zone }}\"})'"
 
 - name: perform appliance IPA integration
   shell: >

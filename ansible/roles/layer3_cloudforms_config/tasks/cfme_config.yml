@@ -1,26 +1,16 @@
-# - name: copy settings.sql
-#   copy: src=settings.sql dest=/tmp/settings.sql owner=root group=root mode=0644
-- name: create settings.sql
-  template: src=settings.sql.j2 dest=/tmp/settings.sql owner=root group=root mode=0644
-  register: settings
+- name: configure appliance
+  shell: /var/www/miq/vmdb/bin/rails runner 'MiqServer.my_server.set_config({{ item.key }} => {{ item.value }})'
+  with_dict: "{{cfme_settings2}}"
 
-- name: apply settings.sql
-# when using become, it fails with the error message /opt/rh/rh-postgresql94/root/usr/bin/psql: error while loading shared libraries: libpq.so.rh-postgresql94-5: cannot open shared object file: No such file or directory
-  shell: sudo -i -u postgres psql -f /tmp/settings.sql vmdb_production
-  # shell: psql -f /tmp/settings.sql vmdb_production
-  # become: yes
-  # become_user: postgres
-  # become_method: sudo
-  when: settings|changed
+#  /var/www/miq/vmdb/bin/rails runner 'MiqServer.my_server.set_config(:authentication => {:mode=>"httpd", :local_login_disabled=>false, :saml_enabled=>true, :sso_enabled=>false, :user_proxies=>[{}], :httpd_role=>true, :amazon_role=>false, :ldap_role=>false})'
+# bin/rails r "puts Zone.find_by(:name => 'OSP')[:id]"
 
 - name: make sure evmserverd is restarted
   service: name=evmserverd state=restarted enabled=yes
-  when: settings|changed
 
 - name: wait for cfme web ui to become available again
-#  wait_for: host={{ hostvars['cloudforms'].vm_nics[0].ip }} port=443 timeout=600
-  wait_for: host="{{ (vm_nics|selectattr('netname','match', infrastructure_network_services.netname)|first).ip }}" port=443 timeout=600
-  delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+  wait_for: host="{{ ansible_host }}" port=443 timeout=600
+  delegate_to: "{{ jump_host|default(infrastructure_delegate_host_used_to_test_if_layer2_host_is_available) }}"
 
 - name: create export script
   template: src=export.sh.j2 dest=~/export.sh owner=root group=root mode=0755

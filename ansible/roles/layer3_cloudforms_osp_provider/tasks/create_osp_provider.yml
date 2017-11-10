@@ -29,13 +29,22 @@
       become: yes
       become_user: "{{ hostvars['rhosp-director'].rhosp_stack_user }}"
   delegate_to: rhosp-director
+
+- name: get zone id
+  shell: "source /etc/default/evm && /var/www/miq/vmdb/bin/rails runner \"puts Zone.find_by(:name => \'OSP\')[:id]\""
+  register: temp_zone_id
+  failed_when: temp_zone_id.stdout == ''
+
+- set_fact:
+    cf_zone_id: "{{temp_zone_id.stdout}}"
+
 - name: create osp provider
   #shell: curl -k -u admin:{{ root_password }} -XPOST -d'{{ lookup('template', 'osp_provider.json.j2') | to_json }}' https://{{ vm_nics[0].ip }}/api/providers
-  shell: curl -k -u admin:{{ root_password }} -XPOST -d'{{ lookup('template', 'osp_provider.json.j2') | to_json }}' https://{% for vm_nic in hostvars[inventory_hostname_short].vm_nics %}{% if vm_nic.netname|regex_search('(services)') %}{{ vm_nic.ip }}{% endif %}{% endfor %}/api/providers
+  shell: curl -k -u admin:{{ root_password }} -XPOST -d'{{ lookup('template', 'osp_provider.json.j2') | to_json }}' https://{{ ansible_host }}/api/providers
   register: osp_provider
   with_items:
     - type: "ManageIQ::Providers::Openstack::CloudManager"
-      name: "RHOSP Overcloud"
+      name: "RHOSP Overcloud3"
       ip: "{{ hostvars['openstack'].vm_nics[0].ip }}"
       host: "{{ hostvars['openstack'].hostname }}"
       admin_name: "cfme-bind-user"
@@ -43,7 +52,7 @@
       api_version: "v3"
       domain_id: "{{ hailstorm_domain_id.stdout }}"
     - type: "ManageIQ::Providers::Openstack::InfraManager"
-      name: "RHOSP Undercloud"
+      name: "RHOSP Undercloud3"
       ip: "{{ hostvars['rhosp-director'].vm_nics[0].ip }}"
       host: "{{ hostvars['rhosp-director'].hostname }}"
       admin_name: "admin"
