@@ -1,4 +1,12 @@
 ---
+- hosts: rh-sso-osp-vm-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat' ]
+      mode: readfacts
+      when: rhsso_is_deployed_on == 'osp'
 - hosts: cf-osp-vm-group
   remote_user: root
   gather_facts: false
@@ -13,6 +21,7 @@
       hosts:
         - satellite
         - ipa
+        - rh-sso
       when: cf_is_deployed_on == 'osp'
     - role: layerX_dns
       tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]
@@ -72,6 +81,7 @@
   roles:
     - { role: layer2_ipa_certificate, tags: ['layer2', 'cf', 'cf-certificate', 'cf-ui'], mode: create, certcn: 'cloudforms.{{ hailstorm_dns_domain }}' }
     - { role: layer3_cloudforms_certificate, tags: ['layer2', 'cf', 'cf-certificate', 'cf-ui'], mode: create }
+    - { role: layer3_cloudforms_saml_config, tags: ['layer2', 'cf', 'cf-saml', 'cf-ui'], mode: create, when: "cf_use_rhsso|default(false,true)" }
 
 - hosts: cloudforms-wk-osp
   remote_user: root

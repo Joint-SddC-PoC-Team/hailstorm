@@ -1,0 +1,41 @@
+# after this script has run, SAML (mod_auth_mellon) should be configured and the variable
+# cf_saml_metadata should be set
+
+- name: create /etc/httpd/saml2
+  file: state=directory path=/etc/httpd/saml2
+
+- name: copy template configs
+  copy: src=/opt/rh/cfme-appliance/TEMPLATE/etc/httpd/conf.d/{{ item }} dest=/etc/httpd/conf.d/{{ item }} remote_src=yes
+  with_items:
+    - manageiq-remote-user.conf
+    - manageiq-external-auth-saml.conf
+
+- name: create saml metadata
+  shell: cd /etc/httpd/saml2 && /usr/libexec/mod_auth_mellon/mellon_create_metadata.sh https://cloudforms.{{ hailstorm_dns_domain }} https://cloudforms.{{ hailstorm_dns_domain }}/saml2 creates=/etc/httpd/saml2/cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.xml
+
+- name: link key and cert
+  file: state=link src=/etc/httpd/saml2/{{ item.src }} dest=/etc/httpd/saml2/{{ item.dest }}
+  with_items:
+    - src: "https_cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.key"
+      dest: miqsp-key.key
+    - src: "https_cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.cert"
+      dest: miqsp-cert.cert
+    - src: "https_cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.xml"
+      dest: miqsp-metadata.xml
+
+- set_fact:
+    rhsso_realm: infra
+
+- name: download idp metadata from sso
+  get_url: validate_certs=no dest=/etc/httpd/saml2/idp-metadata.xml url=https://sso.{{ hailstorm_dns_domain }}:8443/auth/realms/{{ rhsso_realm }}/protocol/saml/descriptor
+
+- name: restart httpd
+  service: name=httpd state=restarted
+
+- name: read metadata into variable
+  command: cat /etc/httpd/saml2/miqsp-metadata.xml
+  failed_when: temp_miqsp_metadata.stdout == ''
+  register: temp_miqsp_metadata
+
+- set_fact:
+    cf_saml_metadata: "{{ temp_miqsp_metadata.stdout }}"

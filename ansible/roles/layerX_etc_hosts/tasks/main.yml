@@ -1,10 +1,10 @@
 - name: add entries to /etc/hosts (for services network)
-  lineinfile: dest=/etc/hosts line="{{ (hostvars[item].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }} {{ item }} {{ hostvars[item].hostname }}{% for name in (additional_dns|default('')).split(',') %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endfor %}"
+  lineinfile: dest=/etc/hosts line="{{ (hostvars[item].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }} {{ item }} {{ hostvars[item].hostname }}{% for name in (hostvars[item].additional_dns|default('')).split(',')|select|list %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endfor %}"
   with_items: "{{ hosts }}"
   when: infrastructure_network_services.netname in (vm_nics|map(attribute="netname")|list)
 
-- name: add satellite entries to /etc/hosts (for DNAT IP)
-  lineinfile: dest=/etc/hosts line="{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match',item)|first).on_host_prefix|ipaddr('address') }} {{ item }} {{ hostvars[item].hostname }}{% for name in (additional_dns|default('')).split(',') %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endfor %}"
+- name: add entries to /etc/hosts (for DNAT IP)
+  lineinfile: dest=/etc/hosts line="{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match',item)|first).on_host_prefix|ipaddr('address') }} {{ item }} {{ hostvars[item].hostname }}{% for name in (hostvars[item].additional_dns|default('')).split(',')|select|list %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endfor %}"
   with_items: "{{ hosts }}"
   when: >
     infrastructure_network_services.netname not in (vm_nics|map(attribute='netname')|list)
@@ -12,3 +12,11 @@
     external_network_config is defined
     and
     external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match',item)|list|length > 0
+
+- name: add entries to /etc/hosts (for floating IP)
+  lineinfile: dest=/etc/hosts line="{{ hostvars[item].ansible_host }} {{ item }} {{ hostvars[item].hostname }}{% for name in (hostvars[item].additional_dns|default('')).split(',')|select|list %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endfor %}"
+  with_items: "{{ hosts }}"
+  when: >
+    infrastructure_network_services.netname not in (vm_nics|map(attribute='netname')|list)
+    and
+    hostvars[item].osp_tenant|default(true,false)

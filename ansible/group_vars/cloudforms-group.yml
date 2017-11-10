@@ -8,7 +8,7 @@ ntp_client: will_be_configured_in_the_cf_config_role
 cfme_settings2:
   ":server": '{:timezone=>"Berlin", :company=>"Hailstorm", :role=>"{{ cf_roles }}"}'
   ":smtp": '{:authentication=>"none", :domain=>"{{ hailstorm_dns_domain }}", :from=>"cloudforms@{{ hailstorm_dns_domain }}", :host=>"{{ hostvars["infrastructure"].hostname }}", :password=>"", :port=>"25", :user_name=>"evmadmin" }'
-  ":authentication": '{:mode=>"httpd", :local_login_disabled=>false, :saml_enabled=>true, :sso_enabled=>false, :user_proxies=>[{}], :httpd_role=>true, :amazon_role=>false, :ldap_role=>false }'
+  ":authentication": '{:mode=>"httpd", :local_login_disabled=>false, :saml_enabled=>{% if cf_use_rhsso|default(false,true) %}true{% else %}false{% endif %}, :sso_enabled=>{% if cf_use_rhsso|default(false,true) %}true{% else %}false{% endif %}, :user_proxies=>[{}], :httpd_role=>true, :amazon_role=>false, :ldap_role=>false }'
   ":ntp": '{:server=>["{{ infrastructure_address_ntp_server }}"]}'
 
 tdagent_configs:
