@@ -67,6 +67,7 @@ http_proxy:
   protocol: https
   username:
   password:
+  certificates: ["ProxyHTTP.crt","BoschInternetProxyCA2.crt"]
 
 # external_network_config:
 #   guest_network_bridging_mac_prefix: "52:54:00:48:04:"
