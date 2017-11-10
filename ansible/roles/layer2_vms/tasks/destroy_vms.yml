@@ -6,12 +6,10 @@
     - name: get list of vms
       virt: command=list_vms
       register: virt_vms
-      run_once: true
     - name: get list of running vms
       command: virsh list --name
       register: running_vms
       changed_when: false
-      run_once: true
   delegate_to: "{{ infrastructure_delegate_kvm_host }}"
 
 - name: delete kickstart files
