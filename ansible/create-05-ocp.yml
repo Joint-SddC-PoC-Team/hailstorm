@@ -64,6 +64,7 @@
       hosts:
         - satellite
         - ipa
+        - openstack
       when: ocp_is_deployed_on == 'osp'
 
 # # write floatign IPs to DNAT DNS
