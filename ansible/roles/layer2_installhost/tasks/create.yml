@@ -94,14 +94,27 @@
     virtualenv="/opt/ansible-{{ item }}"
   with_items:  "{{current_lifecycle_env.ansible_available_versions}}"
 
-# - name: Install pip packages to be able to use ansible modules inside virtualenv
-#   pip:
-#     name="{{ item }}"
-#     state=present
-#   with_items:
-#     - shade
-#     - nailgun
-#     - vspk
+- name: Install pip packages to be able to use ansible modules
+  pip:
+    name="{{ item }}"
+    state=present
+  with_items:
+    - shade
+    - nailgun
+    - vspk
+  when: use_local_pip is not defined or not use_local_pip
+
+- name: Install pip packages to be able to use ansible modules
+  pip:
+    name="{{ item }}"
+    state=present
+    extra_args="--no-index --find-links file:///opt/pip/"
+  with_items:
+    - shade
+    - nailgun
+    - vspk
+  when: use_local_pip is defined and use_local_pip
+
 
 - name: Install pip packages to be able to use ansible modules inside virtualenv
   pip:
@@ -117,8 +130,7 @@
   pip:
     name="{{ item[0] }}"
     state=present
-    version="{{ item[1] }}"
-    virtualenv="/opt/ansible-{{ item[2] }}"
+    virtualenv="/opt/ansible-{{ item[1] }}"
     extra_args="--no-index --find-links file:///opt/pip/"
   with_nested:
     - ['pip', 'shade', 'nailgun', 'vspk']
