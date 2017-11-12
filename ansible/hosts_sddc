@@ -30,10 +30,6 @@ satellite       ansible_host=10.116.127.152
 [ipa-group]
 ipa             ansible_host=10.116.127.153 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
-# proxy only for COE MUC deployment
-[proxy-group]
-proxy           ansible_host=10.116.127.8 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
-
 [install-host-group]
 install-host    ansible_host=10.116.127.154 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
 
@@ -52,16 +48,37 @@ efk             ansible_host=10.116.127.174 activation_key="AK-CV-OS-RHEL7-SERVE
 infrastructure  ansible_host=10.116.127.155 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" additional_dns="imap,smtp,ntp,vsd" roles=["dnat","smtp","haproxy","ntp","syslog"]
 #syslog		      ansible_host=10.116.127.9 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" roles=["syslog"]
 
-# bosch-vpn only for COE MUC deployment
-[bosch-vpn-group]
-bosch-vpn       l1host="layer1" ansible_host=10.116.127.19 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
-
 # which system will host virt-who -> this should not be satellite since virt-who reports to subscription-manager which reports to RHN (which doesn't know the Default Organization) on satellite
 [virt-who]
 infrastructure
 
 #### END ADDITIONAL L2 VMS
 
+
+#### BEGIN SYSTEM CONTEXT EMULATION
+
+# bosch-vpn only for COE MUC deployment
+[bosch-vpn-group]
+bosch-vpn       l1host="layer1" ansible_host=10.116.127.19 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+
+# proxy only for COE MUC deployment
+[proxy-group]
+proxy           ansible_host=10.116.127.8 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+
+[windows-group]
+## same IP as storage-console or syslog
+ad1 ansible_host=10.116.127.9
+
+[windows-group:vars]
+ansible_user=Administrator
+ansible_password="{{ root_password }}"
+ansible_port=5986
+ansible_connection=winrm
+# The following is necessary for Python 2.7.9+ (or any older Python that has backported SSLContext, eg, Python 2.7.5 on RHEL7) when using default WinRM self-signed certificates:
+ansible_winrm_server_cert_validation=ignore
+
+
+#### END SYSTEM CONTEXT EMULATION
 
 
 #### BEGIN RED HAT VIRTUALIZATION
@@ -408,6 +425,7 @@ efk-group
 dev-client-group
 tower
 storage-console
+windows-group
 
 # to let it participate in the calculation of ansible_host
 # and the ssh proxy command used to communicate with all layer2/3 hosts

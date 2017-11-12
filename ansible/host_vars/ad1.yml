@@ -1,0 +1,15 @@
+---
+mem: 2048
+vcpu: 2
+disk:
+  path: "{{ inventory_hostname_short }}.qcow2"
+  size: 30
+  format: qcow2
+
+windows_install_dvd: 9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO
+
+nic_attachments:
+  - "{{ infrastructure_network_services }}"
+  - "{{ infrastructure_network_admin }}"
+default_route_via: "{{ infrastructure_network_services }}"
+name_service_via: "{{ infrastructure_network_services }}"
