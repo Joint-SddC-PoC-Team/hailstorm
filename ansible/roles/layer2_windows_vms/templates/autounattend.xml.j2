@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <settings pass="windowsPE">
+        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <SetupUILanguage>
+                <UILanguage>en-US</UILanguage>
+            </SetupUILanguage>
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UserLocale>en-US</UserLocale>
+        </component>
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <!-- DiskConfiguration>
+                  <Disk wcm:action="add">
+                      <CreatePartitions>
+                          <CreatePartition wcm:action="add">
+                              <Order>1</Order>
+                              <Size>100</Size>
+                              <Type>Primary</Type>
+                          </CreatePartition>
+                          <CreatePartition wcm:action="add">
+                              <Order>2</Order>
+                              <Extend>true</Extend>
+                              <Type>Primary</Type>
+                          </CreatePartition>
+                      </CreatePartitions>
+                      <ModifyPartitions>
+                          <ModifyPartition wcm:action="add">
+                              <Format>NTFS</Format>
+                              <Label>System</Label>
+                              <Order>2</Order>
+                              <PartitionID>2</PartitionID>
+                          </ModifyPartition>
+                      </ModifyPartitions>
+                      <WillWipeDisk>true</WillWipeDisk>
+                      <DiskID>0</DiskID>
+                  </Disk>
+            </DiskConfiguration -->
+            <DiskConfiguration>
+<Disk wcm:action="add">
+<CreatePartitions>
+<CreatePartition wcm:action="add">
+<Order>1</Order>
+<Type>Primary</Type>
+<Size>100</Size>
+</CreatePartition>
+<CreatePartition wcm:action="add">
+<Extend>true</Extend>
+<Order>2</Order>
+<Type>Primary</Type>
+</CreatePartition>
+</CreatePartitions>
+<ModifyPartitions>
+<ModifyPartition wcm:action="add">
+<Active>true</Active>
+<Format>NTFS</Format>
+<Label>System Reserved</Label>
+<Order>1</Order>
+<PartitionID>1</PartitionID>
+<TypeID>0x27</TypeID>
+</ModifyPartition>
+<ModifyPartition wcm:action="add">
+<Active>true</Active>
+<Format>NTFS</Format>
+<Label>OS</Label>
+<Letter>C</Letter>
+<Order>2</Order>
+<PartitionID>2</PartitionID>
+</ModifyPartition>
+</ModifyPartitions>
+<DiskID>0</DiskID>
+<WillWipeDisk>true</WillWipeDisk>
+</Disk>
+</DiskConfiguration>
+
+            <ImageInstall>
+                <OSImage>
+                    <InstallFrom>
+                        <MetaData wcm:action="add">
+                            <Key>/IMAGE/NAME</Key>
+                            <Value>Windows Server 2012 R2 SERVERSTANDARD</Value>
+                            <!-- Value>Windows Server 2012 R2 SERVERSTANDARDCORE</Value -->
+                        </MetaData>
+                    </InstallFrom>
+                    <InstallTo>
+                        <DiskID>0</DiskID>
+                        <PartitionID>2</PartitionID>
+                    </InstallTo>
+                </OSImage>
+            </ImageInstall>
+            <UserData>
+                <ProductKey>
+                    <WillShowUI>Never</WillShowUI>
+                </ProductKey>
+                <AcceptEula>true</AcceptEula>
+            </UserData>
+            <EnableFirewall>false</EnableFirewall>
+            <EnableNetwork>true</EnableNetwork>
+        </component>
+    </settings>
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <ComputerName>{{ inventory_hostname_short }}</ComputerName>
+        </component>
+        <component name="Microsoft-Windows-TCPIP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <Interfaces>
+                {% for nic in vm_nics %}
+                <Interface wcm:action="add">
+                    <Identifier>{{ nic.mac|replace(':','-') }}</Identifier>
+                    <Ipv4Settings>
+                        <DhcpEnabled>false</DhcpEnabled>
+                        <Metric>10</Metric>
+                        <RouterDiscoveryEnabled>false</RouterDiscoveryEnabled>
+                    </Ipv4Settings>
+                    <UnicastIpAddresses>
+                        <IpAddress wcm:action="add" wcm:keyValue="1">{{ nic.ip }}/{{ (infrastructure_networks|selectattr('netname','match',nic.netname)|first).default_gw_host_prefix|ipaddr('prefix') }}</IpAddress>
+                    </UnicastIpAddresses>
+                    {% if default_route_via.netname == nic.netname %}
+                    <Routes>
+                        <Route wcm:action="add">
+                            <Identifier>1</Identifier>
+                            <Metric>10</Metric>
+                            <NextHopAddress>{{ (infrastructure_networks|selectattr('netname','match',nic.netname)|first).default_gw_host_prefix|ipaddr('address') }}</NextHopAddress>
+                            <Prefix>0.0.0.0/0</Prefix>
+                        </Route>
+                    </Routes>
+                    {% endif %}
+                </Interface>
+                {% endfor %}
+            </Interfaces>
+        </component>
+        {% for nic in vm_nics %}
+        {% if name_service_via.netname == nic.netname %}
+        <component name="Microsoft-Windows-DNS-Client" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <DNSSuffixSearchOrder>
+                <DomainName wcm:action="add" wcm:keyValue="1">{{ hailstorm_dns_domain }}</DomainName>
+            </DNSSuffixSearchOrder>
+            <Interfaces>
+                <Interface wcm:action="add">
+                    <DNSServerSearchOrder>
+                        <IpAddress wcm:action="add" wcm:keyValue="1">{{ infrastructure_address_default_dns }}</IpAddress>
+                    </DNSServerSearchOrder>
+                    <DisableDynamicUpdate>true</DisableDynamicUpdate>
+                    <DNSDomain>{{ hailstorm_dns_domain }}</DNSDomain>
+                    <EnableAdapterDomainNameRegistration>false</EnableAdapterDomainNameRegistration>
+                    <Identifier>{{ nic.mac|replace(':','-') }}</Identifier>
+                </Interface>
+            </Interfaces>
+        </component>
+        {% endif %}
+        {% endfor %}
+        <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <!-- RunSynchronous>
+                <RunSynchronousCommand wcm:action="add">
+                    <Path>powershell -file E:\ConfigureRemotingForAnsible.ps1 -EnableCredSSP</Path>
+                </RunSynchronousCommand>
+            </RunSynchronous -->
+            <RunAsynchronous>
+                <RunAsynchronousCommand wcm:action="add">
+                    <!-- Credentials>
+                        <Username>administrator</Username>
+                        <Password>{{ root_password }}</Password>
+                    </Credentials -->
+                    <Description>Enable Ansible</Description>
+                    <Order>1</Order>
+                    <Path>powershell -file &quot;E:\ConfigureRemotingForAnsible.ps1&quot; -EnableCredSSP</Path>
+                </RunAsynchronousCommand>
+            </RunAsynchronous>
+        </component >
+    </settings>
+    <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <AutoLogon>
+                <Password>
+                    <Value>{{ root_password }}</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+                <Enabled>true</Enabled>
+                <!-- LogonCount>2</LogonCount -->
+                <Username>administrator</Username>
+            </AutoLogon>
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>powershell -file &quot;E:\ConfigureRemotingForAnsible.ps1&quot; -EnableCredSSP</CommandLine>
+                    <Description>Enable Ansible</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                    <Order>1</Order>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+            <UserAccounts>
+                <AdministratorPassword>
+                    <Value>{{ root_password }}</Value>
+                    <PlainText>true</PlainText>
+                </AdministratorPassword>
+            </UserAccounts>
+            <RegisteredOrganization>-</RegisteredOrganization>
+            <RegisteredOwner>-</RegisteredOwner>
+        </component>
+    </settings>
+    <!-- cpi:offlineImage cpi:source="wim:c:/users/administrator/desktop/install.wim#Windows Server 2012 R2 SERVERSTANDARDCORE" xmlns:cpi="urn:schemas-microsoft-com:cpi" /-->
+    <cpi:offlineImage cpi:source="wim:c:/users/administrator/desktop/install.wim#Windows Server 2012 R2 SERVERSTANDARD" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
+</unattend>

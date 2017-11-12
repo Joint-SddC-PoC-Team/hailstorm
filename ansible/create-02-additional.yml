@@ -78,21 +78,6 @@
   roles:
     - { role: layer2_virtwho, tags: [ 'layer2', 'virtwho' ], mode: create }
 
-#### BOSCH VPN Client
-
-- hosts: bosch-vpn-group
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_vms, tags: [ 'layer2', 'bosch-vpn', 'vm'], mode: create }
-    - role: layerX_dns
-      tags: [ 'layer2', 'bosch-vpn', 'dns', 'dnsupdate', 'dnat' ]
-      mode: update_services_network
-    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'bosch-vpn', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
-    - { role: layer2_rhel, tags: [ 'layer2', 'bosch-vpn', 'rhel' ], mode: create }
-    - { role: layer2_cisco_anyconnect_client, tags: [ 'layer2', 'bosch-vpn', 'anyconnect' ], mode: create }
-    - { role: layerX_syslog_client, tags: [ 'layer2', 'bosch-vpn', 'syslog',  'syslog-client'], mode: create }
-
 - hosts: efk
   remote_user: root
   gather_facts: false

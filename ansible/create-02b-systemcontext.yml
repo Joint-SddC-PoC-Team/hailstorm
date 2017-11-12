@@ -1,0 +1,38 @@
+---
+- hosts: windows-group
+  remote_user: root
+  gather_facts: false
+  roles:
+     - { role: layer2_windows_vms, tags: [ 'layer2', 'ad', 'vm' ], mode: create }
+
+
+- hosts: proxy-group
+  remote_user: root
+  gather_facts: false
+  roles:
+     - { role: layer2_vms, tags: [ 'layer2', 'proxy', 'vm' ], mode: create }
+     - role: layerX_dns
+       tags: [ 'layer2', 'proxy', 'dns', 'dnsupdate', 'dnat' ]
+       mode: update_services_network
+       skip_dnat_dns: True
+     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'proxy', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+     - { role: layer2_rhel, tags: [ 'layer2', 'proxy', 'rhel' ], mode: create }
+    ### proxy should be neither IPA client nor syslog client since it is not part of the system itself, but system context
+    #  - { role: layerX_ipa_client, tags: [ 'layer2', 'proxy',  'ipa-client'], mode: create }
+    #  - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
+     - { role: layer2_proxy, tags: [ 'layer2', 'proxy', 'proxy-config' ], mode: create }
+
+#### BOSCH VPN Client
+
+- hosts: bosch-vpn-group
+  remote_user: root
+  gather_facts: false
+  roles:
+   - { role: layer2_vms, tags: [ 'layer2', 'bosch-vpn', 'vm'], mode: create }
+   - role: layerX_dns
+     tags: [ 'layer2', 'bosch-vpn', 'dns', 'dnsupdate', 'dnat' ]
+     mode: update_services_network
+   - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'bosch-vpn', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+   - { role: layer2_rhel, tags: [ 'layer2', 'bosch-vpn', 'rhel' ], mode: create }
+   - { role: layer2_cisco_anyconnect_client, tags: [ 'layer2', 'bosch-vpn', 'anyconnect' ], mode: create }
+   - { role: layerX_syslog_client, tags: [ 'layer2', 'bosch-vpn', 'syslog',  'syslog-client'], mode: create }
