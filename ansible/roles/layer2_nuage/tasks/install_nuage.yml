@@ -36,11 +36,18 @@
       shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" install_vcs.yml
 
     - name: Phase V) configure VSRs
-      shell: "sshpass -p admin ssh admin@{{ hostvars['{{ item }}'].vm_nics[0].ip }} < ~/vsr/good_{{ item }}.cfg > ~/vsr/good_{{ item }}.cfg.log"
+      shell: "sshpass -p admin ssh -o StrictHostKeyChecking=no admin@{{ hostvars[item].vm_nics[0].ip }} < ~/vsr/good_{{ item }}.cfg > ~/vsr/good_{{ item }}.cfg.log"
       with_items:
         - r1
         - r2
     
+    - name: Phase VI) configure VSCs
+      shell: "sshpass -p admin ssh -o StrictHostKeyChecking=no admin@{{ hostvars[item].vm_nics[0].ip }} < ~/vsc/config.txt > ~/vsc/config.txt.log"
+      with_items:
+        - c1
+        - c2
+        - c3
+        - c4
   when: has_nuconfiguration.stat.exists == False
   become: yes
   become_user: "{{ nuage_user }}"

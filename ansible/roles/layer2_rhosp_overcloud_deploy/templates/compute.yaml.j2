@@ -102,7 +102,6 @@ resources:
                         - {get_param: ControlPlaneSubnetCidr}
               routes:
                 -
-                  ip_netmask: 0.0.0.0/0
                   next_hop: {get_param: ControlPlaneDefaultRoute}
                   # Optionally have this interface as default route
                   default: true
