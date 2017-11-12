@@ -6,8 +6,8 @@
         project: admin
         shared: True
         external: true
-        provider_network_type: flat
-        provider_physical_network: "{{ item.netname }}"
+        provider_network_type: "{% if nuage is defined %}vxlan{% else %}flat{% endif %}"
+        provider_physical_network: "{% if nuage is not defined %}{{ item.netname }}{% endif %}"
         validate_certs: False
       with_items: "{{ overcloud_provider_networks|select|list }}"
 

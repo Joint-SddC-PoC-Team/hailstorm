@@ -93,18 +93,18 @@ layer1-group
 #### BEGIN NUAGE
 
 [nuage]
-vsd1 l1host="layer1_ansible_host" ansible_host=10.116.127.156 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','1 100 5222']" additional_dns="xmpp"
-vsd2 l1host="layer1_ansible_host" ansible_host=10.116.127.157 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','2 100 5222']" additional_dns="xmpp"
-vsd3 l1host="layer1_ansible_host" ansible_host=10.116.127.158 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','3 100 5222']" additional_dns="xmpp"
-c1 l1host="layer1_ansible_host" ansible_host=10.116.127.162 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc1"
-c2 l1host="layer1_ansible_host" ansible_host=10.116.127.163 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc2"
-c3 l1host="layer1_ansible_host" ansible_host=10.116.127.164 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc3"
-c4 l1host="layer1_ansible_host" ansible_host=10.116.127.165 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc4"
-elastic1 l1host="layer1_ansible_host" ansible_host=10.116.127.159 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-elastic2 l1host="layer1_ansible_host" ansible_host=10.116.127.160 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-elastic3 l1host="layer1_ansible_host" ansible_host=10.116.127.161 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
-r1 l1host="layer1_ansible_host" ansible_host=10.116.127.166 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr1"
-r2 l1host="layer1_ansible_host" ansible_host=10.116.127.168 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr2"
+vsd1 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.156 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','1 100 5222']" additional_dns="xmpp"
+vsd2 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.157 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','2 100 5222']" additional_dns="xmpp"
+vsd3 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.158 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" srv_dns="['_xmpp-client._tcp.xmpp','3 100 5222']" additional_dns="xmpp"
+c1 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.162 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc1"
+c2 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.163 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc2"
+c3 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.164 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc3"
+c4 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.165 nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsc4"
+elastic1 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.159 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+elastic2 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.160 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+elastic3 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.161 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
+r1 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.166 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr1"
+r2 l1host="{{ layer1_ansible_host }}" ansible_host=10.116.127.168 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}" additional_dns="vsr2"
 
 [nuage-vsd]
 vsd1

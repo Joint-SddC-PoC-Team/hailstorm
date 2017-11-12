@@ -5,7 +5,7 @@
   become_user: "{{ rhosp_stack_user }}"
 
 - name: Unregister nodes from satellite
-  command: hammer host delete --name "{{ item }}"
+  shell: hammer host delete --name "{{ item }}" || hammer host delete --name "{{ item }}.{{ node_hailstorm_dns_domain }}"
   with_items: "{{ rhosp_nodes.stdout_lines }}"
   delegate_to: satellite
   ignore_errors: True # Maybe the node was not correctly registered, so better ignore errors and continue
