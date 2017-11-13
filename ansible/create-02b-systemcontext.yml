@@ -4,6 +4,7 @@
   gather_facts: false
   roles:
      - { role: layer2_vms, tags: [ 'layer2', 'ad', 'vm' ], mode: create }
+     - { role: layer2_active_directory, tags: [ 'layer2', 'ad', 'vm' ], mode: create }
 
 
 - hosts: proxy-group

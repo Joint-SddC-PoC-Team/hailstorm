@@ -1,0 +1,10 @@
+Install-windowsfeature AD-domain-services
+Import-Module ADDSDeployment
+
+$plainpw = "{{ root_password }}"
+$secureString = ConvertTo-SecureString $plainpw -AsPlainText -Force
+
+Install-ADDSForest -CreateDnsDelegation:$false ` -DatabasePath "C:\Windows\NTDS" ` -DomainMode "Win2012R2" ` -DomainName "{{ ad_domain_name }}" ` -DomainNetbiosName "{{ ad_netbios_name }}" `  -ForestMode "Win2012R2" `  -InstallDns:$true `  -LogPath "C:\Windows\NTDS" `  -NoRebootOnCompletion:$true `  -SysvolPath "C:\Windows\SYSVOL" `  -Force:$true  -safemodeadministratorpassword $secureString
+Install-WindowsFeature RSAT-ADDS
+
+net group "Domain Admins" administrator /add
