@@ -1,6 +1,10 @@
 - block:
     - include: create_vms.yml
-  when: mode == "create"
+  when: mode == "create" and not windows|default(false,true)
+
+- block:
+    - include: create_windows_vm.yml
+  when: mode == "create" and windows|default(false,true)
 
 - block:
     - include: start_vms.yml
