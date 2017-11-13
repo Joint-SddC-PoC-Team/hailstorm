@@ -1,12 +1,4 @@
-# based on https://1337red.wordpress.com/building-and-attacking-an-active-directory-lab-with-powershell/
-
-- name: create AD setup script
-  win_template: src=setupad.ps1.j2 dest=C:\setupad.ps1
-  register: adsetupscript
-- name: set up AD
-  win_shell: C:\setupad.ps1 >> c:\setupad.txt
-  register: ad_setup
-  when: adsetupscript|changed
-- name: reboot machine
-  win_reboot:
-  when: ad_setup|changed
+- block:
+    - include: install_ad.yml
+    - include: dns-records-add.yml
+  when: mode=="create"
