@@ -209,7 +209,7 @@ myvsrs:
       mgmt_to_hv_bridge: "{{ hostvars['r1'].nic_attachments[0].bridge }}",
       ports_to_hv_bridges: {{ ports_to_hv_bridges_vsr1 }},
       license_file: '/home/{{ nuage_user }}/licenses/NOKIA_BOSCH_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
-      deploy_cfg_file: '/home/{{ nuage_user }}/vsr/config1.txt'}
+      deploy_cfg_file: '/home/{{ nuage_user }}/vsr/r1_empty.cfg'}
   - { hostname: "{{ hostvars['r2'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
       target_server: "{{ hostvars['r2'].l1host }}",
@@ -220,7 +220,7 @@ myvsrs:
       mgmt_to_hv_bridge: "{{ hostvars['r2'].nic_attachments[0].bridge }}",
       ports_to_hv_bridges: {{ ports_to_hv_bridges_vsr2 }},
       license_file: '/home/{{ nuage_user }}/licenses/NOKIA_RED HAT_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
-      deploy_cfg_file: '/home/{{ nuage_user }}/vsr/config2.txt'}
+      deploy_cfg_file: '/home/{{ nuage_user }}/vsr/r2_empty.cfg'}
 ###
 # Ansible
 # The IP addr or hostname of the Ansible host
