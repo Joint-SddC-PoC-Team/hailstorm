@@ -92,6 +92,7 @@
             <UserData>
                 <ProductKey>
                     <WillShowUI>Never</WillShowUI>
+                    {% if windows_product_key|default(false,true) %}<Key>{{ windows_product_key }}</Key>{% endif %}
                 </ProductKey>
                 <AcceptEula>true</AcceptEula>
             </UserData>

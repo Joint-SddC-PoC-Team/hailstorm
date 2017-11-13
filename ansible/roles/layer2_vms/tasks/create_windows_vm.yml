@@ -1,0 +1,81 @@
+
+# How to use virt-install with Windows
+#https://serverfault.com/questions/644437/unattended-installation-of-windows-server-2012-on-kvm
+
+# Download W12K2R2
+# https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2
+
+# How to create autounattended.xml
+#https://www.derekseaman.com/2012/07/windows-server-2012-unattended.html
+#Windows ADK https://www.microsoft.com/en-us/download/details.aspx?id=30652
+#http://windowsafg.no-ip.org/server2012r2.html
+
+# How to run powershell script
+#https://serverfault.com/questions/813992/run-powershell-script-from-server-in-unattend-xml
+
+# How to configure TCP/IP
+#https://social.technet.microsoft.com/Forums/windowsserver/en-US/63eccbca-09f6-46e1-b701-3c450249342d/unattendxml-automate-static-ip?forum=winserversetup
+
+# How to configure DNS Servers
+#https://technet.microsoft.com/en-us/library/cc766025.aspx
+
+# Ansible prep script
+# https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
+
+
+- block:
+    - name: install virtio-win
+      yum: name=virtio-win state=present enablerepo=rhel-7-server-supplementary-rpms
+      when: enable_virtio_win|default(false,true)
+
+    - name: get list of vms
+      virt: command=list_vms
+      delegate_to: "{{ infrastructure_delegate_kvm_host }}"
+      register: virt_vms
+
+    - block:
+        - name: create temp dir
+          file: state=directory path=/tmp/config-{{ inventory_hostname_short }}
+
+        - name: create answer files
+          template: src=autounattend.xml.j2 dest=/tmp/config-{{ inventory_hostname_short }}/autounattend.xml
+          register: answer_file
+
+        - name: create ansible preparation powershell script
+          copy: src=ConfigureRemotingForAnsible.ps1 dest=/tmp/config-{{ inventory_hostname_short }}/ConfigureRemotingForAnsible.ps1 mode=0755
+          register: prep_script
+
+        - name: create config ISO
+          shell: cd /tmp && mkisofs -o config-{{ inventory_hostname_short }}.iso -J -r config-{{ inventory_hostname_short }}
+          when: answer_file|changed or prep_script|changed
+
+        - name: trigger installation
+          shell: >
+            virt-install
+            --name {{ inventory_hostname_short }}
+            --vcpus {{ vcpu }},sockets=1
+            --ram {{ mem }}
+            {% for nic in vm_nics %}
+            --network network={{ nic.netname }},mac={{ nic.mac }}
+            {% endfor %}
+            --disk size={{ disk.size }},path={{ layer1_qcow_storage.path }}/{{ disk.path }},format={{ disk.format }},device=disk
+            --disk path={{ layer1_binary_dir }}/{{ windows_install_dvd }},device=cdrom
+            --disk path=/tmp/config-{{ inventory_hostname_short }}.iso,device=cdrom
+            {% if enable_virtio_win|default(false,true) %}--disk path=/usr/share/virtio-win/virtio-win.iso,device=cdrom{% endif %}
+            --os-type windows
+            --os-variant win2k8
+            --graphics vnc,listen=0.0.0.0,password={{ root_password }}
+            --noautoconsole
+            --wait 10
+
+      when: inventory_hostname_short not in virt_vms.list_vms
+  delegate_to: "{{ infrastructure_delegate_kvm_host }}"
+
+- name: ensure that VMs are running
+  virt: name="{{ inventory_hostname_short }}" state=running uri=qemu:///system
+  when: skip_install is not defined or skip_install != true
+  delegate_to: "{{ infrastructure_delegate_kvm_host }}"
+  
+- name: wait for windows server to become avialable
+  wait_for: host={{ ansible_host }} port=5986 delay=0 timeout=900
+  delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
