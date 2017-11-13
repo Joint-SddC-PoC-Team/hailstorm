@@ -59,6 +59,7 @@ infrastructure_network_guests:
   bridge:                 "guests"
   mac_prefix:             "{% if infrastructure_network_master is defined %}52:54:00:48:04:{% else %}{{ external_network_config.guest_network_bridging_mac_prefix }}{% endif %}"
   forward_mode:           "bridge"
+  physical_underlay:      false
 
   #COE MUC
   default_gw_host_prefix: "10.32.111.254/20"
