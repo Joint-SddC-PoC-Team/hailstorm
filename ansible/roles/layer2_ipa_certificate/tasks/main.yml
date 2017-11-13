@@ -1,6 +1,6 @@
 - block:
     - name: check host exists in IPA DB
-      shell: "echo \"{{ hostvars['ipa'].ipa_admin_password }}\" | kinit admin 1>/dev/null && LANG=C ipa host-find {{ item }} | awk '/Host name:|Hostname:/'|cut -d: -f2|xargs"
+      shell: "echo \"{{ hostvars['ipa'].ipa_admin_password }}\" | kinit admin 1>/dev/null && LANG=C ipa host-find {{ item }} | awk 'match($0,/Host ?name:\\s+/) {print substr($0, RSTART + RLENGTH)}'"
       changed_when: false
       failed_when: false
       with_items: "['{{ certcn|default(hostname) }}']{% if cert_san is defined %}+{{ cert_san }}{% endif %}"
