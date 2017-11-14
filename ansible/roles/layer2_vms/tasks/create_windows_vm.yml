@@ -1,4 +1,3 @@
-
 # How to use virt-install with Windows
 #https://serverfault.com/questions/644437/unattended-installation-of-windows-server-2012-on-kvm
 
@@ -75,7 +74,7 @@
   virt: name="{{ inventory_hostname_short }}" state=running uri=qemu:///system
   when: skip_install is not defined or skip_install != true
   delegate_to: "{{ infrastructure_delegate_kvm_host }}"
-  
+
 - name: wait for windows server to become avialable
   wait_for: host={{ ansible_host }} port=5986 delay=0 timeout=900
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"

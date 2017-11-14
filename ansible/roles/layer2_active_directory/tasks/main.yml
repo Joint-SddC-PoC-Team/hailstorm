@@ -1,0 +1,4 @@
+- block:
+    - include: install_ad.yml
+    - include: dns-records-add.yml
+  when: mode=="create"

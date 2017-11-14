@@ -91,7 +91,7 @@
             </ImageInstall>
             <UserData>
                 <ProductKey>
-                    <WillShowUI>Never</WillShowUI>
+                    <WillShowUI>OnError</WillShowUI>
                     {% if windows_product_key|default(false,true) %}<Key>{{ windows_product_key }}</Key>{% endif %}
                 </ProductKey>
                 <AcceptEula>true</AcceptEula>

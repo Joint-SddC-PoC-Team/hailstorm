@@ -1,0 +1,35 @@
+
+# - name: find existing ptr records
+#   shell:  echo "{{ ipa_admin_password }}" | ( kinit admin && for zone in $(ipa dnszone-find |grep "Zone name"|grep arpa|cut -c14-); do ipa dnsrecord-find $zone | grep "PTR record:"| cut -c15- | sed "s/, /\\n/g"; done)
+#   register: ptr_records
+#   changed_when: false
+#
+# - name: add ptr records
+#   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ item.ip | ipaddr('revdns') | regex_replace('^\d+\.(.*)$', '\1') }} {{ item.ip.split('.')[3] }} --ptr-rec={{ item.name }}.{{ hailstorm_dns_domain }}.
+#   when: item.name != 'localhost' and item.name + "." + hailstorm_dns_domain + "."  not in ptr_records.stdout_lines
+#   with_items: "{{ lookup('template','a_records.j2') }}"
+#   ignore_errors: true
+
+- name: check MX record
+  win_shell: Get-DnsServerResourceRecord -Zone {{ hailstorm_dns_domain }} -RRType MX | %{$_.HostName}
+  register: mx_record
+  changed_when: false
+
+#- debug: var=mx_record
+
+- name: add MX dns record
+  win_shell: Add-DNSServerResourceRecord -Zone {{ hailstorm_dns_domain }} -MX -Name "@" -MailExchange infrastructure.{{ hailstorm_dns_domain }}. -Preference 10
+  when: mx_record.stdout == ""
+
+# - name: check existing SRV dns records
+#   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-find {{ hailstorm_dns_domain }}. | grep SRV
+#   register: srv_record
+#   changed_when: false
+#
+# - name: add SRV dns record
+#   shell: echo {{ ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }}. {{ hostvars[item].srv_dns[0] }} --srv-rec='{{ hostvars[item].srv_dns[1] }} {{ item }}'
+#   register: srv_dns
+#   when: hostvars[item].srv_dns is defined and hostvars[item].srv_dns[1] not in srv_record.stdout
+#   failed_when: "srv_dns.rc != 0 and 'ERROR: no modifications to be performed' not in srv_dns.stderr"
+#   changed_when: srv_dns.rc == 0
+#   with_items: "{{ groups.all }}"

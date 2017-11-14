@@ -2,7 +2,7 @@
 
 - block:
     - name: check host exists in IPA DB
-      shell: "echo \"{{ hostvars['ipa'].ipa_admin_password }}\" | kinit admin 1>/dev/null && ipa host-find {{ host|default(hostname) }} | awk '/Host name:|Hostname:/'|cut -d: -f2|xargs"
+      shell: "echo \"{{ hostvars['ipa'].ipa_admin_password }}\" | kinit admin 1>/dev/null && ipa host-find {{ host|default(hostname) }} | awk 'match($0,/Host ?name:\\s+/) {print substr($0, RSTART + RLENGTH)}'"
       changed_when: false
       failed_when: false
       register: existing_host

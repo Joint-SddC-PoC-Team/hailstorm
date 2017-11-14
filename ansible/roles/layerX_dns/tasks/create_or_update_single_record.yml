@@ -40,3 +40,45 @@
         - restart named
   when: not skip_dnat_dns|default(false,true)
   delegate_to: infrastructure
+
+
+### AD DNS
+# work around the problem that delegating to AD does not seem to pull the proper variables from the AD host
+- set_fact:
+    ansible_winrm_server_cert_validation: ignore
+- name: test if AD is available for remote management
+  shell: curl -k https://{{ (hostvars[groups['primary-ad-group'][0]].vm_nics|selectattr('netname','match',infrastructure_network_admin.netname)|first).ip }}:5986
+  register: ad_available
+  changed_when: false
+  delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+
+- block:
+    # - name: query A record in AD DNS
+    #   set_fact: existing_a_record="{{ lookup('dig', hostname + ' @' + hostvars[groups['primary-ad-group'][0]].ansible_host) }}"
+    - name: query A record in AD DNS
+      win_shell: Get-DnsServerResourceRecord -ZoneName {{ hailstorm_dns_domain }} -Name {{ item }} -RRType A | %{$_.RecordData.IPv4Address.IPAddressToString}
+      failed_when: false
+      changed_when: false
+      register: temp_existing_a_record
+
+    - set_fact:
+        existing_a_record: 'NXDOMAIN'
+      when: temp_existing_a_record.rc != 0
+
+    - set_fact:
+        existing_a_record: "{{ temp_existing_a_record.stdout|trim() }}"
+      when: temp_existing_a_record.rc == 0
+
+    # - debug: var=item
+    # - debug: var=existing_a_record
+
+    - name: remove existing A record
+      win_shell: Remove-DnsServerResourceRecord -ZoneName {{ hailstorm_dns_domain }} -Name {{ item }} -RRType A -Force
+      when: existing_a_record != 'NXDOMAIN' and existing_a_record != temp_external_ip|default(ip)
+
+    - name: create A record in AD DNS
+      win_shell: Add-DNSServerResourceRecordA -ZoneName {{ hailstorm_dns_domain }} -Name {{ item }} -IPv4Address {{ temp_external_ip|default(ip) }}
+      when: existing_a_record == 'NXDOMAIN' or existing_a_record != temp_external_ip|default(ip)
+
+  when: ad_available.stdout != ''
+  delegate_to: "{{groups['primary-ad-group'][0]}}"
