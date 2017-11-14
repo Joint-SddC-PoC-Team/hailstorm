@@ -202,28 +202,28 @@ openstack2        ansible_host=10.116.127.176 nic_attachments="[ {{ infrastructu
 rhosp-director
 
 [overcloud-controller-group]
-rhosp-control1
-rhosp-control2
-rhosp-control3
+#rhosp-control1
+#rhosp-control2
+#rhosp-control3
 
 [overcloud-compute-group]
-rhosp-compute1
-rhosp-compute2
-rhosp-compute3
-rhosp-compute4
-rhosp-compute5
-rhosp-compute6
-rhosp-compute7
+#rhosp-compute1
+#rhosp-compute2
+#rhosp-compute3
+#rhosp-compute4
+#rhosp-compute5
+#rhosp-compute6
+#rhosp-compute7
 
 
 [overcloud2-director-group]
 rhosp-director2
 
 [overcloud2-compute-group]
-rhosp-compute8
+#rhosp-compute8
 
 [overcloud2-controller-group]
-rhosp-control4
+#rhosp-control4
 
 
 #### END OPENSTACK
