@@ -25,12 +25,12 @@
 - set_fact:
     ansible_winrm_server_cert_validation: ignore
 - name: test if AD is available for remote management
-  shell: curl -k https://{{ (hostvars[groups['primary-ad-group'][0]].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}:5986
+  shell: curl -k https://{{ hostvars[groups['primary-ad-group'][0]].ansible_host }}:5986
   register: ad_available
   changed_when: false
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
   failed_when: false
-  
+
 - block:
     - name: remove existing A record
       win_shell: Remove-DnsServerResourceRecord -ZoneName {{ hailstorm_dns_domain }} -Name {{ item }} -RRType A -Force
