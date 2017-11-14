@@ -1,0 +1,13 @@
+
+osd_disks_config:
+   - {"device": "/dev/sdb", "journal": "/dev/sdf" }
+   - {"device": "/dev/sdc", "journal": "/dev/sdf" }
+   - {"device": "/dev/sdd", "journal": "/dev/sdf" }
+   - {"device": "/dev/sde", "journal": "/dev/sdf" }
+   - {"device": "/dev/sdg", "journal": "/dev/sdk" }
+   - {"device": "/dev/sdh", "journal": "/dev/sdk" }
+   - {"device": "/dev/sdi", "journal": "/dev/sdk" }
+   - {"device": "/dev/sdj", "journal": "/dev/sdk" }
+pm_user: "changeme"
+pm_password: "changeme"
+pm_type: "pxe_ipmitool"

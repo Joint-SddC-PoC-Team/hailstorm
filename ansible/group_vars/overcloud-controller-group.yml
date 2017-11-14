@@ -1,0 +1,3 @@
+pm_user: "changeme"
+pm_password: "changeme"
+pm_type: "pxe_ipmitool"

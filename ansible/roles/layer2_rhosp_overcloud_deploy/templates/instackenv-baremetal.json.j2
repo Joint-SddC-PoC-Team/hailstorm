@@ -1,6 +1,6 @@
 {
   "nodes": [
-    {% for node in controller %}
+    {% for node in overcloud-controller-group %}
     {
       "pm_user": "{{ hostvars[node].pm_user }}",
       "pm_addr": "{{ hostvars[node].pm_addr }}",
@@ -17,7 +17,7 @@
       "capabilities": "node:control-{{ loop.index0 }},profile:baremetal,boot_option:local"
     },
     {% endfor %}
-    {% for node in compute %}
+    {% for node in overcloud-compute-group %}
     {
       "pm_user": "{{ hostvars[node].pm_user }}",
       "pm_addr": "{{ hostvars[node].pm_addr }}",
