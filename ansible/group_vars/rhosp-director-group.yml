@@ -3,7 +3,7 @@ mem: "{{ layer2_rhosp_director_mem }}"
 vcpu: "{{ layer2_rhosp_director_cpu }}"
 disk:
   path: "{{ inventory_hostname_short }}.qcow2"
-  size: 80
+  size: 100
   format: qcow2
   # partition_table:
   #   lvmpv: 59500
@@ -12,7 +12,7 @@ disk:
   #   root: 50000
   physvols:
     boot: 500
-    rhel: 79500
+    rhel: 99500
   logvols:
     - name: swap
       fstype: swap
@@ -21,7 +21,7 @@ disk:
     - name: root
       fstype: "{{ fstype }}"
       mountpoint: /
-      size: 50000
+      size: 74000
     - name: home
       fstype: "{{ fstype }}"
       mountpoint: /home
@@ -54,6 +54,12 @@ overcloud_provider_networks:
   - "{{ infrastructure_network_admin }}"
   - "{{ infrastructure_network_guests }}"
   - "{{ infrastructure_network_provisioning }}"
+
+overcloud_provider_baremetal_networks:
+  - "{{ infrastructure_network_services }}"
+  - "{{ infrastructure_network_admin }}"
+  - "{{ infrastructure_network_provisioning }}"
+
 
 default_overcloud_flavors: [
   {

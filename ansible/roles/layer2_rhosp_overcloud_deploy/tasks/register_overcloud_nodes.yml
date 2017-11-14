@@ -3,11 +3,27 @@
   become: yes
   become_user: "{{ rhosp_stack_user }}"
   register: instackenv_json
+  when: not current_lifecycle_env.osp_in_baremetal
+
+
+- name: create instackenv.json (baremetal)
+  template: src=instackenv-baremetal.json.j2 dest=~/instackenv.json mode=0644
+  become: yes
+  become_user: "{{ rhosp_stack_user }}"
+  register: instackenv_json
+  when: current_lifecycle_env.osp_in_baremetal
+
+
 - block:
     - name: import baremetal nodes to ironic
       shell: . ~/stackrc && openstack baremetal import --json ~/instackenv.json
     - name: configure boot
       shell: . ~/stackrc && openstack baremetal configure boot
+    - name: assign root disks
+      shell: . ~/stackrc && openstack baremetal node set --property root_device='{"serial"{{':'}} "{{ hostvars[item].root_disk}}"}' {{ item }}
+      with_items: "{{ compute + controller }}"
+      when: current_lifecycle_env.osp_in_baremetal
+
     - name: delete ironic flavors
       #https://bugzilla.redhat.com/show_bug.cgi?id=1317312
       #shell: . ~/stackrc && openstack flavor delete {{ item }}
@@ -75,4 +91,5 @@
     . ~/stackrc && ironic node-update \
     $(ironic port-show --address {{ hostvars[item].vm_nics[0].mac }} |  awk '/node_uuid/{ print $4 }') \
     add properties/hailstorm_name='{{ hostvars[item].inventory_hostname_short }}'
+  when: not current_lifecycle_env.osp_in_baremetal
   with_items: "{{ compute + controller }}"

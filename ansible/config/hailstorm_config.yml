@@ -25,7 +25,8 @@ lifecycle_environments:
     openstack_version: 11
     # controlled node placement fails on the second scale up since an unmapped hostname (overcloud-compute-3) is assigned
     #Controlled Node Placement with OSP10 or later
-    osp_controlled_node_placement: false
+    osp_controlled_node_placement: true
+    osp_in_baremetal: true
     #TLS with OSP10 or later
     osp_use_tls: true
     #CEPH with OSP10 or later
@@ -760,7 +761,22 @@ ipa_group:
     pwpolicy: --maxlife=20000 --minlife=0 --history=0 --maxfail=0 --priority=0
 
 osp_domain_name: hailstorm
-
+osp_keystone_domais:
+  - hailstorm:
+      url:  "ldap://{{ hostvars['ipa'].vm_nics[0].ip }}"
+      user: "uid=osp-bind-user,cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\\.',',dc=') }}"
+      user_filter: "(memberOf=cn=demo-all,cn=groups,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\\.',',dc=') }})"
+      password: "{{ root_password }}"
+      user_tree_dn: "cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\\.',',dc=') }}"
+      user_objectclass: inetUser
+      user_id_attribute: uid
+      user_name_attribute: uid
+      user_mail_attribute: mail
+      user_pass_attribute: ""
+      user_allow_create: False
+      user_allow_update: False
+      user_allow_delete: False
+      tls_cacertfile: /etc/ssl/certs/ca.crt
 # quota definition according to the variables defined here: http://docs.ansible.com/ansible/latest/os_quota_module.html
 osp_projects:
   - name: demo-vms

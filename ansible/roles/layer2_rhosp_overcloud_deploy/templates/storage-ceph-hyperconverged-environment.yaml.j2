@@ -32,5 +32,11 @@ parameter_defaults:
 #  OsdComputeExtraConfig:
     ceph::profile::params::osd_journal_size: 5120
     ceph::profile::params::osds:
-        '/dev/vdb': {}
-        '/dev/vdc': {}
+{% for disk in hostvars[groups['rhosp-compute']|first].osd_disks_config %}
+{% if disk.journal == "" %}
+      '{{ disk.device }}': {}
+{% else %}
+      '{{ disk.device}}': 
+        journal: '{{ disk.journal }}'
+{% endif %}
+{% endfor %}

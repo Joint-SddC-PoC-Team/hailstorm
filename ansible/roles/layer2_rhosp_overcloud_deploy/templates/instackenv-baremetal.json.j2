@@ -1,0 +1,38 @@
+{
+  "nodes": [
+    {% for node in controller %}
+    {
+      "pm_user": "{{ hostvars[node].pm_user }}",
+      "pm_addr": "{{ hostvars[node].pm_addr }}",
+      "pm_password": "{{ hostvars[node].pm_password }}",
+      "pm_type": "{{ hostvars[node].pm_type }}",
+      "pm_port": "{{ hostvars[node].pm_port }}",
+      "mac": [
+        "{{ hostvars[node].boot_mac }}"
+      ],
+      "name": "{{ node }}",
+      "cpu": "{{ hostvars[node].vcpu }}",
+      "memory": "{{ hostvars[node].mem }}",
+      "arch": "x86_64",
+      "capabilities": "node:control-{{ loop.index0 }},profile:baremetal,boot_option:local"
+    },
+    {% endfor %}
+    {% for node in compute %}
+    {
+      "pm_user": "{{ hostvars[node].pm_user }}",
+      "pm_addr": "{{ hostvars[node].pm_addr }}",
+      "pm_password": "{{ hostvars[node].pm_password }}",
+      "pm_type": "{{ hostvars[node].pm_type }}",
+      "pm_port": "{{ hostvars[node].pm_port }}",
+      "mac": [
+        "{{ hostvars[node].boot_mac }}"
+      ],
+      "name": "{{ node }}",
+      "cpu": " {{ hostvars[node].vcpu }}",
+      "memory": "{{ hostvars[node].mem }}",
+      "arch": "x86_64",
+      "capabilities": "node:compute-{{ loop.index0 }},profile:baremetal,boot_option:local"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}

@@ -109,33 +109,21 @@ EOF
 OPENSTACK_API_VERSIONS = {
   "identity": 3
 }
-OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = False
-OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = '{{ osp_domain_name }}'
+OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
+OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = '{{ osp_keystone_domais[0].keys()[0] }}'
 EOF
   fi
-
-  sudo cat <<EOF >/etc/keystone/domains/keystone.{{ osp_domain_name }}.conf
+{% for domain in osp_keystone_domais %}
+  sudo cat <<EOF >/etc/keystone/domains/keystone.{{ domain.keys()[0] }}.conf
 [ldap]
-url =  ldap://{{ hostvars['ipa'].vm_nics[0].ip }}
-user = uid=osp-bind-user,cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
-user_filter = (memberOf=cn=demo-all,cn=groups,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }})
-password = {{ root_password }}
-user_tree_dn = cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
-user_objectclass = inetUser
-user_id_attribute = uid
-user_name_attribute = uid
-user_mail_attribute = mail
-user_pass_attribute =
-user_allow_create = False
-user_allow_update = False
-user_allow_delete = False
-tls_cacertfile = /etc/ssl/certs/ca.crt
-
+{% for config in domain[domain.keys()[0]].keys() %}
+{{ config }} = {{ domain[domain.keys()[0]][config] }}
+{% endfor %}
 [identity]
 driver = keystone.identity.backends.ldap.Identity
 EOF
-
-  sudo chown keystone:keystone /etc/keystone/domains/keystone.hailstorm.conf
+sudo chown keystone:keystone /etc/keystone/domains/keystone.{{ domain.keys()[0] }}.conf
+{% endfor %}
 
   sudo systemctl condrestart openstack-keystone.service
 }

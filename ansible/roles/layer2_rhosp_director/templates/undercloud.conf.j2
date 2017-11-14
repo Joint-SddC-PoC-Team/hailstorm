@@ -4,6 +4,7 @@ local_ip = {{ vm_nics[0].ip }}/24
 local_interface = {{ vm_nics[0].dev }}
 undercloud_public_vip = {{ hostname }}
 undercloud_admin_vip = {{ provisioning_admin_vip }}
+undercloud_debug = False
 
 masquerade_network = {{ vm_nics[0].ip | regex_replace('(^.*\.).*$', '\\1') }}0/24
 dhcp_start = {{ provisioning_dhcp_start }}

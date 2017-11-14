@@ -51,8 +51,9 @@
     - name: create osp domain
       shell: >
         . ~/overcloudrc_v3 &&
-        openstack domain create {{ osp_domain_name }}
-      when: ipa_available|success and osp_domain_name not in domains.stdout_lines
+        openstack domain create {{ item.keys()[0] }}
+      when: ipa_available|success and item.keys()[0] not in domains.stdout_lines
+      with_items: "{{ osp_keystone_domais }}"
 
     - name: restart keystone on controller
       shell: >
@@ -61,7 +62,8 @@
         ssh -o StrictHostKeyChecking=no heat-admin@$ip sudo systemctl condrestart openstack-keystone;
         ssh -o StrictHostKeyChecking=no heat-admin@$ip sudo systemctl condrestart httpd;
         done
-      when: ipa_available|success and osp_domain_name not in domains.stdout_lines
+      when: ipa_available|success and item.keys()[0] not in domains.stdout_lines
+      with_items: "{{ osp_keystone_domais }}"
       ignore_errors: true
 
     - name: wait httpd to be avialable again
@@ -105,15 +107,16 @@
     - name: grant admin domain user to default domain
       shell: >
         . ~/overcloudrc_v3 &&
-         openstack role add --domain default --user $(openstack user list --domain hailstorm|grep " admin "|awk '{print $2}') admin
+         openstack role add --domain default --user $(openstack user list --domain {{ item.keys()[0] }}|grep " admin "|awk '{print $2}') admin
+      with_items: "{{ osp_keystone_domais }}"
 
     - name: grant admin domain user to hailstorm domain
       shell: >
         . ~/overcloudrc_v3 &&
-         openstack role add --domain hailstorm --user $(openstack user list --domain hailstorm|grep " {{ item }} "|awk '{print $2}') admin
-      with_items:
-        - admin
-        - "{{ osp_admin_user }}"
+         openstack role add --domain {{ item[0].keys()[0] }} --user $(openstack user list --domain {{ item[0].keys()[0] }}|grep " {{ item[1] }} "|awk '{print $2}') admin
+      with_nested:
+        - "{{ osp_keystone_domais }}"
+        - ["admin","{{ osp_admin_user }}"]
 
   become: yes
   become_user: "{{ rhosp_stack_user }}"

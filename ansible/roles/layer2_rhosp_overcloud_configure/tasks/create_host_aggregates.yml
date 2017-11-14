@@ -7,3 +7,4 @@
     validate_certs: False
   with_items: "{{ osp_host_aggregates }}"
   delegate_to: localhost
+  when: False
