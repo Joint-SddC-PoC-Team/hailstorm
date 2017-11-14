@@ -1,3 +1,9 @@
+mem: 262144
+vcpu: 48
+disk:
+  size: 278
+
 pm_user: "changeme"
 pm_password: "changeme"
 pm_type: "pxe_ipmitool"
+pm_port: 623
