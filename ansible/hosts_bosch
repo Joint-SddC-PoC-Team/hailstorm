@@ -10,6 +10,7 @@ FE-SDDC-RH12r ansible_host=10.116.127.151 node_bridge_config="{ 'services':{'nic
 
 [sddc:vars]
 ansible_ssh_common_args="-i ./binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no"
+nic_attachments="[ {{ infrastructure_network_services }} ]"
 
 # the layer1 group should only contain a single server called layer1
 [layer1-group]
@@ -441,6 +442,7 @@ rh-sso-rhv-vm-group
 rh-sso-l2-vm-group
 ocp-l2-vm-group
 ocp-rhv-vm-group
+sddc
 
 [accessible_via_floating_ip:children]
 ansible-jump-host
