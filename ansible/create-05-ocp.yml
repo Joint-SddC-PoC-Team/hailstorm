@@ -48,6 +48,15 @@
       mode: update_floating_ip
       when: ocp_is_deployed_on == 'osp'
 
+- hosts: rh-sso-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer2', 'ocp', 'ocp-l2', 'vm', 'ocp-vm']
+      mode: readfacts
+      when: rhsso_is_deployed_on == 'osp'
+
 # write VM+LBaaS tenant IPs to /etc/hosts
 - hosts: ocp-osp-vm-group
   remote_user: root
@@ -65,6 +74,7 @@
         - satellite
         - ipa
         - openstack
+        - rh-sso
       when: ocp_is_deployed_on == 'osp'
 
 # # write floatign IPs to DNAT DNS
