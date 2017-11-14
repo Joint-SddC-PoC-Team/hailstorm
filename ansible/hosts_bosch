@@ -161,9 +161,9 @@ rhosp-director2 l1host="FE-SDDC-RH12r" ansible_host=10.116.127.175 activation_ke
 
 # The group of all osp control nodes
 [rhosp-control]
-rhosp-control1  ansible_host=10.116.127.140 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.100" boot_mac="1c:98:ec:18:9e:ee" root_disk="PDNNF0ARH311IZ" 
-rhosp-control2  ansible_host=10.116.127.141 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.101" boot_mac="1c:98:ec:18:be:ea" root_disk="PDNNF0ARH311OW" 
-rhosp-control3  ansible_host=10.116.127.142 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.102" boot_mac="1c:98:ec:17:1f:ba" root_disk="PDNNF0ARH311HU" 
+#rhosp-control1  ansible_host=10.116.127.140 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.100" boot_mac="1c:98:ec:18:9e:ee" root_disk="PDNNF0ARH311IZ"
+#rhosp-control2  ansible_host=10.116.127.141 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.101" boot_mac="1c:98:ec:18:be:ea" root_disk="PDNNF0ARH311OW"
+#rhosp-control3  ansible_host=10.116.127.142 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.102" boot_mac="1c:98:ec:17:1f:ba" root_disk="PDNNF0ARH311HU"
 #rhosp-control4  ansible_host=10.116.127.151 activation_key="AK-CV-RHOSP-{{ stage }}"
 
 # A list of all OpenStack subgroups
@@ -190,18 +190,17 @@ openstack2        ansible_host=10.116.127.176 nic_attachments="[ {{ infrastructu
 rhosp-director
 
 [overcloud-controller-group]
-#rhosp-control1
-#rhosp-control2
-#rhosp-control3
+fe-sddc-rh1r    ansible_host=10.116.127.140 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.100" boot_mac="1c:98:ec:18:9e:ee" root_disk="PDNNF0ARH311IZ"
+fe-sddc-rh2r    ansible_host=10.116.127.141 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.101" boot_mac="1c:98:ec:18:be:ea" root_disk="PDNNF0ARH311OW"
+fe-sddc-rh3r    ansible_host=10.116.127.142 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.102" boot_mac="1c:98:ec:17:1f:ba" root_disk="PDNNF0ARH311HU"
+
 
 [overcloud-compute-group]
-#rhosp-compute1
-#rhosp-compute2
-#rhosp-compute3
-#rhosp-compute4
-#rhosp-compute5
-#rhosp-compute6
-#rhosp-compute7
+fe-sddc-rh4r    ansible_host=10.116.127.143 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.103" boot_mac="1c:98:ec:18:be:fe" root_disk="PDNNF0ARH311IW"
+fe-sddc-rh5r    ansible_host=10.116.127.144 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.104" boot_mac="1c:98:ec:14:59:2a" root_disk="PDNNF0ARH311I3"
+fe-sddc-rh6r    ansible_host=10.116.127.145 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.105" boot_mac="1c:98:ec:18:ae:0a" root_disk="PDNNF0ARH311JM"
+fe-sddc-rh7r    ansible_host=10.116.127.146 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.106" boot_mac="1c:98:ec:18:ae:aa" root_disk="PDNNF0ARH311HY"
+
 
 
 [overcloud2-director-group]
