@@ -7,6 +7,10 @@
       "pm_password": "{{ hostvars[node].pm_password }}",
       "pm_type": "{{ hostvars[node].pm_type }}",
       "pm_port": "{{ hostvars[node].pm_port }}",
+      {% if pm_priv_level is defined %}
+      "pm_priv_level": "{{ pm_priv_level}}",
+      "ipmi_priv_level": "{{ pm_priv_level}}",
+      {% endif %}
       "mac": [
         "{{ hostvars[node].boot_mac }}"
       ],
@@ -24,6 +28,10 @@
       "pm_password": "{{ hostvars[node].pm_password }}",
       "pm_type": "{{ hostvars[node].pm_type }}",
       "pm_port": "{{ hostvars[node].pm_port }}",
+      {% if pm_priv_level is defined %}
+      "pm_priv_level": "{{ pm_priv_level}}",
+      "ipmi_priv_level": "{{ pm_priv_level}}",
+      {% endif %}
       "mac": [
         "{{ hostvars[node].boot_mac }}"
       ],

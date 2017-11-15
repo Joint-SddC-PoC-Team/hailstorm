@@ -7,3 +7,4 @@ pm_user: "changeme"
 pm_password: "changeme"
 pm_type: "pxe_ipmitool"
 pm_port: 623
+pm_priv_level: USER
