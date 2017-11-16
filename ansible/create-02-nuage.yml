@@ -36,6 +36,18 @@
     - role: layer2_haproxy_service
       tags: [ 'layer2', 'infrastructure', 'nuage', 'haproxy' ]
       mode: create
+      haproxy_listen_port: 7443
+      haproxy_listen_ip: "{{ (hostvars['infrastructure'].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}"
+      haproxy_listen_proto: "https"
+      haproxy_connect_port: 7443
+      haproxy_hostgroup: "nuage-vsd"
+      haproxy_name: "nuage_vsd_ocp"
+      haproxy_httpcheck: "/nuage/health"
+      when: '"haproxy" in hostvars[inventory_hostname_short].roles'
+      balance: source
+    - role: layer2_haproxy_service
+      tags: [ 'layer2', 'infrastructure', 'nuage', 'haproxy' ]
+      mode: create
       haproxy_listen_port: 9200
       haproxy_listen_ip: "{{ (hostvars['infrastructure'].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}"
       haproxy_listen_proto: "http"

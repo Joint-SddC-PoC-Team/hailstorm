@@ -161,6 +161,9 @@ external_network_config:
           - from_port: 465
             to_port: 465
             proto: tcp
+          - from_port: 7443
+            to_port: 7443
+            proto: tcp
           - from_port: 9200
             to_port: 9200
             proto: tcp
