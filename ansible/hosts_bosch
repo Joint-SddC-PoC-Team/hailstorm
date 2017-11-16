@@ -458,6 +458,8 @@ nuage
 accessible_via_floating_ip
 accessible_via_underlay
 accessible_via_services_network
+overcloud-controller-group
+overcloud-compute-group
 
 # A group to capture all nodes with standard 3-NIC network layout (services, admin, storage)
 [niclayout-standard:children]
