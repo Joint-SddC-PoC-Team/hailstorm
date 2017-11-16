@@ -9,8 +9,8 @@
 # Both are required to run the nuage_unzip role. nuage_unzipped_files_dir
 # is required when one or more operation lists, below, are set to 'install'
 # or 'upgrade'.
-nuage_zipped_files_dir: "/home/{{ nuage_user }}/binaries"
-nuage_unzipped_files_dir: "/home/{{ nuage_user }}/binaries-unpacked"
+nuage_zipped_files_dir: "/home/{{ nuage.user }}/binaries"
+nuage_unzipped_files_dir: "/home/{{ nuage.user }}/binaries-unpacked"
 ###
 # Path to a public key file to be injected in to VSD,VNS Util, VCIN and VSTAT vms
 # during deployment and corresponding private file to be used to connect to the
@@ -25,7 +25,7 @@ user_ssh_priv_key: ~/.ssh/id_rsa
 # remote_user names for ansible to execute as on the target server (hypervisor)
 # and Ansible host. target_server_username is the remote_user for all hypervisors.
 # ansible_sudo_username is the sudo user for local actions.
-# # TODO: add nuage to sudoers in Hailstorm by e.g. echo "{{ nuage_user }} ALL=(root) NOPASSWD:ALL" | tee /etc/sudoers.d/{{ nuage_user }}
+# # TODO: add nuage to sudoers in Hailstorm by e.g. echo "{{ nuage.user }} ALL=(root) NOPASSWD:ALL" | tee /etc/sudoers.d/{{ nuage.user }}
 target_server_username: "root"
 ansible_sudo_username: "root"
 ###
@@ -207,9 +207,9 @@ myvsrs:
       mgmt_netmask_prefix: "{{ (hostvars['r1'].vm_nics[0].ip ~ '/' ~ hostvars['r1'].vm_nics[0].netmask) | ipaddr('prefix') }}",
       mgmt_static_route_list: [ 0.0.0.0/1 ],
       mgmt_to_hv_bridge: "{{ hostvars['r1'].nic_attachments[0].bridge }}",
-      ports_to_hv_bridges: {{ ports_to_hv_bridges_vsr1 }},
-      license_file: '/home/{{ nuage_user }}/licenses/NOKIA_BOSCH_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
-      deploy_cfg_file: '/home/{{ nuage_user }}/vsr/r1_empty.cfg'}
+      ports_to_hv_bridges: {{ nuage.ports_to_hv_bridges_vsr1 }},
+      license_file: '/home/{{ nuage.user }}/licenses/NOKIA_BOSCH_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
+      deploy_cfg_file: '/home/{{ nuage.user }}/vsr/r1_empty.cfg'}
   - { hostname: "{{ hostvars['r2'].inventory_hostname }}.{{ hailstorm_dns_domain }}",
       target_server_type: "kvm",
       target_server: "{{ hostvars['r2'].l1host }}",
@@ -218,9 +218,9 @@ myvsrs:
       mgmt_netmask_prefix: "{{ (hostvars['r2'].vm_nics[0].ip ~ '/' ~ hostvars['r2'].vm_nics[0].netmask) | ipaddr('prefix') }}",
       mgmt_static_route_list: [ 0.0.0.0/1 ],
       mgmt_to_hv_bridge: "{{ hostvars['r2'].nic_attachments[0].bridge }}",
-      ports_to_hv_bridges: {{ ports_to_hv_bridges_vsr2 }},
-      license_file: '/home/{{ nuage_user }}/licenses/NOKIA_RED HAT_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
-      deploy_cfg_file: '/home/{{ nuage_user }}/vsr/r2_empty.cfg'}
+      ports_to_hv_bridges: {{ nuage.ports_to_hv_bridges_vsr2 }},
+      license_file: '/home/{{ nuage.user }}/licenses/NOKIA_RED HAT_VSR_POC_LicenseKey_temp_until_31012017_Installation.zip',
+      deploy_cfg_file: '/home/{{ nuage.user }}/vsr/r2_empty.cfg'}
 ###
 # Ansible
 # The IP addr or hostname of the Ansible host
