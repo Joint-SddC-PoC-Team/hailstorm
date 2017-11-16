@@ -26,6 +26,20 @@ appliances
 ansible-playbook -vv -i hosts_sddc -e @config/infrastructure_config_sddc.yml -e @config/hailstorm_config.yml -e @config/storm6.coe.muc.redhat.com.yml -e "enable_nuage=nuage" create-03-osp.yml --skip-tags overcloud2,ipa-service
 
 
+Manual steps
+============
+
+After the deployment the following steps are required for the Nuage
+infrastructure to be fully functional:
+
+∘ Platform Configuration/Infrastructure/Data Center Gateways/Pending/{r1,r2}/Blue Check
+∘ Platform Configuration/Infrastructure/Data Center Gateways/Gateways/{r1,r2}/WAN Services/vrf<num>001_FIP/Permissions/Shared Infrastructure
+∘ Platform Configuration/Infrastructure/Data Center Gateways/Gateways/{r1,r2}/WAN Services/vrf<num>002_mgmt_data/Add OpenStack_Org
+∘ Platform Configuration/Infrastructure/Data Center Gateways/Gateways/{r1,r2}/Blue Hammer (wait)
+∘ OpenStack_Org/L3 domains/Networks/router internal_demo_vms/router (symbol)/wan service/add r1 and r2 with vrf<num>002_mgmt_data
+∘ Shared Infrastructure/L3 domains/Networks/Domain for FIPs in 10.32.96.0/router (symbol)/wan service/add r1 and r2 with vrf<num>001_FIP
+
+
 Tear down
 =========
 
