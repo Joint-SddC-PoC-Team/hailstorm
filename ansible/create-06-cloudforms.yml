@@ -22,6 +22,8 @@
         - satellite
         - ipa
         - rh-sso
+        - openstack
+        - rhosp-director
       when: cf_is_deployed_on == 'osp'
     - role: layerX_dns
       tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]

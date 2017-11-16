@@ -12,6 +12,7 @@
   register: openstack_response
   changed_when: false
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+  run_once: true
 
 - block:
     - set_fact:
