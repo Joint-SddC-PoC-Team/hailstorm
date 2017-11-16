@@ -5,6 +5,6 @@
     - include: fix_bugs.yml
     ## enable lbaas UI
     - include: add_nuage_vrs.yml
-      when: nuage is defined
+      when: enable_nuage is defined
     - include: add_lbaas_ui.yml
   when: mode=="create"

@@ -3,8 +3,15 @@ vcpu: 48
 disk:
   size: 278
 
+osd_disks_config: "{% if current_lifecycle_env.osp_in_baremetal %}osd_disks_config_baremetal{%else %}osd_disks_config_virtual{% endif %}"
 
-osd_disks_config:
+osd_disks_config_virtual:
+   - {"device": "/dev/vdb" }
+   - {"device": "/dev/vdc" }
+   - {"device": "/dev/vdd" }
+   - {"device": "/dev/vde" }
+
+osd_disks_config_baremetal:
    - {"device": "/dev/sdb", "journal": "/dev/sdf" }
    - {"device": "/dev/sdc", "journal": "/dev/sdf" }
    - {"device": "/dev/sdd", "journal": "/dev/sdf" }
@@ -13,6 +20,7 @@ osd_disks_config:
    - {"device": "/dev/sdh", "journal": "/dev/sdk" }
    - {"device": "/dev/sdi", "journal": "/dev/sdk" }
    - {"device": "/dev/sdj", "journal": "/dev/sdk" }
+
 pm_user: "changeme"
 pm_password: "changeme"
 pm_type: "pxe_ipmitool"

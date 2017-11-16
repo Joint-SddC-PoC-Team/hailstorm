@@ -10,9 +10,11 @@
   template: src=instackenv-baremetal.json.j2 dest=~/instackenv.json mode=0644
   become: yes
   become_user: "{{ rhosp_stack_user }}"
-  register: instackenv_json
+  register: instackenv_json_bm
   when: current_lifecycle_env.osp_in_baremetal
 
+- debug: var=instackenv_json
+- debug: var=instackenv_json_bm
 
 - block:
     - name: import baremetal nodes to ironic
@@ -82,7 +84,7 @@
             add properties/capabilities='{% if current_lifecycle_env.osp_controlled_node_placement %}node:compute-{{ item.0 }},profile:baremetal{% else %}profile:compute{% endif %},boot_option:local'
           with_indexed_items: "{{ compute }}"
       when: current_lifecycle_env.openstack_version <= 9
-  when: instackenv_json.changed
+  when: (instackenv_json is defined and instackenv_json.changed) or (instackenv_json_bm is defined and instackenv_json_bm.changed)
   become: yes
   become_user: "{{ rhosp_stack_user }}"
 

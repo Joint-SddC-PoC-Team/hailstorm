@@ -41,7 +41,7 @@
       with_items: "{{ templates|select|list }}"
 
     - name: create nic configs
-      template: src={{ item }}{% if current_lifecycle_env.osp_in_baremetal %}-baremetal{% endif %}{% if nuage is defined %}-nuage{% endif %}.yaml.j2 dest=~/templates/nic-configs/{{ item }}.yaml mode=0644
+      template: src={{ item }}{% if current_lifecycle_env.osp_in_baremetal %}-baremetal{% endif %}{% if enable_nuage is defined %}-nuage{% endif %}.yaml.j2 dest=~/templates/nic-configs/{{ item }}.yaml mode=0644
       with_items:
         - "compute"
         - "controller"

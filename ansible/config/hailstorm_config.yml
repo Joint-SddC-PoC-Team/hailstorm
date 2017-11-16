@@ -947,6 +947,25 @@ osp_host_aggregates:
      - overcloud-compute-2.{{ hailstorm_dns_domain }}
      - overcloud-compute-3.{{ hailstorm_dns_domain }}
 
+osp_mtu: 1500
+
 proxy_users:
   - { "name": "satellite", "password": "redhat01" }
   - { "name": "infrastructure", "password": "redhat01" }
+
+
+nuage:
+  haproxy_route: "172.20.0.0/16 via 10.116.127.179"
+  user: "nuage"
+  # we do not set the passwords here, as this is part of the nuage-metro installer, but we can reference them from here
+  vsr_user: "admin"
+  vsr_pw: "admin"
+  vsc_user: "admin"
+  vsc_pw: "admin"
+  vsd_user: "root"
+  vsd_pw: "Alcatel"
+  # directory under ansible/binary, where the nuage binaries are stored
+  metro_bins: "nuage"
+  # bridges for the external network on the KVM host
+  ports_to_hv_bridges_vsr1: "['tenant','services','ospf1','bgp1','nuage_vsr'{% if infrastructure_network_guests.physical_underlay == false %},'guests'{% endif %}]"
+  ports_to_hv_bridges_vsr2: "['tenant','services','ospf2','bgp2','nuage_vsr'{% if infrastructure_network_guests.physical_underlay == false %},'guests'{% endif %}]"
