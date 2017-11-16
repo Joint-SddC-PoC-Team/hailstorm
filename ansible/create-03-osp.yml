@@ -74,7 +74,7 @@
     - role: layer2_rhosp_undercloud_configure_nuage
       tags: ['layer2', 'nuage', 'undercloud-config-nuage']
       mode: create
-      when: nuage is defined
+      when: enable_nuage is defined
     - role: layer2_ipa_certificate
       tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-cert']
       mode: create

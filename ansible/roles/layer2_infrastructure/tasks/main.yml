@@ -1,0 +1,15 @@
+---
+- block:
+    - name: add route for nuage for haproxy
+      lineinfile:
+        path: /etc/sysconfig/network-scripts/route-eth0
+        line: "{{ nuage.haproxy_route }}"
+        state: present
+        create: yes
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: enable route
+      shell: ifup eth0
+  when: enable_nuage is defined

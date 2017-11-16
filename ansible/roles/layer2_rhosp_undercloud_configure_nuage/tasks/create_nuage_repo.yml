@@ -49,7 +49,7 @@
       shell: rsync -e "ssh -i nuage-metro/binary/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no" -aviPHAXS `find binaries-unpacked -name \*.rpm|grep el7|grep -v newton; ls -1 binaries-unpacked/nuage-puppet-modules*` root@{{ hostvars['satellite'].hostname }}:/var/www/html/pub/nuage
   delegate_to: install-host
   become: true
-  become_user: "{{ hostvars['install-host'].nuage_user }}"
+  become_user: "{{ nuage.user }}"
 
 - block:
     - name: createrepo

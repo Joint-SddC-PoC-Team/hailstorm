@@ -6,7 +6,7 @@
     # for n in destroy undefine; do for i in c1.hailstorm4.coe.muc.redhat.com c2.hailstorm4.coe.muc.redhat.com c3.hailstorm4.coe.muc.redhat.com c4.hailstorm4.coe.muc.redhat.com r1.hailstorm4.coe.muc.redhat.com r2.hailstorm4.coe.muc.redhat.com elastic1.hailstorm4.coe.muc.redhat.com elastic2.hailstorm4.coe.muc.redhat.com elastic3.hailstorm4.coe.muc.redhat.com vsd1.hailstorm4.coe.muc.redhat.com vsd2.hailstorm4.coe.muc.redhat.com vsd3.hailstorm4.coe.muc.redhat.com; do virsh $n $i; done; done
 
     - name: Get authorized key for nuage user as variable
-      shell: cat ~{{ nuage_user }}/.ssh/id_rsa.pub
+      shell: cat ~{{ nuage.user }}/.ssh/id_rsa.pub
       register: nuage_ssh_pubkey
 
     - name: remove authorized key for root
@@ -16,10 +16,14 @@
         key: "{{ nuage_ssh_pubkey.stdout }}"
 
   become: yes
-  become_user: "{{ nuage_user }}"
+  become_user: "{{ nuage.user }}"
 
+- name: kill all processes of nuage user
+  command: pkill -u -9 "{{ nuage.user }}"
+  ignore_errors: yes
+ 
 - name: remove nuage user
   user:
-    name: "{{ nuage_user }}"
+    name: "{{ nuage.user }}"
     state: absent
     remove: yes

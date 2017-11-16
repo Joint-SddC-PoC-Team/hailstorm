@@ -5,11 +5,13 @@
       tags: ["nuage_install"]
   when: mode=="create"
 
+- debug: var=nuage
+
 - block:
-    - name: check for user {{ nuage_user }}
+    - name: check for user {{ nuage.user }}
       getent:
         database: passwd
-        key: "{{ nuage_user }}"
+        key: "{{ nuage.user }}"
         fail_key: false
     - debug:
         var: getent_passwd

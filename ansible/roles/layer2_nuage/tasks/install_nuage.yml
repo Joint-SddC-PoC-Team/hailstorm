@@ -1,5 +1,5 @@
 - name: check for existence of config (via created hosts file)
-  stat: path="~{{ nuage_user }}/nuage-metro/hosts"
+  stat: path="~{{ nuage.user }}/nuage-metro/hosts"
   register: has_nuconfiguration
 
 - debug:
@@ -36,18 +36,25 @@
       shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" install_vcs.yml
 
     - name: Phase V) configure VSRs
-      shell: "sshpass -p admin ssh -o StrictHostKeyChecking=no admin@{{ hostvars[item].vm_nics[0].ip }} < ~/vsr/{{ item }}_w{% if infrastructure_network_guests.physical_underlay == false %}o{% endif %}_physical_underlay.cfg > ~/vsr/{{ item }}.cfg.log"
+      shell: "sshpass -p {{ nuage.vsr_pw }} ssh -o StrictHostKeyChecking=no {{ nuage.vsr_user }}@{{ hostvars[item].vm_nics[0].ip }} < ~/vsr/{{ item }}_w{% if infrastructure_network_guests.physical_underlay == false %}o{% endif %}_physical_underlay.cfg > ~/vsr/{{ item }}_w{% if infrastructure_network_guests.physical_underlay == false %}o{% endif %}_physical_underlay.cfg.log"
       with_items:
         - r1
         - r2
     
     - name: Phase VI) configure VSCs
-      shell: "sshpass -p admin ssh -o StrictHostKeyChecking=no admin@{{ hostvars[item].vm_nics[0].ip }} < ~/vsc/config.txt > ~/vsc/config.txt.log"
+      shell: "sshpass -p {{ nuage.vsc_pw }} ssh -o StrictHostKeyChecking=no {{ nuage.vsc_user }}@{{ hostvars[item].vm_nics[0].ip }} < ~/vsc/config.txt > ~/vsc/config.txt.log"
       with_items:
         - c1
         - c2
         - c3
         - c4
+
+    - name: Phase VII) configure VSDs
+      shell: sshpass -p {{ nuage.vsd_pw }} ssh -o StrictHostKeyChecking=no "{{ nuage.vsd_user}}@{{ hostvars[item].vm_nics[0].ip }}" "echo '{{ nuage.haproxy_route }}' > /etc/sysconfig/network-scripts/route-eth0;ifup eth0"
+      with_items:
+        - vsd1
+        - vsd2
+        - vsd3
   when: has_nuconfiguration.stat.exists == False
   become: yes
-  become_user: "{{ nuage_user }}"
+  become_user: "{{ nuage.user }}"
