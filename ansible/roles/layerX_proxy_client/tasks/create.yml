@@ -1,6 +1,6 @@
 - name: Copy CA certificate (alienca is proxy CA)
   copy:
-    dest: /etc/pki/tls/certs/proxy.pem
+    dest: /etc/pki/ca-trust/source/anchors/proxy.pem
     content: "{% for ssl_cert in ssl_certs %}{{ lookup('file','binary/' + ssl_cert) }}\n{% endfor %}"
     owner: root
     group: root
