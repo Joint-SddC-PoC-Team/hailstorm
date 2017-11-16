@@ -110,10 +110,10 @@ OPENSTACK_API_VERSIONS = {
   "identity": 3
 }
 OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
-OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = '{{ osp_keystone_domais[0].keys()[0] }}'
+OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = '{{ osp_keystone_domains[0].keys()[0] }}'
 EOF
   fi
-{% for domain in osp_keystone_domais %}
+{% for domain in osp_keystone_domains %}
   sudo cat <<EOF >/etc/keystone/domains/keystone.{{ domain.keys()[0] }}.conf
 [ldap]
 {% for config in domain[domain.keys()[0]].keys() %}

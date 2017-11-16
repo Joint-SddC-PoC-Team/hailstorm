@@ -18,3 +18,17 @@ pm_password: "changeme"
 pm_type: "pxe_ipmitool"
 pm_port: 623
 pm_priv_level: USER
+
+
+nic_attachments:
+  - "{{ infrastructure_network_provisioning }}"
+  - "{{ infrastructure_network_storage }}"
+  - "{{ infrastructure_network_storage_mgmt }}"
+  - "{{ infrastructure_network_internal_api }}"
+  - "{{ infrastructure_network_tenant }}"
+  - "{{ infrastructure_network_admin }}"
+  - "{{ infrastructure_network_services }}"
+#default_route_via: "{{ infrastructure_network_services }}"
+#name_service_via: "{{ infrastructure_network_services }}"
+default_route_via: "{{ infrastructure_network_provisioning }}"
+name_service_via: "{{ infrastructure_network_provisioning }}"

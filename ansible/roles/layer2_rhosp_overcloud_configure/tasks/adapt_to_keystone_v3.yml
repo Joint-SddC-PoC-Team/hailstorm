@@ -53,7 +53,7 @@
         . ~/overcloudrc_v3 &&
         openstack domain create {{ item.keys()[0] }}
       when: ipa_available|success and item.keys()[0] not in domains.stdout_lines
-      with_items: "{{ osp_keystone_domais }}"
+      with_items: "{{ osp_keystone_domains }}"
 
     - name: restart keystone on controller
       shell: >
@@ -63,7 +63,7 @@
         ssh -o StrictHostKeyChecking=no heat-admin@$ip sudo systemctl condrestart httpd;
         done
       when: ipa_available|success and item.keys()[0] not in domains.stdout_lines
-      with_items: "{{ osp_keystone_domais }}"
+      with_items: "{{ osp_keystone_domains }}"
       ignore_errors: true
 
     - name: wait httpd to be avialable again
@@ -108,14 +108,14 @@
       shell: >
         . ~/overcloudrc_v3 &&
          openstack role add --domain default --user $(openstack user list --domain {{ item.keys()[0] }}|grep " admin "|awk '{print $2}') admin
-      with_items: "{{ osp_keystone_domais }}"
+      with_items: "{{ osp_keystone_domains }}"
 
     - name: grant admin domain user to hailstorm domain
       shell: >
         . ~/overcloudrc_v3 &&
          openstack role add --domain {{ item[0].keys()[0] }} --user $(openstack user list --domain {{ item[0].keys()[0] }}|grep " {{ item[1] }} "|awk '{print $2}') admin
       with_nested:
-        - "{{ osp_keystone_domais }}"
+        - "{{ osp_keystone_domains }}"
         - ["admin","{{ osp_admin_user }}"]
 
   become: yes
