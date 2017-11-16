@@ -19,10 +19,10 @@
       shell: . ~/stackrc && openstack baremetal import --json ~/instackenv.json
     - name: configure boot
       shell: . ~/stackrc && openstack baremetal configure boot
-    - name: assign root disks
-      shell: . ~/stackrc && openstack baremetal node set --property root_device='{"serial"{{':'}} "{{ hostvars[item].root_disk}}"}' {{ item }}
-      with_items: "{{ compute + controller }}"
-      when: current_lifecycle_env.osp_in_baremetal
+    # - name: assign root disks
+    #   shell: . ~/stackrc && openstack baremetal node set --property root_device='{"serial"{{':'}} "{{ hostvars[item].root_disk}}"}' {{ item }}
+    #   with_items: "{{ compute + controller }}"
+    #   when: current_lifecycle_env.osp_in_baremetal
 
     - name: delete ironic flavors
       #https://bugzilla.redhat.com/show_bug.cgi?id=1317312

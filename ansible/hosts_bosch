@@ -190,7 +190,7 @@ openstack2        ansible_host=10.116.127.176 nic_attachments="[ {{ infrastructu
 rhosp-director
 
 [overcloud-controller-group]
-fe-sddc-rh1r    ansible_host=10.116.127.140 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.100" boot_mac="1c:98:ec:18:9e:ee" root_disk="PDNNF0ARH311IZ"
+#fe-sddc-rh1r    ansible_host=10.116.127.140 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.100" boot_mac="1c:98:ec:18:9e:ee" root_disk="PDNNF0ARH311IZ"
 fe-sddc-rh2r    ansible_host=10.116.127.141 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.101" boot_mac="1c:98:ec:18:be:ea" root_disk="PDNNF0ARH311OW"
 fe-sddc-rh3r    ansible_host=10.116.127.142 activation_key="AK-CV-RHOSP-{{ stage }}" pm_addr="10.116.127.102" boot_mac="1c:98:ec:17:1f:ba" root_disk="PDNNF0ARH311HU"
 
