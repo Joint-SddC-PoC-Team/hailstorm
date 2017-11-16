@@ -1,0 +1,8 @@
+parameter_defaults:
+# the following is OSP10 specific; for other versions see https://access.redhat.com/solutions/2521041
+# for Jumbo frames use:
+#    NeutronGlobalPhysnetMtu: 9000
+# for VNFs to have an MTU in VMs of 1500 use:
+#    NeutronGlobalPhysnetMtu: 1550
+    NeutronGlobalPhysnetMtu: {{ osp_mtu }}
+    

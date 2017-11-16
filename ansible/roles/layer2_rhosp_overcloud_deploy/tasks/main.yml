@@ -2,9 +2,9 @@
   slurp:
     src: /home/{{ rhosp_stack_user }}/nuage-ospdirector-ML2-SRIOV/generate-cms-id/cms_id.txt
   register: nuage_cms_id
-  when: nuage is defined
+  when: enable_nuage is defined
 - debug: var=nuage_cms_id
-  when: nuage is defined
+  when: enable_nuage is defined
 # use with: nuage_cms_id['content'] | b64decode
 
 - block:
@@ -22,6 +22,7 @@
           - commandlineparams-environment.yaml
           - network-isolation.yaml
           - network-environment.yaml
+          - neutron-environment.yaml
           - ips-from-pool-environment.yaml
           - extra-config-post-deployment-environment.yaml
           - extra-config-post-deployment.yaml
@@ -44,8 +45,8 @@
           - tls-inject-trust-anchor-environment.yaml
           - monitoring-environment.yaml
           - logging-environment.yaml
-          - "{% if nuage is defined %}neutron-nuage-config.yaml{% endif %}"
-          - "{% if nuage is defined %}nova-nuage-config.yaml{% endif %}"
+          - "{% if enable_nuage is defined %}neutron-nuage-config.yaml{% endif %}"
+          - "{% if enable_nuage is defined %}nova-nuage-config.yaml{% endif %}"
   when: mode=="create"
 
 - block:
@@ -63,6 +64,7 @@
           - commandlineparams-environment.yaml
           - network-isolation.yaml
           - network-environment.yaml
+          - neutron-environment.yaml
           - ips-from-pool-environment.yaml
           - extra-config-post-deployment-environment.yaml
           - extra-config-post-deployment.yaml
@@ -85,6 +87,6 @@
           - tls-inject-trust-anchor-environment.yaml
           - monitoring-environment.yaml
           - logging-environment.yaml
-          - "{% if nuage is defined %}neutron-nuage-config.yaml{% endif %}"
-          - "{% if nuage is defined %}nova-nuage-config.yaml{% endif %}"
+          - "{% if enable_nuage is defined %}neutron-nuage-config.yaml{% endif %}"
+          - "{% if enable_nuage is defined %}nova-nuage-config.yaml{% endif %}"
   when: mode=="reset"
