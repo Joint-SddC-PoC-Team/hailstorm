@@ -123,6 +123,14 @@
     - { role: layer2_rhel, tags: [ 'layer3', 'ocp', 'rhel', 'ocp-prep'  ], mode: create }
     - { role: layerX_ipa_client, tags: [ 'layer3', 'ocp',  'ipa-client', 'ocp-prep' ], mode: create }
     - { role: layerX_distribute_pubkey, tags: [ 'layer3', 'ocp', 'ocp-installprep' , 'ocp-prep' ], mode: create, pubkeyhost: "{{ groups['ocp-installer-group']|first }}" }
+    - role: layerX_proxy_client
+      tags: [ 'layer2', 'ocp', 'ocp-prep', 'proxy-client' ]
+      mode: create
+      ssl_certs: "{{ http_proxy.certificates }}"
+      proxy_host: "{{ http_proxy.proxyname }}"
+      proxy_username: "{{ http_proxy.username }}"
+      proxy_password: "{{ http_proxy.password }}"
+      proxy_port: "{{ http_proxy.port }}"
 
 - hosts: ocp-master-group,ocp-node-group
   remote_user: root
