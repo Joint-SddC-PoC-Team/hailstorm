@@ -946,6 +946,8 @@ osp_host_aggregates:
      - overcloud-compute-2.{{ hailstorm_dns_domain }}
      - overcloud-compute-3.{{ hailstorm_dns_domain }}
 
+osp_mtu: 1500
+
 proxy_users:
   - { "name": "satellite", "password": "redhat01" }
   - { "name": "infrastructure", "password": "redhat01" }

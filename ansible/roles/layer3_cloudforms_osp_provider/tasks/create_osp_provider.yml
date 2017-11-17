@@ -5,7 +5,7 @@
       failed_when: undercloud_password.stdout == ""
       changed_when: false
     # - name: retrieve overcloud admin password
-    #   command: awk -F = '/OS_PASSWORD/{ print $2 }' ~stack/overcloudrc
+    #   command: awk -F = '/OS_PASSWORD/{ print $2 }' ~stack/{{ stack_name }}rc
     #   register: overcloud_password
     #   failed_when: overcloud_password.stdout == ""
     #   changed_when: false
@@ -21,7 +21,7 @@
       changed_when: false
     - name: retrieve hailstorm domain id
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
         openstack domain show hailstorm -c id -f value
       register: hailstorm_domain_id
       failed_when: hailstorm_domain_id.stdout == ""

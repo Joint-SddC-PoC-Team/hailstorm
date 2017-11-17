@@ -14,7 +14,7 @@
 
     - name: load raw image into glance
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
         openstack image create
         --public
         --disk-format raw
@@ -39,7 +39,7 @@
 
 - name: load qcow2 image into glance
   shell: >
-    . ~/overcloudrc_v3 &&
+    . ~/{{ stack_name }}rc_v3 &&
     {% if item.image | search('\.gz$') %}z{% endif %}cat /tmp/binary/{{ item.image }} |
     openstack image create
     --public

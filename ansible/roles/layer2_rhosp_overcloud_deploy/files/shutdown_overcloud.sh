@@ -16,7 +16,7 @@ source /home/stack/bin/osp-env.sh || exit 1
 
 # stop instances
 read -p "press return for stopping instances..."
-source ~/overcloudrc || exit 1
+source ~/{{ stack_name }}rc || exit 1
 for vm in `nova list --all-tenants 2>/dev/null|awk '{print $2}'|grep -v "ID\|^$"`; do
   nova stop $vm 2>/dev/null
 done

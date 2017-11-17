@@ -430,6 +430,78 @@ external_network_config:
             to_port: 22
             proto: tcp
 
+      - expose_machine: openstack2
+        on_host_prefix: 10.32.105.64/32
+        via_network: services
+        ports:
+        - from_port: 80
+          to_port: 80
+          proto: tcp
+        - from_port: 443
+          to_port: 443
+          proto: tcp
+        # novnc proxy
+        - from_port: 6080
+          to_port: 6080
+          proto: tcp
+        # novnc proxy TLS
+        - from_port: 13080
+          to_port: 13080
+          proto: tcp
+        # keystone
+        - from_port: 13000
+          to_port: 13000
+          proto: tcp
+        # gnocci
+        - from_port: 13041
+          to_port: 13041
+          proto: tcp
+        # placement
+        - from_port: 13778
+          to_port: 13778
+          proto: tcp
+        # cinder
+        - from_port: 13776
+          to_port: 13776
+          proto: tcp
+        # aodh
+        - from_port: 13042
+          to_port: 13042
+          proto: tcp
+        # glance
+        - from_port: 13292
+          to_port: 13292
+          proto: tcp
+        # ceilometer
+        - from_port: 13777
+          to_port: 13777
+          proto: tcp
+        # heat-cfn
+        - from_port: 13776
+          to_port: 13776
+          proto: tcp
+        # heat
+        - from_port: 13004
+          to_port: 13004
+          proto: tcp
+        # swift
+        - from_port: 13808
+          to_port: 13808
+          proto: tcp
+        # nova
+        - from_port: 13774
+          to_port: 13774
+          proto: tcp
+        # panko
+        - from_port: 13779
+          to_port: 13779
+          proto: tcp
+        # neutron
+        - from_port: 13696
+          to_port: 13696
+          proto: tcp
+
+
 nic_bonding:
 #   - name: <bonddevice>
 #     nics:

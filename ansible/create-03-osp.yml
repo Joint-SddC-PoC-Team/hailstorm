@@ -18,7 +18,7 @@
   roles:
     - { role: layer2_vms, tags: [ 'layer2', 'rhosp', 'vm' ], mode: create }
 
-- hosts: rhosp-all-group,openstack
+- hosts: rhosp-all-group,vips
   remote_user: root
   gather_facts: false
   roles:
@@ -65,7 +65,38 @@
       controller: "{{ groups['overcloud2-controller-group'] }}"
       compute: "{{ groups['overcloud2-compute-group'] }}"
       openstack_vip: "openstack2"
-      stack_name: "overcloud2"
+
+
+- hosts: overcloud2-controller-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer2_rhosp_overcloud_postdeploy_controller
+      tags: ['layer2', 'rhosp', 'overcloud2', 'overcloud-controller']
+      mode: create
+      when: overcloud2_after_creation is defined
+
+- hosts: overcloud2-director-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer2_rhosp_overcloud_configure
+      tags: ['layer2', 'rhosp', 'overcloud2', 'overcloud-configure']
+      mode: create
+      when: overcloud2_after_creation is defined
+      openstack_vip: "openstack2"
+
+- hosts: overcloud2-controller-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer2_rhosp_overcloud_configure_lbaas
+      tags: ['layer2', 'rhosp', 'overcloud2', 'overcloud-controller']
+      mode: create
+      when: overcloud2_after_creation is defined
+
+
+
 
 - hosts: overcloud-director-group
   remote_user: root
@@ -92,7 +123,6 @@
       controller: "{{ groups['overcloud-controller-group'] }}"
       compute: "{{ groups['overcloud-compute-group'] }}"
       openstack_vip: "openstack"
-      stack_name: "overcloud"
 
 - hosts: overcloud-controller-group
   remote_user: root
@@ -109,6 +139,7 @@
     - role: layer2_rhosp_overcloud_configure
       tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-configure']
       mode: create
+      openstack_vip: "openstack"
 
 - hosts: overcloud-controller-group
   remote_user: root

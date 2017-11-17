@@ -145,8 +145,8 @@ elastic3
 #### BEGIN OPENSTACK
 
 [rhosp-director-group]
-rhosp-director  l1host="FE-SDDC-RH11r" ansible_host=10.116.127.172 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director" provisioning_admin_vip="192.168.105.74" provisioning_dhcp_start="192.168.105.10" provisioning_dhcp_end="192.168.105.25" provisioning_discovery_start="192.168.105.26" provisioning_discovery_end="192.168.105.41"
-rhosp-director2 l1host="FE-SDDC-RH12r" ansible_host=10.116.127.175 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director2" provisioning_admin_vip="192.168.105.75" provisioning_dhcp_start="192.168.105.42" provisioning_dhcp_end="192.168.105.57" provisioning_discovery_start="192.168.105.58" provisioning_discovery_end="192.168.105.73"
+rhosp-director  l1host="FE-SDDC-RH11r" ansible_host=10.116.127.172 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director" provisioning_admin_vip="192.168.105.74" provisioning_dhcp_start="192.168.105.10" provisioning_dhcp_end="192.168.105.25" provisioning_discovery_start="192.168.105.26" provisioning_discovery_end="192.168.105.41" stack_name="overcloud"
+rhosp-director2 l1host="FE-SDDC-RH12r" ansible_host=10.116.127.175 activation_key="AK-CV-RHOSP-{{ stage }}" additional_dns="director2" provisioning_admin_vip="192.168.105.75" provisioning_dhcp_start="192.168.105.42" provisioning_dhcp_end="192.168.105.57" provisioning_discovery_start="192.168.105.58" provisioning_discovery_end="192.168.105.73" stack_name="overcloud2"
 
 # The group of all osp compute nodes
 [rhosp-compute]

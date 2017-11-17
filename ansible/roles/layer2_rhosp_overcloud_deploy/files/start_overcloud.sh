@@ -39,7 +39,7 @@ CONTROLLER="4.239.239.161"
 ansible $CONTROLLER -b -m shell -a "pcs cluster start --all"
 sleep 30s
 ansible $CONTROLLER -b -m shell -a "pcs status"
-source ~/overcloudrc || exit 1
+source ~/{{ stack_name }}rc || exit 1
 nova service-list 2>/dev/null
 sleep 2m
 
@@ -58,7 +58,7 @@ while ! ansible computes -b -m ping &>/dev/null; do
   sleep 5s
 done
 echo " done."
-source ~/overcloudrc || exit 1
+source ~/{{ stack_name }}rc || exit 1
 nova service-list 2>/dev/null
 
 # start VMs

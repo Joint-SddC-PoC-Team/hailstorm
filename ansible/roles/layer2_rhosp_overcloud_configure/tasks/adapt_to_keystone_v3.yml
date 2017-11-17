@@ -3,12 +3,12 @@
       wait_for: host={{ hostvars['ipa'].hostname }} port=22 timeout=1
       register: ipa_available
 
-    - name: copy overcloudrc
-      copy: src=~/overcloudrc dest=~/overcloudrc_v3 force=no remote_src=true mode=755
+    - name: copy {{ stack_name }}rc
+      copy: src=~/{{ stack_name }}rc dest=~/{{ stack_name }}rc_v3 force=no remote_src=true mode=755
       when: ipa_available|success
 
-    - name: adapt overcloudrc
-      lineinfile: dest=~/overcloudrc_v3 line="{{ item.line }}" regexp="{{ item.regexp }}"
+    - name: adapt {{ stack_name }}rc
+      lineinfile: dest=~/{{ stack_name }}rc_v3 line="{{ item.line }}" regexp="{{ item.regexp }}"
       with_items:
         - line: "export OS_IDENTITY_API_VERSION=3"
           regexp: "^export OS_IDENTITY_API_VERSION"
@@ -19,15 +19,15 @@
       when: ipa_available|success
 
     - name: change auth url
-      replace: dest=~/overcloudrc_v3 regexp="/v2.0" replace="/v3"
+      replace: dest=~/{{ stack_name }}rc_v3 regexp="/v2.0" replace="/v3"
       when: ipa_available|success
 
-    - name: create hailstorm domain overcloudrc
-      copy: src=~/overcloudrc_v3 dest=~/overcloudrc_v3_{{ osp_domain_name }} force=no remote_src=true mode=755
+    - name: create hailstorm domain {{ stack_name }}rc
+      copy: src=~/{{ stack_name }}rc_v3 dest=~/{{ stack_name }}rc_v3_{{ osp_domain_name }} force=no remote_src=true mode=755
       when: ipa_available|success
 
-    - name: adapt hailstorm domain overcloudrc
-      lineinfile: dest=~/overcloudrc_v3_{{ osp_domain_name }} line="{{ item.line }}" regexp="{{ item.regexp }}"
+    - name: adapt hailstorm domain {{ stack_name }}rc
+      lineinfile: dest=~/{{ stack_name }}rc_v3_{{ osp_domain_name }} line="{{ item.line }}" regexp="{{ item.regexp }}"
       with_items:
         - line: "export OS_PROJECT_DOMAIN_NAME={{ osp_domain_name }}"
           regexp: "^export OS_PROJECT_DOMAIN_NAME"
@@ -41,7 +41,7 @@
 
     - name: list openstack domains
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
         openstack domain list -f value -c Name
       register: domains
       changed_when: false
@@ -50,7 +50,7 @@
 
     - name: create osp domain
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
         openstack domain create {{ item.keys()[0] }}
       when: ipa_available|success and item.keys()[0] not in domains.stdout_lines
       with_items: "{{ osp_keystone_domains }}"
@@ -74,27 +74,27 @@
 - block:
     - name: find existing services
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
         openstack service list --column Name -f value
       register: existing_services
       changed_when: false
 
     - name: create keystone v3 service
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
         openstack service create --name keystonev3 --description "Keystone Identity Service v3" identityv3
       when: '"keystonev3" not in existing_services.stdout_lines'
 
     - name: get existing keystone v3 endpoints
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
         openstack endpoint list --service keystonev3 --column Interface -f value
       changed_when: false
       register: keystonev3_endpoints
 
     - name: create keystone v3 endpoints
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
         openstack endpoint list --service keystone --interface {{ item }} --column URL -f value |
         sed s/v2.0/v3/g |
         xargs openstack endpoint create --region regionOne keystonev3 {{ item }}
@@ -106,13 +106,13 @@
 
     - name: grant admin domain user to default domain
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
          openstack role add --domain default --user $(openstack user list --domain {{ item.keys()[0] }}|grep " admin "|awk '{print $2}') admin
       with_items: "{{ osp_keystone_domains }}"
 
     - name: grant admin domain user to hailstorm domain
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
          openstack role add --domain {{ item[0].keys()[0] }} --user $(openstack user list --domain {{ item[0].keys()[0] }}|grep " {{ item[1] }} "|awk '{print $2}') admin
       with_nested:
         - "{{ osp_keystone_domains }}"

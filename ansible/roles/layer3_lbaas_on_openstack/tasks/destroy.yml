@@ -1,6 +1,6 @@
 - block:
   - name: List load balancers
-    shell:  . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-show "{{ inventory_hostname_short }}" -f json
+    shell:  . ~/{{ stack_name }}rc_v3 && neutron lbaas-loadbalancer-show "{{ inventory_hostname_short }}" -f json
     run_once: true
     register: list_lb
     failed_when: False
@@ -8,33 +8,33 @@
   - block:
 
     - name: Obtain the floating IP for the load balancer
-      shell: . ~/overcloudrc_v3 && openstack floating ip list -f json  --fixed-ip-address {{ (list_lb.stdout|from_json).vip_address }}
+      shell: . ~/{{ stack_name }}rc_v3 && openstack floating ip list -f json  --fixed-ip-address {{ (list_lb.stdout|from_json).vip_address }}
       register: temp_floating_ip
 
     - name:  Delete the floating IP for the load balancer
-      shell:  . ~/overcloudrc_v3 &&  openstack floating ip delete {{ (temp_floating_ip.stdout | from_json | first)["Floating IP Address"] }}
+      shell:  . ~/{{ stack_name }}rc_v3 &&  openstack floating ip delete {{ (temp_floating_ip.stdout | from_json | first)["Floating IP Address"] }}
       register: create_fip
       run_once: True
       when: temp_floating_ip.stdout != '[]'
 
     - name: Delete the pool for the load balancer HTTP
-      shell: . ~/overcloudrc_v3 &&  neutron lbaas-pool-delete {{ inventory_hostname_short }}-http-pool
+      shell: . ~/{{ stack_name }}rc_v3 &&  neutron lbaas-pool-delete {{ inventory_hostname_short }}-http-pool
       run_once: True
 
     - name: Delete the pool for the load balancer HTTPS
-      shell: . ~/overcloudrc_v3 &&  neutron lbaas-pool-delete {{ inventory_hostname_short }}-https-pool
+      shell: . ~/{{ stack_name }}rc_v3 &&  neutron lbaas-pool-delete {{ inventory_hostname_short }}-https-pool
       run_once: True
 
     - name: Delete the listener for the load balancer HTTP
-      shell: . ~/overcloudrc_v3 && neutron lbaas-listener-delete {{ inventory_hostname_short }}-http-listener
+      shell: . ~/{{ stack_name }}rc_v3 && neutron lbaas-listener-delete {{ inventory_hostname_short }}-http-listener
       run_once: True
 
     - name: Delete the listener for the load balancer HTTPS
-      shell: . ~/overcloudrc_v3 && neutron lbaas-listener-delete {{ inventory_hostname_short }}-https-listener
+      shell: . ~/{{ stack_name }}rc_v3 && neutron lbaas-listener-delete {{ inventory_hostname_short }}-https-listener
       run_once: True
 
     - name: Delete the load balancer
-      shell: . ~/overcloudrc_v3 && neutron lbaas-loadbalancer-delete {{ inventory_hostname_short }}
+      shell: . ~/{{ stack_name }}rc_v3 && neutron lbaas-loadbalancer-delete {{ inventory_hostname_short }}
       run_once: True
 
     when: list_lb.rc == 0

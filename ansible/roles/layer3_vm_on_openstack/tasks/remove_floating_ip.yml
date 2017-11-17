@@ -1,7 +1,7 @@
 - block:
     - name: read instance data
       shell: >
-        . ~/overcloudrc_v3_hailstorm &&
+        . ~/{{ stack_name }}rc_v3_hailstorm &&
         OS_TENANT_NAME={{ osp_tenant }}
         OS_PROJECT_NAME={{ osp_tenant }}
         OS_PASSWORD={{ root_password }}
@@ -21,7 +21,7 @@
 
     - name: remove floating IP from server
       shell: >
-        . ~/overcloudrc_v3_hailstorm &&
+        . ~/{{ stack_name }}rc_v3_hailstorm &&
         OS_TENANT_NAME={{ osp_tenant }}
         OS_PROJECT_NAME={{ osp_tenant }}
         OS_PASSWORD={{ root_password }}
@@ -30,7 +30,7 @@
 
     - name: remove floating IP
       shell: >
-        . ~/overcloudrc_v3_hailstorm &&
+        . ~/{{ stack_name }}rc_v3_hailstorm &&
         OS_TENANT_NAME={{ osp_tenant }}
         OS_PROJECT_NAME={{ osp_tenant }}
         OS_PASSWORD={{ root_password }}

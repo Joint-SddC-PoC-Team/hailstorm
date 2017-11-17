@@ -1,6 +1,6 @@
 - name: check if instance already exists
   shell: >
-    . ~/overcloudrc_v3_hailstorm &&
+    . ~/{{ stack_name }}rc_v3_hailstorm &&
     OS_TENANT_NAME={{ osp_tenant }}
     OS_PROJECT_NAME={{ osp_tenant }}
     OS_PASSWORD={{ root_password }}

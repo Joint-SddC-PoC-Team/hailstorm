@@ -52,7 +52,7 @@
 
 # - name: add security group to server (stopgap measure to address HSRACKDEV-517)
 #   shell: >
-#     . ~/overcloudrc_v3 &&
+#     . ~/{{ stack_name }}rc_v3 &&
 #     export OS_TENANT_NAME={{ osp_tenant }} &&
 #     export OS_PROJECT_NAME={{ osp_tenant }} &&
 #     export OS_PROJECT_DOMAIN_NAME={{ osp_domain_name }} &&

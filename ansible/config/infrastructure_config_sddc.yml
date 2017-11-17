@@ -19,7 +19,7 @@ infrastructure_address_ntp_server: "{% if infrastructure_server_with_ntp_role ==
 infrastructure_address_default_dns: "{{ infrastructure_network_services.default_gw_host_prefix | ipaddr('address') }}"
 infrastructure_address_nfs_server: "{{ infrastructure_network_storage.default_gw_host_prefix | ipaddr('address') }}"
 
-hailstorm_dns_domain: "{% if infrastructure_network_master is defined %}hailstorm4.coe.muc.redhat.com{% else %}{{ node_hailstorm_dns_domain }}{% endif %}"
+hailstorm_dns_domain: "{{ node_hailstorm_dns_domain }}"
 disable_registration_against_satellite: "{% if infrastructure_network_master is defined %}False{% else %}{{ node_disable_registration_against_satellite }}{% endif %}"
 satellite_version:    "{% if infrastructure_network_master is defined %}6.2{% else %}{{ node_satellite_version }}{% endif %}"
 stage:                "{% if infrastructure_network_master is defined %}DEV{% else %}{{ node_stage }}{% endif %}"

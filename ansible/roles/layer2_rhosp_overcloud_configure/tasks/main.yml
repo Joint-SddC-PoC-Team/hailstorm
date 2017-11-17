@@ -7,7 +7,7 @@
 
     - set_fact:
         os_auth_hailstorm:
-          auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
+          auth_url: "https://{{ hostvars[openstack_vip].inventory_hostname_short }}.{{ hailstorm_dns_domain }}:13000/v3/"
 #          project_name: demo-infra
 #          tenant_name: admin
           domain_name: hailstorm
@@ -17,7 +17,7 @@
           password: "{{ root_password }}"
     - set_fact:
         os_auth_hailstorm_{{ item.name|replace("-","_") }}:
-          auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
+          auth_url: "https://{{ hostvars[openstack_vip].inventory_hostname_short }}.{{ hailstorm_dns_domain }}:13000/v3/"
           project_name: "{{ item.name }}"
           tenant_name: "{{ item.name }}"
           domain_name: hailstorm

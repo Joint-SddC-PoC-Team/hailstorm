@@ -4,7 +4,7 @@
 - block:
     - name: get image list (default project)
       shell: >
-        . ~/overcloudrc_v3 &&
+        . ~/{{ stack_name }}rc_v3 &&
         openstack image list -f json
       register: images
       changed_when: false
