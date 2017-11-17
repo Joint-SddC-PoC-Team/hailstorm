@@ -11,7 +11,7 @@
   ignore_errors: True # Maybe the node was not correctly registered, so better ignore errors and continue
 
 - name: delete overcloud heat stack
-  shell: . ~/stackrc && heat stack-list | grep overcloud && heat stack-delete overcloud -y || true
+  shell: . ~/stackrc && heat stack-list | grep overcloud && heat stack-delete {{ stack_name }} -y || true
   ignore_errors: true
   become: yes
   become_user: "{{ rhosp_stack_user }}"
