@@ -18,15 +18,18 @@
 
     - name: Phase I) initial build - base variables and hosts
       shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" build.yml -t always
+      tags: ['nuage-phase-1']
 
     - name: add hosts to hosts_sddc
       shell: cd nuage-metro && cat hosts >> hosts_sddc
 
     - name: Phase II) sw unpack - phase I was needed for that
       shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" nuage_unzip.yml
+      tags: ['nuage-phase-2']
 
     - name: Phase III) build configs - configs for all products are created here
       shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" build.yml
+      tags: ['nuage-phase-3']
 
     - debug:
         msg: "Hint: To follow the creation of the Nuage appliances, login to the install-host as root and run tail -f /home/nuage/nuage-metro/ansible.log."
@@ -34,13 +37,15 @@
 
     - name: Phase IV) install
       shell: source ansible-2.2.1.0/bin/activate && cd nuage-metro && ansible-playbook -vv -i hosts_sddc -e "build_vars_file=ha_build_vars.yml" install_vcs.yml
+      tags: ['nuage-phase-4']
 
     - name: Phase V) configure VSRs
       shell: "sshpass -p {{ nuage.vsr_pw }} ssh -o StrictHostKeyChecking=no {{ nuage.vsr_user }}@{{ hostvars[item].vm_nics[0].ip }} < ~/vsr/{{ item }}_w{% if infrastructure_network_guests.physical_underlay == false %}o{% endif %}_physical_underlay.cfg > ~/vsr/{{ item }}_w{% if infrastructure_network_guests.physical_underlay == false %}o{% endif %}_physical_underlay.cfg.log"
       with_items:
         - r1
         - r2
-    
+      tags: ['nuage-phase-5']
+
     - name: Phase VI) configure VSCs
       shell: "sshpass -p {{ nuage.vsc_pw }} ssh -o StrictHostKeyChecking=no {{ nuage.vsc_user }}@{{ hostvars[item].vm_nics[0].ip }} < ~/vsc/config.txt > ~/vsc/config.txt.log"
       with_items:
@@ -48,6 +53,7 @@
         - c2
         - c3
         - c4
+      tags: ['nuage-phase-6']
 
     - name: Phase VII) configure VSDs
       shell: sshpass -p {{ nuage.vsd_pw }} ssh -o StrictHostKeyChecking=no "{{ nuage.vsd_user}}@{{ hostvars[item].vm_nics[0].ip }}" "echo '{{ nuage.haproxy_route }}' > /etc/sysconfig/network-scripts/route-eth0;ifup eth0"
@@ -55,6 +61,7 @@
         - vsd1
         - vsd2
         - vsd3
+      tags: ['nuage-phase-7']
   when: has_nuconfiguration.stat.exists == False
   become: yes
   become_user: "{{ nuage.user }}"
