@@ -5,6 +5,18 @@ OCP 3.5/6.
 All code for integration of Nuage is enabled via the environment variable
 "enable_nuage".
 
+Structure
+=========
+
+The installation is done in 3 steps:
+- install Nuage appliances
+- patch Director and Overcloud image
+- install Overcoud with Nuage
+
+The first step is forwarded to the Nuage-Metro installer who will do the
+job. Note that this installer is not idempotent. All other parts are
+normal Hailstorm Ansible plays.
+
 
 Deploy
 =========
@@ -21,9 +33,22 @@ ansible-playbook -i hosts_sddc -e @config/infrastructure_config_sddc.yml -e @con
 b) Install the nuage appliances (VSD, VSC, VSR)
 ansible-playbook -vv -i hosts_sddc -e @config/infrastructure_config_sddc.yml -e @config/hailstorm_config.yml -e @config/storm6.coe.muc.redhat.com.yml create-02-nuage.yml
 
-c) Install OpenStack Director and Overcloud with already deplyed Nuage
+NOTE: The installation frequently fails due to ghost-reasons. If that
+happens and due to the non-idempotency of the Nuage playbooks, you have
+to tear the Nuage part completely down as stated in "Tear down" below in
+parts b, c and d. Then repeat the install step here to re-deploy.
+
+c) Install OpenStack Director and Overcloud with already deployed Nuage
 appliances
 ansible-playbook -vv -i hosts_sddc -e @config/infrastructure_config_sddc.yml -e @config/hailstorm_config.yml -e @config/storm6.coe.muc.redhat.com.yml -e "enable_nuage=nuage" create-03-osp.yml --skip-tags overcloud2,ipa-service
+
+
+Passwords
+=========
+
+Paswords can be found at the end of config/hailstorm_config.yml. They
+should not be changed as they are not forwarded to the Nuage installer,
+but only used during installation.
 
 
 Manual steps
