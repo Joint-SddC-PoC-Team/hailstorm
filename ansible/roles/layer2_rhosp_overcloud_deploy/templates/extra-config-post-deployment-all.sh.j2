@@ -3,9 +3,9 @@ set -x
 
 function heat_control {
   # see https://access.redhat.com/solutions/2868471 and https://bugzilla.redhat.com/show_bug.cgi?id=1395139
-  sudo crudini --set /etc/heat/heat.conf DEFAULT heat_metadata_server_url {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://openstack.{{ hailstorm_dns_domain }}:{% if current_lifecycle_env.osp_use_tls %}13005{% else %}8000{% endif %}
-  sudo crudini --set /etc/heat/heat.conf DEFAULT heat_waitcondition_server_url {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://openstack.{{ hailstorm_dns_domain }}:{% if current_lifecycle_env.osp_use_tls %}13005{% else %}8000{% endif %}/v1/waitcondition
-  #sudo crudini --set /etc/heat/heat.conf DEFAULT heat_watch_server_url {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://openstack.{{ hailstorm_dns_domain }}:{% if current_lifecycle_env.osp_use_tls %}13005{% else %}8000{% endif %}
+  sudo crudini --set /etc/heat/heat.conf DEFAULT heat_metadata_server_url {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://{{ hostvars[openstack_vip].hostname }}:{% if current_lifecycle_env.osp_use_tls %}13005{% else %}8000{% endif %}
+  sudo crudini --set /etc/heat/heat.conf DEFAULT heat_waitcondition_server_url {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://{{ hostvars[openstack_vip].hostname }}:{% if current_lifecycle_env.osp_use_tls %}13005{% else %}8000{% endif %}/v1/waitcondition
+  #sudo crudini --set /etc/heat/heat.conf DEFAULT heat_watch_server_url {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://{{ hostvars[openstack_vip].hostname }}:{% if current_lifecycle_env.osp_use_tls %}13005{% else %}8000{% endif %}
 
   # ensure that signaling is also NOT usign 127.0.0.1 - see https://bugs.launchpad.net/openstack-ansible/+bug/1459414
   sudo crudini --set /etc/heat/heat.conf clients_heat endpoint_type publicURL
@@ -40,7 +40,7 @@ function nova_control {
 
 function nova_compute {
   # modify VNC proxy config on compute nodes
-  sudo crudini --set /etc/nova/nova.conf vnc novncproxy_base_url {% if current_lifecycle_env.osp_use_tls %}https://openstack.{{ hailstorm_dns_domain }}:13080/vnc_auto.html{% else %}http://openstack.{{ hailstorm_dns_domain }}:6080/vnc_auto.html{% endif %}
+  sudo crudini --set /etc/nova/nova.conf vnc novncproxy_base_url {% if current_lifecycle_env.osp_use_tls %}https://{{ hostvars[openstack_vip].hostname }}:13080/vnc_auto.html{% else %}http://{{ hostvars[openstack_vip].hostname }}:6080/vnc_auto.html{% endif %}
   sudo crudini --del /etc/nova/nova.conf DEFAULT novncproxy_base_url
 
 {% if current_lifecycle_env.osp_storage_backend == "ceph_ownvms" %}

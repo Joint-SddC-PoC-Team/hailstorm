@@ -64,6 +64,8 @@
       mode: prepare
       controller: "{{ groups['overcloud2-controller-group'] }}"
       compute: "{{ groups['overcloud2-compute-group'] }}"
+      openstack_vip: "openstack2"
+      stack_name: "overcloud2"
 
 - hosts: overcloud-director-group
   remote_user: root
@@ -89,6 +91,8 @@
       mode: create
       controller: "{{ groups['overcloud-controller-group'] }}"
       compute: "{{ groups['overcloud-compute-group'] }}"
+      openstack_vip: "openstack"
+      stack_name: "overcloud"
 
 - hosts: overcloud-controller-group
   remote_user: root

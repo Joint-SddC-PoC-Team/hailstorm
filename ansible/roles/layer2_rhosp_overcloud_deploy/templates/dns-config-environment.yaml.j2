@@ -1,7 +1,7 @@
 parameter_defaults:
-  CloudName: {{ hostvars['openstack'].hostname }}
+  CloudName: {{ hostvars[openstack_vip].hostname }}
 
-  #if this parameter is set, the rollout will fail in ControllerLoadBalancerDeployment_Step1
+  #needs configuration in the undercloud, see
   #https://access.redhat.com/solutions/2089051
   CloudDomain: {{ hailstorm_dns_domain }}
 

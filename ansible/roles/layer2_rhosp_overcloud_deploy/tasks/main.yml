@@ -12,9 +12,6 @@
       tags: ['prep-director']
     - include: register_overcloud_nodes.yml
       tags: ['register']
-  when: mode=="create" or mode=="prepare"
-
-- block:
     - include: create_overcloud.yml
       tags: ['overcloud-deploy']
       vars:
@@ -47,7 +44,8 @@
           - logging-environment.yaml
           - "{% if enable_nuage is defined %}neutron-nuage-config.yaml{% endif %}"
           - "{% if enable_nuage is defined %}nova-nuage-config.yaml{% endif %}"
-  when: mode=="create"
+  when: mode=="create" or mode=="prepare"
+
 
 - block:
     - include: destroy_overcloud.yml

@@ -1,5 +1,5 @@
 - name: check deployed stack
-  shell: . ~/stackrc && heat stack-list | grep overcloud
+  shell: . ~/stackrc && heat stack-list | grep {{ stack_name }}
   failed_when: false
   changed_when: false
   register: stack
@@ -57,6 +57,7 @@
         . ~/stackrc ; rm ~/deploy_overcloud.log ;
         {{ lookup('template','deploy-overcloud.j2') }} 2>&1 >> ~/deploy_overcloud.log
       tags: ['deploy']
+      when: mode=="create"
     #   async: 7200
     #   poll: 0
     #   register: deploy_overcloud

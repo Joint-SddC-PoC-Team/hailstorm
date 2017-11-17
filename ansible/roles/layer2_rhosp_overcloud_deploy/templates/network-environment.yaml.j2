@@ -7,7 +7,7 @@ resource_registry:
   OS::TripleO::Controller::Net::SoftwareConfig: ./nic-configs/controller.yaml
 
 parameter_defaults:
-  PublicVirtualFixedIPs: [{'ip_address':'{{ hostvars['openstack'].vm_nics[0].ip }}'}]
+  PublicVirtualFixedIPs: [{'ip_address':'{{ hostvars[openstack_vip].vm_nics[0].ip }}'}]
 
   # Internal API used for private OpenStack Traffic
   InternalApiNetCidr: {{ infrastructure_network_internal_api.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_internal_api.default_gw_host_prefix | ipaddr('prefix') }}

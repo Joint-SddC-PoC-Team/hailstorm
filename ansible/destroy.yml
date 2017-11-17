@@ -373,6 +373,7 @@
       tags: [ 'layer2', 'rhosp', 'overcloud' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
+      stack_name: overcloud
     - role: layer2_rhosp_director
       tags: [ 'layer2', 'rhosp', 'undercloud' ]
       mode: destroy
@@ -392,6 +393,7 @@
       tags: [ 'layer2', 'rhosp', 'overcloud2' ]
       mode: destroy
       when: vm_exists is defined and vm_exists == true
+      stack_name: overcloud2
     - role: layer2_rhosp_director
       tags: [ 'layer2', 'rhosp', 'undercloud2' ]
       mode: destroy
