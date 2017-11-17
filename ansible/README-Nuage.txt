@@ -30,7 +30,10 @@ To deploy the parts of Nuage e.g. on storm6 in single steps use somethijng like 
 a) Create required dnatting if you are using a virtual environment
 ansible-playbook -i hosts_sddc -e @config/infrastructure_config_sddc.yml -e @config/hailstorm_config.yml -e @config/storm6.coe.muc.redhat.com.yml create-01-base.yml --tags dnat --skip-tags satellite,tower
 
-b) Install the nuage appliances (VSD, VSC, VSR)
+b) Create required route on the infrastructure/haproxy node
+ansible-playbook -i hosts_sddc -e @config/infrastructure_config_sddc.yml -e @config/hailstorm_config.yml -e @config/storm6.coe.muc.redhat.com.yml create-02-additional.yml --tags nuage -e "enable_nuage=nuage"
+
+c) Install the nuage appliances (VSD, VSC, VSR)
 ansible-playbook -vv -i hosts_sddc -e @config/infrastructure_config_sddc.yml -e @config/hailstorm_config.yml -e @config/storm6.coe.muc.redhat.com.yml create-02-nuage.yml
 
 NOTE: The installation frequently fails due to ghost-reasons. If that
@@ -38,7 +41,7 @@ happens and due to the non-idempotency of the Nuage playbooks, you have
 to tear the Nuage part completely down as stated in "Tear down" below in
 parts b, c and d. Then repeat the install step here to re-deploy.
 
-c) Install OpenStack Director and Overcloud with already deployed Nuage
+d) Install OpenStack Director and Overcloud with already deployed Nuage
 appliances
 ansible-playbook -vv -i hosts_sddc -e @config/infrastructure_config_sddc.yml -e @config/hailstorm_config.yml -e @config/storm6.coe.muc.redhat.com.yml -e "enable_nuage=nuage" create-03-osp.yml --skip-tags overcloud2,ipa-service
 
@@ -83,7 +86,7 @@ c) In case of remaining VMs, remove them on e.g. storm6
 for o in vsd c elastic r; do for m in destroy undefine; do for n in 1 2 3 4; do virsh $m $o$n.hailstorm6.coe.muc.redhat.com; done; done; done
 
 d) In case of remaining xmpp DNS entries, remove them e.g. on storm6
-ssh ipa.hailstorm6.coe.muc.redhat.com <<EOF	
+ssh ipa.hailstorm6.coe.muc.redhat.com <<EOF
 echo redhat01 | kinit admin && ipa dnsrecord-del hailstorm6.coe.muc.redhat.com xmpp --a-rec=10.116.127.156
 echo redhat01 | kinit admin && ipa dnsrecord-del hailstorm6.coe.muc.redhat.com xmpp --a-rec=10.116.127.157
 echo redhat01 | kinit admin && ipa dnsrecord-del hailstorm6.coe.muc.redhat.com xmpp --a-rec=10.116.127.158
