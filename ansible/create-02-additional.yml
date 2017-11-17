@@ -94,10 +94,5 @@
     - role: layerX_proxy_client
       tags: [ 'layer2', 'efk', 'proxy-client' ]
       mode: create
-      ssl_certs: "{{ http_proxy.certificates }}"
-      proxy_host: "{{ http_proxy.proxyname }}"
-      proxy_username: "{{ http_proxy.username }}"
-      proxy_password: "{{ http_proxy.password }}"
-      proxy_port: "{{ http_proxy.port }}"
     - { role: layer2_efk_centos_opstools, tags: [ 'layer2', 'efk', 'efk-install'], mode: create, when: "current_lifecycle_env.openstack_version >= 10" }
     - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }

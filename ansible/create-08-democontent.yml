@@ -23,11 +23,7 @@
     # - role: layerX_proxy_client
     #   tags: [ 'layer2', 'lookbusy', 'lookbusy-osp', 'proxy-client' ]
     #   mode: create
-    #   ssl_certs: ["alienca.cert.pem","rootca.cert.pem"]
-    #   proxy_host: "{{ (hostvars['proxy'].vm_nics|selectattr('netname','match',infrastructure_network_admin.netname)|first).ip }}"
-    #   proxy_username: "infrastructure"
-    #   proxy_password: "{{ (proxy_users | selectattr('name','match', 'infrastructure') | first).password }}"
-    #   proxy_port: 3128
+
 
 - hosts: rhosp-director-group
   remote_user: root

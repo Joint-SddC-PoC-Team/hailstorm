@@ -141,13 +141,7 @@
     - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'install-host', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
     - { role: layer2_rhel, tags: [ 'layer2', 'install-host', 'rhel' ], mode: create }
     - { role: layerX_ipa_client, tags: [ 'layer2', 'install-host',  'ipa-client' ], mode: create }
-    # - { role: layerX_distribute_proxycert, tags: [ 'layer2', 'install-host', 'proxy-cert' ], mode: create }
     - role: layerX_proxy_client
       tags: [ 'layer2', 'install-host', 'proxy-client' ]
       mode: create
-      ssl_certs: "{{ http_proxy.certificates }}"
-      proxy_host: "{{ http_proxy.proxyname }}"
-      proxy_username: "{{ http_proxy.username }}"
-      proxy_password: "{{ http_proxy.password }}"
-      proxy_port: "{{ http_proxy.port }}"
     - { role: layer2_installhost, tags: [ 'layer2', 'install-host' ], mode: create }

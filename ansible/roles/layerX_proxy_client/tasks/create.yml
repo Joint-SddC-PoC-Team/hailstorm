@@ -1,11 +1,12 @@
 - name: Copy CA certificate (alienca is proxy CA)
   copy:
     dest: /etc/pki/ca-trust/source/anchors/proxy.pem
-    content: "{% for ssl_cert in ssl_certs %}{{ lookup('file','binary/' + ssl_cert) }}\n{% endfor %}"
+    content: "{% for ssl_cert in http_proxy.certificates %}{{ lookup('file','binary/' + ssl_cert) }}\n{% endfor %}"
     owner: root
     group: root
     mode: 0640
   register: copy_ca
+  when: http_proxy is defined and http_proxy.certificates is defined
 
 - name: Update ca trust certificates
   command: update-ca-trust
@@ -18,8 +19,9 @@
     owner: root
     group: root
     content: |
-       export http_proxy=https://{{ proxy_username }}:{{ proxy_password }}@{{ proxy_host }}:{{ proxy_port }}/
+       export http_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.proxy_port|default(false,true) %}:{{ http_proxy.proxy_port }}{% endif %}/
        export https_proxy=$http_proxy
        export ftp_proxy=$http_proxy
        export rsync_proxy=$http_proxy
        export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com,.{{ hailstorm_dns_domain }}"
+  when: http_proxy is defined and http_proxy.proxyname|default(false,true)
