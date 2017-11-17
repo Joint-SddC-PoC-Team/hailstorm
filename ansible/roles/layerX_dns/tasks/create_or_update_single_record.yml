@@ -1,21 +1,21 @@
 ### IPA
 - block:
     - name: check existing record for {{ item }}
-      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin 2>/dev/null 1>/dev/null && ipa dnsrecord-show {{ hailstorm_dns_domain }} {{ item }}  | awk '/A record:/{print $3}'
+      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin 2>/dev/null 1>/dev/null && ipa dnsrecord-show {{ hailstorm_dns_domain }} {{ item }}  | awk 'match($0,/A record:\s*/) {print substr($0, RSTART+RLENGTH)}'
       register: iparecord
       failed_when: iparecord.rc != 0 and 'DNS resource record not found' not in iparecord.stderr
       changed_when: false
 
-    # TODO - IPA can return multiple IPs in the output, how to deal?
-    - name: remove previous record for {{ item }}
-      shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-del {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ iparecord.stdout }}
-      when: item != 'ipa' and iparecord.rc == 0 and iparecord.stdout != ip and iparecord.stdout != ''
+    # # TODO - IPA can return multiple IPs in the output, how to deal?
+    # - name: remove previous record for {{ item }}
+    #   shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-del {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ iparecord.stdout }}
+    #   when: item != 'ipa' and iparecord.rc == 0 and iparecord.stdout != '' and ip not in iparecord.stdout
 
     - name: create new record for {{ item }}
       shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-add {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ ip }}
       register: iparecord2
       failed_when: iparecord2.rc != 0 and 'no modifications to be performed' not in iparecord2.stderr
-      when: iparecord.rc != 0 or iparecord.stdout != ip
+      when: iparecord.rc != 0 or ip not in iparecord.stdout
   delegate_to: ipa
 
 - set_fact:
@@ -47,10 +47,12 @@
 - set_fact:
     ansible_winrm_server_cert_validation: ignore
 - name: test if AD is available for remote management
-  shell: curl -k https://{{ hostvars[groups['primary-ad-group'][0]].ansible_host }}:5986
+  shell: curl -k --connect-timeout 1 https://{{ hostvars[groups['primary-ad-group'][0]].ansible_host }}:5986
   register: ad_available
   changed_when: false
-  delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+  #delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
+  # need to delegate to localhost since winrm cannot use jump host
+  delegate_to: localhost
   failed_when: false
 
 - block:
@@ -67,19 +69,21 @@
       when: temp_existing_a_record.rc != 0
 
     - set_fact:
-        existing_a_record: "{{ temp_existing_a_record.stdout|trim() }}"
+        existing_a_record: "{{ temp_existing_a_record.stdout_lines|map('trim')|list }}"
       when: temp_existing_a_record.rc == 0
+
+    - debug: var=existing_a_record
 
     # - debug: var=item
     # - debug: var=existing_a_record
 
-    - name: remove existing A record
-      win_shell: Remove-DnsServerResourceRecord -ZoneName {{ hailstorm_dns_domain }} -Name {{ item }} -RRType A -Force
-      when: existing_a_record != 'NXDOMAIN' and existing_a_record != temp_external_ip|default(ip)
+    # - name: remove existing A record
+    #   win_shell: Remove-DnsServerResourceRecord -ZoneName {{ hailstorm_dns_domain }} -Name {{ item }} -RRType A -Force
+    #   when: existing_a_record != 'NXDOMAIN' and existing_a_record != temp_external_ip|default(ip)
 
     - name: create A record in AD DNS
       win_shell: Add-DNSServerResourceRecordA -ZoneName {{ hailstorm_dns_domain }} -Name {{ item }} -IPv4Address {{ temp_external_ip|default(ip) }}
-      when: existing_a_record == 'NXDOMAIN' or existing_a_record != temp_external_ip|default(ip)
+      when: existing_a_record == 'NXDOMAIN' or temp_external_ip|default(ip) not in existing_a_record
 
 
     - set_fact:
