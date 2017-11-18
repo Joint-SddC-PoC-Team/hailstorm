@@ -3,7 +3,7 @@ vcpu: 48
 disk:
   size: 278
 
-osd_disks_config: "{% if current_lifecycle_env.osp_in_baremetal %}osd_disks_config_baremetal{%else %}osd_disks_config_virtual{% endif %}"
+osd_disks_config: "{% if current_lifecycle_env.osp_in_baremetal %}{{ osd_disks_config_baremetal }}{%else %}{{ osd_disks_config_virtual }}{% endif %}"
 
 osd_disks_config_virtual:
    - {"device": "/dev/vdb" }
