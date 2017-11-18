@@ -25,8 +25,9 @@ lifecycle_environments:
     openstack_version: 11
     # controlled node placement fails on the second scale up since an unmapped hostname (overcloud-compute-3) is assigned
     #Controlled Node Placement with OSP10 or later
-    osp_controlled_node_placement: true
-    osp_in_baremetal: true
+    osp_controlled_node_placement: false
+    osp_glance_use_swift: true
+    osp_in_baremetal: false
     #TLS with OSP10 or later
     osp_use_tls: true
     #CEPH with OSP10 or later

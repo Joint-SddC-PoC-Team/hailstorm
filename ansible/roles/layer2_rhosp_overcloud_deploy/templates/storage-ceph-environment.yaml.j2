@@ -16,7 +16,6 @@ parameter_defaults:
   NovaEnableRbdBackend: true
   CinderEnableRbdBackend: true
   CinderBackupBackend: ceph
-  GlanceBackend: rbd
   GnocchiBackend: rbd
   # If the Ceph pools which host VMs, Volumes and Images do not match these
   # names OR the client keyring to use is not named 'openstack',  edit the
@@ -26,6 +25,8 @@ parameter_defaults:
   GlanceRbdPoolName: images
   GnocchiRbdPoolName: metrics
   CephClientUserName: openstack
+  GlanceBackend: {% if current_lifecycle_env.osp_glance_use_swift|default(false,true) %}swift{% else %}rbd{% endif %}
+
 
   # finally we disable the Cinder LVM backend
   CinderEnableIscsiBackend: false

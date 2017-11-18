@@ -12,8 +12,9 @@ parameter_defaults:
   NovaEnableRbdBackend: true
   CinderEnableRbdBackend: true
   CinderBackupBackend: ceph
-  GlanceBackend: rbd
   GnocchiBackend: rbd
+  GlanceBackend: {% if current_lifecycle_env.osp_glance_use_swift|default(false,true) %}swift{% else %}rbd{% endif %}
+
 
   # finally we disable the Cinder LVM (via iSCSI) and NFS backends
   CinderEnableIscsiBackend: false
