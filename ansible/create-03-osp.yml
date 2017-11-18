@@ -9,8 +9,8 @@
     - role: layer1_rhosp
       tags: [ 'rhosp', layer1 ]
       mode: create
-    - role: layer1_ceph_inventory
-      tags: [ 'layer2', 'ceph', 'overcloud', 'overcloud-ceph' ]
+    # - role: layer1_ceph_inventory
+    #   tags: [ 'layer2', 'ceph', 'overcloud', 'overcloud-ceph' ]
 
 - hosts: rhosp-all-group
   remote_user: root

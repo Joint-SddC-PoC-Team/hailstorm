@@ -8,6 +8,11 @@ resource_registry:
 
 parameter_defaults:
   PublicVirtualFixedIPs: [{'ip_address':'{{ hostvars[openstack_vip].vm_nics[0].ip }}'}]
+  ControlFixedIPs: [{'ip_address':'{{ infrastructure_network_provisioning.default_gw_host_prefix | regex_replace('(.*\.).*','\\1') }}{{ hostvars[openstack_vip].ansible_host|regex_replace('\d+\.\d+\.\d+\.(.*)','\\1') }}'}]
+  InternalApiVirtualFixedIPs: [{'ip_address':'{{ infrastructure_network_internal_api.default_gw_host_prefix | regex_replace('(.*\.).*','\\1') }}{{ hostvars[openstack_vip].ansible_host|regex_replace('\d+\.\d+\.\d+\.(.*)','\\1') }}'}]
+  StorageVirtualFixedIPs: [{'ip_address':'{{ infrastructure_network_storage.default_gw_host_prefix | regex_replace('(.*\.).*','\\1') }}{{ hostvars[openstack_vip].ansible_host|regex_replace('\d+\.\d+\.\d+\.(.*)','\\1') }}'}]
+  StorageMgmtVirtualFixedIPs: [{'ip_address':'{{ infrastructure_network_storage_mgmt.default_gw_host_prefix | regex_replace('(.*\.).*','\\1') }}{{ hostvars[openstack_vip].ansible_host|regex_replace('\d+\.\d+\.\d+\.(.*)','\\1') }}'}]
+  RedisVirtualFixedIPs: [{'ip_address':'{{ infrastructure_network_internal_api.default_gw_host_prefix | regex_replace('(.*\.).*','\\1') }}{{ hostvars[openstack_vip].ansible_host|regex_replace('\d+\.\d+\.\d+\.(.*)','\\1')|int + 1 }}'}]
 
   # Internal API used for private OpenStack Traffic
   InternalApiNetCidr: {{ infrastructure_network_internal_api.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_internal_api.default_gw_host_prefix | ipaddr('prefix') }}

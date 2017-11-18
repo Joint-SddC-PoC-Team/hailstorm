@@ -402,15 +402,26 @@
       mode: destroy
       when: vm_exists is defined and vm_exists == true
 
-- hosts: rhosp-all-group
+- hosts: overcloud-director-group,overcloud-compute-group,overcloud-controller-group
   gather_facts: false
   remote_user: root
   roles:
     - role: layer2_vms
-      tags: [ 'layer2','rhosp', 'vm' ]
+      tags: [ 'layer2','rhosp', 'vm','undercloud' ]
       mode: destroy
     - role: layerX_dns
-      tags: [ 'layer2', 'rhosp', 'vm','dnat' ]
+      tags: [ 'layer2', 'rhosp', 'vm','dnat', 'undercloud' ]
+      mode: destroy_services_network
+
+- hosts: overcloud2-director-group,overcloud2-compute-group,overcloud2-controller-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layer2_vms
+      tags: [ 'layer2','rhosp', 'vm','undercloud2' ]
+      mode: destroy
+    - role: layerX_dns
+      tags: [ 'layer2', 'rhosp', 'vm','dnat', 'undercloud2' ]
       mode: destroy_services_network
 
 - hosts: openstack
@@ -418,7 +429,7 @@
   remote_user: root
   roles:
     - role: layerX_dns
-      tags: [ 'layer2', 'rhosp', 'vm','dnat' ]
+      tags: [ 'layer2', 'rhosp', 'vm','dnat', 'overcloud' ]
       mode: destroy_services_network
 
 #### END OPENSTACK+CEPH

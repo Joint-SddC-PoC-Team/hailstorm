@@ -182,6 +182,7 @@ rhosp-director-group
 layer1-group
 
 # virtual IPs - these will not be instantiated through Ansible (but need them for DNS records, DNAT, etc)
+# there should be at least two IPs distance between the VIPs since two VIPs are allocated on the internal_api network
 [vips]
 openstack         ansible_host=10.116.127.173 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"
 openstack2        ansible_host=10.116.127.176 nic_attachments="[ {{ infrastructure_network_services }} ]" default_route_via="{{ infrastructure_network_services }}"

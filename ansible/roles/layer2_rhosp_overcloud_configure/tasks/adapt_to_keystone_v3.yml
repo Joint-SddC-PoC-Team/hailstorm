@@ -67,7 +67,7 @@
       ignore_errors: true
 
     - name: wait httpd to be avialable again
-      wait_for: host={{ hostvars['openstack'].vm_nics[0].ip }} port=80 delay=0 timeout=900
+      wait_for: host={{ hostvars[openstack_vip].vm_nics[0].ip }} port=80 delay=0 timeout=900
   become: yes
   become_user: "{{ rhosp_stack_user }}"
 

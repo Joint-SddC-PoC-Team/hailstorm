@@ -13,6 +13,7 @@
       "mac": [
         "{{ hostvars[node].vm_nics[0].mac }}"
       ],
+      "name": "{{ node }}",
       "cpu": " {{ hostvars[node].vcpu }}",
       "memory": "{{ hostvars[node].mem }}",
       "disk": "{{ hostvars[node].disk.size }}",
@@ -26,6 +27,7 @@
       "pm_addr": "{{ infrastructure_network_admin.default_gw_host_prefix | ipaddr('address') }}",
       "pm_password": "{{ ssh_priv_key_undercloud.replace('\n','\\n').replace('\r','') }}",
       "pm_type": "pxe_ssh",
+      "name": "{{ node }}",
       "mac": [
         "{{ hostvars[node].vm_nics[0].mac }}"
       ],
