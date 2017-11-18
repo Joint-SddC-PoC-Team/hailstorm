@@ -28,8 +28,8 @@
       template: src={{ item }}.j2 dest=~/bin/{{ item }} mode=0755
       with_items:
         - deploy-overcloud
-        - virsh-names
         - scale-down
+#        - virsh-names
 
     - name: Create templates directory
       file: path=~/templates state=directory

@@ -41,7 +41,7 @@
       "memory": "{{ hostvars[node].mem }}",
       "arch": "x86_64",
       {#"capabilities": "node:compute-{{ loop.index0 }},profile:baremetal,boot_option:local"#}
-      "capabilities": "{% if current_lifecycle_env.osp_controlled_node_placement %}node:compute-{{ loop.index0 }},profile:baremetal{% else %}profile:control{% endif %},boot_option:local"
+      "capabilities": "{% if current_lifecycle_env.osp_controlled_node_placement %}node:compute-{{ loop.index0 }},profile:baremetal{% else %}profile:compute{% endif %},boot_option:local"
     }{% if not loop.last %},{% endif %}
     {% endfor %}
   ]
