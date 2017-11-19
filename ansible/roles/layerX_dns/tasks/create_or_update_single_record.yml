@@ -85,7 +85,6 @@
       win_shell: Add-DNSServerResourceRecordA -ZoneName {{ hailstorm_dns_domain }} -Name {{ item }} -IPv4Address {{ temp_external_ip|default(ip) }}
       when: existing_a_record == 'NXDOMAIN' or temp_external_ip|default(ip) not in existing_a_record
 
-
     - set_fact:
         temp_ptr_record: "{{ temp_external_ip|default(ip)|ipaddr('revdns') }}"
         temp_reverse_zone_name: "{{ temp_external_ip|default(ip)|ipaddr('revdns')|regex_replace('\\d+\\.(.*)','\\1') }}"
@@ -110,12 +109,16 @@
       changed_when: false
       register: temp_existing_ptr_record
 
-    - debug: var=temp_existing_ptr_record.stdout|trim
+    - set_fact:
+        temp_existing_ptr_record2: "{{ temp_existing_ptr_record.stdout_lines|map('trim')|list }}"
+    # - debug: var=temp_existing_ptr_record2
+    # - debug: var=temp_ptr_record
 
     # need to cut off last character since this is a dot that is actually returned from AD
     - name: delete PTR record in AD DNS
-      win_shell: Remove-DnsServerResourceRecord -ZoneName {{ temp_reverse_zone_name }} -Name {{ temp_existing_ptr_record.stdout_lines[0] }} -RRType PTR -Force
-      when: temp_existing_ptr_record.stdout|trim != '' and hostname != (temp_existing_ptr_record.stdout|trim)[:-1]
+      win_shell: Remove-DnsServerResourceRecord -ZoneName {{ temp_reverse_zone_name }} -Name {{ temp_ptr_record }} -RRType PTR -Force
+      when: item != '' and hostname != item[:-1]
+      with_items: "{{ temp_existing_ptr_record2 }}"
 
     - name: create PTR entry
       win_shell: Add-DnsServerResourceRecordPtr -ZoneName {{ temp_reverse_zone_name }} -Name "{{ temp_ptr_record }}" -PtrDomainName "{{ hostname }}"
