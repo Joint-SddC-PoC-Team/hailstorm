@@ -429,7 +429,7 @@
   remote_user: root
   roles:
     - role: layerX_dns
-      tags: [ 'layer2', 'rhosp', 'vm','dnat', 'overcloud' ]
+      tags: [ 'layer2', 'rhosp', 'vm','dnsupdate', 'overcloud' ]
       mode: destroy_services_network
 
 #### END OPENSTACK+CEPH
