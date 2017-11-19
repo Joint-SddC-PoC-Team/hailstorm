@@ -59,7 +59,7 @@ lifecycle_environments:
     rhev_templates:
       - name: RHEL7
         image: rhel-server-7.4-x86_64-kvm.qcow2
-    cfme_rhconsulting_scripts_hash: d28acf658d14b321d5e220d99cf5a8e3fb941c26
+    cfme_rhconsulting_scripts_hash: 07b17a7ee9df791e6283fa857733252e70ab207b
     ansible_tower_url: http://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-3.0.3.tar.gz
 
   # - name: 'TEST'

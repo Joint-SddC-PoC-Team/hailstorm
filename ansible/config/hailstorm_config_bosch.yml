@@ -57,7 +57,7 @@ lifecycle_environments:
     rhev_templates:
       - name: RHEL7
         image: rhel-server-7.4-x86_64-kvm.qcow2
-    cfme_rhconsulting_scripts_hash: d28acf658d14b321d5e220d99cf5a8e3fb941c26
+    cfme_rhconsulting_scripts_hash: 07b17a7ee9df791e6283fa857733252e70ab207b
     ansible_tower_url: http://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-3.0.3.tar.gz
 
   # - name: 'TEST'
@@ -216,6 +216,9 @@ satellite_external_repos:
     product_name: CentOS-7
     repo_name: opstools
     repository_url: https://ftp.fau.de/centos/7/opstools/x86_64/
+
+  # - repository_url: https://sensu.global.ssl.fastly.net/yum/7/x86_64/
+  # - repository_url: http://cbs.centos.org/repos/opstools7-elastic-common-testing/x86_64/os/
 
 satellite_repo_name_epel: "{{ hostvars['satellite'].organization_id }}_EPEL-7_EPEL-7"
 satellite_repo_name_tdagent: "{{ hostvars['satellite'].organization_id }}_td-agent_td-agent"

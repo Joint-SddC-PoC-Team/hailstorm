@@ -353,7 +353,7 @@ ansible-jump-demo-vms  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_te
 
 # layer 3 openstack
 [lookbusy-osp-group]
-lookbusy-osp    activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
+#lookbusy-osp    activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_tenant="demo-infra" osp_flavor="m1.small" osp_image="RHEL7"
 
 [lookbusy-group:children]
 lookbusy-osp-group

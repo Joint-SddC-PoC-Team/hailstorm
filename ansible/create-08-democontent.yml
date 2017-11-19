@@ -25,11 +25,11 @@
     #   mode: create
 
 
-- hosts: rhosp-director-group
-  remote_user: root
-  gather_facts: false
-  roles:
-    - { role: layer2_rhosp_overcloud_demo_content, tags: [ 'layer2', 'rhosp', 'overcloud', 'democontent' ], mode: create }
+# - hosts: rhosp-director-group
+#   remote_user: root
+#   gather_facts: false
+#   roles:
+#     - { role: layer2_rhosp_overcloud_demo_content, tags: [ 'layer2', 'rhosp', 'overcloud', 'democontent' ], mode: create }
 
 - hosts: cloudforms-ui
   remote_user: root
