@@ -1,5 +1,6 @@
 layer1_ansible_host: storm4.coe.muc.redhat.com
-node_hailstorm_dns_domain: hailstorm4.coe.muc.redhat.com
+node_hailstorm_dns_domain: rh-sddc.test-bosch.com
+infrastructure_network_master: storm4.coe.muc.redhat.com
 
 node_disable_registration_against_satellite: false
 node_satellite_version: 6.2
@@ -61,10 +62,16 @@ layer2_ceph_cpu: 2
 
 # if a property http_proxy is defined, satellite will be configured to sync via http_proxy
 http_proxy:
+  # proxyname: 10.116.127.8
+  # port: 3128
+  # protocol: https
+  # username: infrastructure
+  # password: redhat01
+  # certificates: ['alienca.cert.pem']
   proxyname: proxy.coe.muc.redhat.com
   port: 3128
   protocol: https
-
+  
 external_network_config:
   guest_network_bridging_mac_prefix: "52:54:00:48:04:"
   guest_network_osp_floating_start: 10.32.105.160
