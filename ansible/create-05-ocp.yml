@@ -38,6 +38,7 @@
       tags: [ 'layer3', 'ocp-osp', 'ocp-osp-install', 'ocp-vm', 'ocp-osp-lb', 'dnat' ]
       mode: create
       when: ocp_is_deployed_on == 'osp'
+      stack_name: overcloud
 
 - hosts: ocp-osp-lbaas-group,ocp-osp-vm-group
   gather_facts: false
