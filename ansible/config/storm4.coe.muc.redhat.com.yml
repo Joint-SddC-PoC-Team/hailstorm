@@ -71,7 +71,7 @@ http_proxy:
   proxyname: proxy.coe.muc.redhat.com
   port: 3128
   protocol: https
-  
+
 external_network_config:
   guest_network_bridging_mac_prefix: "52:54:00:48:04:"
   guest_network_osp_floating_start: 10.32.105.160
@@ -506,6 +506,37 @@ external_network_config:
         # neutron
         - from_port: 13696
           to_port: 13696
+          proto: tcp
+      - expose_machine: si8ads13
+        on_host_prefix: 10.32.105.65/32
+        via_network: services
+        ports:
+        - from_port: 53
+          to_port: 53
+          proto: tcp
+        - from_port: 53
+          to_port: 53
+          proto: udp
+        - from_port: 389
+          to_port: 389
+          proto: tcp
+        - from_port: 636
+          to_port: 636
+          proto: tcp
+        - from_port: 3389
+          to_port: 3389
+          proto: tcp
+        - from_port: 3389
+          to_port: 3389
+          proto: udp
+        - from_port: 80
+          to_port: 80
+          proto: tcp
+        - from_port: 443
+          to_port: 443
+          proto: tcp
+        - from_port: 5986
+          to_port: 5986
           proto: tcp
 
 
