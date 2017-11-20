@@ -1,4 +1,5 @@
 - block:
     - include: install_ad.yml
     - include: dns-records-add.yml
+      when: inventory_hostname_short in groups['primary-ad-group']
   when: mode=="create"
