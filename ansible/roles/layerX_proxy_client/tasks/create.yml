@@ -15,7 +15,7 @@
 - name: Create bash profile for the server
   copy:
     dest: /etc/profile.d/proxy.sh
-    mode: 0640
+    mode: 0644
     owner: root
     group: root
     content: |
