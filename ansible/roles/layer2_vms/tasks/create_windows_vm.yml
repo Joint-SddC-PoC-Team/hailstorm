@@ -58,7 +58,7 @@
             --network network={{ nic.netname }},mac={{ nic.mac }}
             {% endfor %}
             --disk size={{ disk.size }},path={{ layer1_qcow_storage.path }}/{{ disk.path }},format={{ disk.format }},device=disk
-            --disk path={{ layer1_binary_dir }}/{{ windows_install_dvd }},device=cdrom
+            --disk path={{ layer1_binary_dir }}/{{ windows_install_dvd }},device=cdrom,perms=ro
             --disk path=/tmp/config-{{ inventory_hostname_short }}.iso,device=cdrom
             {% if enable_virtio_win|default(false,true) %}--disk path=/usr/share/virtio-win/virtio-win.iso,device=cdrom{% endif %}
             --os-type windows
