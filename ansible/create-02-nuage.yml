@@ -21,6 +21,7 @@
   gather_facts: false
   roles:
     - { role: layer2_ipa_certificate, tags: ['layer2', 'infrastructure',  'nuage', 'haproxy', 'haproxy-certificate'], mode: create, certcn: 'vsd.{{ hailstorm_dns_domain }}' }
+    - { role: layer2_nuage_haproxy_route, tags: [ 'layer2', 'infrastructure', 'haproxy', 'nuage'], mode: create }
     - role: layer2_haproxy_service
       tags: [ 'layer2', 'infrastructure', 'nuage', 'haproxy' ]
       mode: create

@@ -9,7 +9,9 @@
         owner: root
         group: root
         mode: 0644
+      register: route
 
     - name: enable route
-      shell: ifup eth0
+      service: name=network state=restarted
+      when: route|changed
   when: enable_nuage is defined
