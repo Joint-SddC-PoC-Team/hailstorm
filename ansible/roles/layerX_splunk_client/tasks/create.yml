@@ -1,0 +1,20 @@
+---
+- name: copy over the splunk installation 
+  copy: src=binary/{{ current_lifecycle_env.splunk_agent_rpm }} dest=/tmp
+
+- name: install splunk with yum
+  yum:
+    name: "/tmp/{{ current_lifecycle_env.splunk_agent_rpm }}"
+    state: present
+
+- name: splunk license
+  command: /opt/splunkforwarder/bin/splunk start --accept-license creates=/opt/splunkforwarder/etc/users/splunk-system-user
+
+- name: setup to start at boot
+  command: /opt/splunkforwarder/bin/splunk enable boot-start
+
+- name: connect to splunk server
+  command: /opt/splunkforwarder/bin/splunk add forward-server {{ splunk_agent_server }}:{{ splunk_agent_port }} -auth {{ splunk_agent_user }}:{{ splunk_agent_password }}
+
+- name: add monitor for /var/log
+  command: /opt/splunkforwarder/bin/splunk add monitor /var/log
