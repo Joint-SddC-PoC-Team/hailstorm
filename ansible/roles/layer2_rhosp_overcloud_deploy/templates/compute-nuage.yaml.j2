@@ -126,7 +126,7 @@ resources:
               addresses:
                 -
                   ip_netmask: {get_param: StorageIpSubnet}
-{% if override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend) == 'ceph_hyperconverged' %}
+{% if (override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend)) == 'ceph_hyperconverged' %}
             -
               type: interface
               name: nic3
