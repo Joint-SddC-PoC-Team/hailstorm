@@ -1,0 +1,9 @@
+- name: Deleting all found ContainerInterfaces
+  delegate_to: localhost
+  nuage_vspk:
+    auth: "{{ nuage_auth }}"
+    type: ContainerInterface
+    state: absent
+    id: "{{ item.ID }}"
+  with_items: "{{ nuage_containerinterfaces_results.entities }}"
+  when: nuage_containerinterfaces_results.entities is defined
