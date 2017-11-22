@@ -5,8 +5,8 @@
     line: "{{ item }}"
     backup: yes
   with_items:
-    - "ACTIVE_CONTROLLER={{ hostvars['c1'].vm_nics[0].ip }}"
-    - "STANDBY_CONTROLLER={{ hostvars['c2'].vm_nics[0].ip }}"
+    - "ACTIVE_CONTROLLER={{ hostvars['c1'].vm_nics[1].ip }}"
+    - "STANDBY_CONTROLLER={{ hostvars['c2'].vm_nics[1].ip }}"
   notify: restart_openvswitch
 
 - name: copy over selinux rule for nuage
@@ -17,5 +17,5 @@
 - name: add nuage openvswitch selinux rules
   command: semodule -i /root/ovslocal6.pp
 
-- name: Flush handlers  
+- name: Flush handlers
   meta: flush_handlers

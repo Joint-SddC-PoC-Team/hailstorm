@@ -2,8 +2,8 @@
 parameter_defaults:
   HostnameMap:
     {% for node in controller %}
-    overcloud-controller-{{ loop.index0 }}: {{hostvars[node].inventory_hostname_short}}
+    {{ stack_name }}-controller-{{ loop.index0 }}: {{hostvars[node].inventory_hostname_short}}
     {% endfor %}{% for node in compute %}
-    overcloud-compute-{{ loop.index0 }}: {{hostvars[node].inventory_hostname_short}}
+    {{ stack_name }}-compute-{{ loop.index0 }}: {{hostvars[node].inventory_hostname_short}}
     {% endfor %}
 {% endif %}
