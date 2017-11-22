@@ -148,3 +148,14 @@
     - role: layer2_rhosp_overcloud_configure_lbaas
       tags: ['layer2', 'rhosp', 'overcloud', 'overcloud-controller']
       mode: create
+
+- hosts: overcloud-controller-group:overcloud-compute-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer2_rhosp_overcloud_configure_syslog
+      tags:  ['layer2', 'rhosp', 'overcloud', 'overcloud-configure', 'overcloud-configure-syslog']
+      mode: create
+    - role: layerX_syslog_client
+      tags: [ 'layer2', 'rhosp', 'syslog',  'syslog-client']
+      mode: create

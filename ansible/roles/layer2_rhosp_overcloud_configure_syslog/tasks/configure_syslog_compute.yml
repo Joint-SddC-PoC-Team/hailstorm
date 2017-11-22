@@ -1,0 +1,28 @@
+- name: Configure OSP components to use syslog
+  lineinfile:
+    path: "{{ item }}"
+    regexp: '^use_syslog'
+    insertafter: '^#use_syslog'
+    line: "use_syslog = true"
+  notify: restart_compute_services
+  with_items:
+    - /etc/ceilometer/ceilometer.conf
+    - /etc/nova/nova.conf
+- name: Configure OSP components syslog facility
+  lineinfile:
+    path: "{{ item }}"
+    regexp: '^syslog_log_facility'
+    insertafter: '^#syslog_log_facility'
+    line: "syslog_log_facility = LOG_LOCAL0"
+  notify: restart_compute_services
+  with_items:
+    - /etc/ceilometer/ceilometer.conf
+    - /etc/nova/nova.conf
+
+- name: Configure ceph to send logs to syslog
+  lineinfile:
+     path: "/etc/ceph/ceph.conf"
+     line: "log to syslog = true"
+     insertafter: "[global]"
+     regexp: "^log to syslog"
+  notify: restart_ceph

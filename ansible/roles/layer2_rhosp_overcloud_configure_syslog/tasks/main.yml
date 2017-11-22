@@ -1,0 +1,8 @@
+- block:
+    - name: Configure OSP controller components to send logs to syslog
+      include: configure_syslog_controller.yml
+      when: inventory_hostname in groups['overcloud-controller-group']
+    - name: Configure OSP compute components to send logs to syslog
+      include: configure_syslog_compute.yml
+      when: inventory_hostname in groups['overcloud-compute-group']
+  when: mode=="create"

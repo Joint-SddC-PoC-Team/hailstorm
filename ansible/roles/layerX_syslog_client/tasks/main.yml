@@ -2,7 +2,7 @@
     - name: Configure rsyslog
       lineinfile: 
         path: /etc/rsyslog.conf 
-        line: "*.* @{{ (hostvars[item].vm_nics|selectattr('netname','match', infrastructure_network_admin.netname)|first).ip }}:514"
+        line: "*.* @{{ (hostvars[item].vm_nics|selectattr('netname','match', infrastructure_network_services.netname)|first).ip }}:514"
         insertafter: "#### RULES ####"
       register: configure_syslog
       when: '"syslog" in hostvars[item].roles'

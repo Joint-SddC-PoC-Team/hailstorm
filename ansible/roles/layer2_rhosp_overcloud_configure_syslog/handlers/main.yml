@@ -1,0 +1,40 @@
+- name: restart_compute_services
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+     - openstack-nova-api
+     - openstack-nova-compute
+     - openstack-ceilometer-compute
+
+- name: restart_controller_services
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+     - openstack-aodh-evaluator
+     - openstack-aodh-listener
+     - openstack-aodh-notifier
+     - openstack-ceilometer-central
+     - openstack-ceilometer-collector
+     - openstack-ceilometer-notification
+     - openstack-cinder-scheduler
+     - openstack-cinder-volume
+     - openstack-glance-api
+     - openstack-gnocchi-metricd
+     - openstack-gnocchi-statsd
+     - openstack-heat-api-cfn
+     - openstack-heat-api-cloudwatch
+     - openstack-heat-api
+     - openstack-heat-engine
+     - openstack-nova-api
+     - openstack-nova-cert
+     - openstack-nova-conductor
+     - openstack-nova-consoleauth
+     - openstack-nova-novncproxy
+     - openstack-nova-scheduler
+
+- name: restart_ceph
+  service:
+    name: "ceph.target"
+    state: restarted
