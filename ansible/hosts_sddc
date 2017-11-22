@@ -67,9 +67,9 @@ proxy           ansible_host=10.116.127.8 activation_key="AK-CV-OS-RHEL7-SERVER-
 
 [windows-group]
 ## same IP as storage-console or syslog
-si8ads13 ansible_host=10.116.127.9 ad_domain_name="rh-sddc.test-bosch.com" ad_netbios_name="ad-{{ inventory_hostname_short }}"
-si8ads14 ansible_host=10.116.127.6 ad_domain_name="de-rh.rh-sddc.test-bosch.com" ad_netbios_name="ad-{{ inventory_hostname_short }}"
-si8ads15 ansible_host=10.116.127.5 ad_domain_name="emea-rh.rh-sddc.test-bosch.com" ad_netbios_name="ad-{{ inventory_hostname_short }}"
+si8ads13 ansible_host=10.116.127.9 ad_domain_name="{{ hailstorm_dns_domain }}" ad_netbios_name="ad-{{ inventory_hostname_short }}" ad_password="0pen_5ource"
+si8ads14 ansible_host=10.116.127.6 ad_domain_name="de-rh.{{ hailstorm_dns_domain }}" ad_netbios_name="ad-{{ inventory_hostname_short }}" ad_password="0pen_5ource"
+si8ads15 ansible_host=10.116.127.5 ad_domain_name="emea-rh.{{ hailstorm_dns_domain }}" ad_netbios_name="ad-{{ inventory_hostname_short }}" ad_password="0pen_5ource"
 
 [windows-group:vars]
 ansible_user=Administrator
