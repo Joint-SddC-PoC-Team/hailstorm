@@ -58,9 +58,9 @@ prep_cheph_disks()
   fi
 }
 
-{% if current_lifecycle_env.osp_storage_backend == 'ceph_hyperconverged' %}
+{% if override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend) == 'ceph_hyperconverged' %}
 wipe_disks
-{% elif current_lifecycle_env.osp_storage_backend == 'ceph_ownvms' %}
+{% elif override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend) == 'ceph_ownvms' %}
 prep_cheph_disks
 {% else %}
 echo "$0: we do not wipe here anything as this is not a ceph setup"

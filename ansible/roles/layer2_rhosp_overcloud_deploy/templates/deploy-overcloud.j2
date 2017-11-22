@@ -19,7 +19,7 @@ openstack overcloud deploy \
 -e ~/templates/network-isolation.yaml \
 {% if current_lifecycle_env.osp_use_tls|default(false) %}-e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml \
 {% endif %}
-{% if current_lifecycle_env.osp_storage_backend == 'ceph_hyperconverged' %}-e /usr/share/openstack-tripleo-heat-templates/environments/hyperconverged-ceph.yaml \
+{% if override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend) == 'ceph_hyperconverged' %}-e /usr/share/openstack-tripleo-heat-templates/environments/hyperconverged-ceph.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-radosgw.yaml \
 {% endif %}{% if enable_nuage is defined %}-e ~/templates/neutron-nuage-config.yaml -e ~/templates/nova-nuage-config.yaml \
 {% endif %}

@@ -65,6 +65,7 @@
       controller: "{{ groups['overcloud2-controller-group'] }}"
       compute: "{{ groups['overcloud2-compute-group'] }}"
       openstack_vip: "openstack2"
+      override_osp_storage_backend: nfs_layer1
 
 
 - hosts: overcloud2-controller-group
