@@ -35,6 +35,7 @@ lifecycle_environments:
     rhv_version: 4
     cloudforms_version: 5.8
     cloudforms_ova_appliance: cfme-rhevm-5.8.2.3-1.x86_64.rhevm.ova
+    splunk_agent_rpm: splunkforwarder-7.0.0-c8a78efdd40f-linux-2.6-x86_64.rpm
     use_install_host: True
     ansible_use_version: 2.3.2.0
     ansible_available_versions: [2.2.2.0,2.4.0.0,2.2.1.0]

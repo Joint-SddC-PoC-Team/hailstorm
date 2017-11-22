@@ -443,6 +443,7 @@ cf-rhv-vm-group
 cf-osp-vm-group
 rh-sso-rhv-vm-group
 rh-sso-l2-vm-group
+rh-sso-osp-vm-group
 ocp-l2-vm-group
 ocp-rhv-vm-group
 

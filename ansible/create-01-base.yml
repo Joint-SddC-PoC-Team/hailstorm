@@ -145,3 +145,4 @@
       tags: [ 'layer2', 'install-host', 'proxy-client' ]
       mode: create
     - { role: layer2_installhost, tags: [ 'layer2', 'install-host' ], mode: create }
+    #EXAMPLE: - { role: layerX_splunk_client, tags: ['layer2', 'install-host', 'splunk-client'], mode: create, splunk_agent_server: "10.116.127.101", splunk_agent_port: 8889, splunk_agent_user: "admin", splunk_agent_password: "changeme"  }
