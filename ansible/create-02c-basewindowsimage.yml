@@ -22,3 +22,9 @@
         - Altiris_agent/install_agent.bat
         - Certificates/BOSCH-CA1-DE.cer
         - Certificates/BOSCH-CA-DE.cer
+
+- hosts: windows-sample-group
+  remote_user: root
+  gather_facts: false
+  roles:
+     - { role: layer2_windows_cloudinit, tags: [ 'layer2', 'vm' ], mode: create }
