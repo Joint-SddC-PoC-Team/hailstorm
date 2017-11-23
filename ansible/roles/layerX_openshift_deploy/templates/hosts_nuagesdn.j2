@@ -1,0 +1,162 @@
+# OpenShift inventory for Nuage SDN integration
+# Create an OSEv3 group that contains the masters and nodes groups
+[OSEv3:children]
+masters
+etcd
+nodes
+lb
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+# SSH user, this user should allow ssh based auth without requiring a password
+ansible_ssh_user=root
+
+# If ansible_ssh_user is not root, ansible_sudo must be set to true
+#ansible_sudo=true
+
+deployment_type=openshift-enterprise
+osm_default_subdomain={{ ocp_apps_dns_domain }}
+openshift_master_default_subdomain={{ ocp_apps_dns_domain }}
+osm_default_node_selector="region=primary"
+
+{% if http_proxy is defined %}
+openshift_http_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
+openshift_https_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
+openshift_no_proxy=.{{ hailstorm_dns_domain }}
+{% endif %}
+
+{% if cf_is_deployed_on == 'osp' %}
+#openstack cloudprovider
+openshift_cloudprovider_kind=openstack
+openshift_cloudprovider_openstack_auth_url=https://openstack.{{ hailstorm_dns_domain }}:13000/v3
+openshift_cloudprovider_openstack_username=admin
+openshift_cloudprovider_openstack_password={{ root_password }}
+openshift_cloudprovider_openstack_tenant_name={{ osp_tenant }}
+openshift_cloudprovider_openstack_domain_name=hailstorm
+openshift_cloudprovider_openstack_region=regionOne
+# seems like we don't need this value for anything
+#openshift_cloudprovider_openstack_lb_subnet_id=
+{% endif %}
+
+# uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+#openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+{% if ocpOidcClientSecret is defined and ocpOidcClientSecret != "" and ipa_available|success and certificate|success %}
+{# ------ Hailstorm specific:
+# If RH-SSO is available, we use the OICD Auth Provider
+# elseif IPA is availe, we use the LDAP Auth Provider
+# else we use AllowAll as fallback:
+#}
+openshift_master_identity_providers=[{'name':'oidc_rhsso', 'challenge':'false', 'login':'true', 'mappingMethod':'add', 'kind': 'OpenIDIdentityProvider', 'clientID': 'ocp-master', 'clientSecret':'{{ ocpOidcClientSecret }}', 'ca': 'ipa-ca.crt', 'urls': {'authorize': 'https://sso.{{ hailstorm_dns_domain }}:8443/auth/realms/infra/protocol/openid-connect/auth', 'token':'https://sso.{{ hailstorm_dns_domain }}:8443/auth/realms/infra/protocol/openid-connect/token', 'userInfo':'https://sso.{{ hailstorm_dns_domain }}:8443/auth/realms/infra/protocol/openid-connect/userinfo'}, 'claims': { 'id':['sub'], 'preferredUsername':['preferred_username'], 'name':['name'], 'email':['email'] }}]
+{# openshift_master_ldap_ca_file causes the file to be copied to all master nodes /etc/origin/master dirs #}
+openshift_master_ldap_ca_file=/etc/origin/master/ipa-ca.crt
+{% elif ipa_available|success and certificate|success %}
+openshift_master_identity_providers=[{'name': 'ldap_ipa', 'challenge': 'true', 'login': 'true', 'kind': 'LDAPPasswordIdentityProvider', 'attributes': {'id': ['uid'], 'email': ['mail'], 'name': ['cn'], 'preferredUsername': ['uid']}, 'bindDN': 'uid=ose-bind-user,cn=users,cn=compat,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}', 'bindPassword': '{{ root_password }}', 'ca': 'ipa-ca.crt', 'insecure': 'false', 'url': 'ldap://ipa.{{ hailstorm_dns_domain }}:389/cn=compat,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}?uid?sub?(&(objectClass=posixAccount))'}]
+# Configuring the ldap ca certificate
+#openshift_master_ldap_ca='{#{ certificate.stdout }#}'
+# or
+openshift_master_ldap_ca_file=/etc/origin/master/ipa-ca.crt
+{% else %}
+openshift_master_identity_providers=[{'name': 'allow_all_auth', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider' }]
+{% endif %}
+
+# disable checks
+openshift_disable_check=memory_availability,disk_availability,docker_storage,docker_storage_driver
+
+#openshift_use_dnsmasq=False
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname=openshift.{{ hailstorm_dns_domain }}
+openshift_master_cluster_public_hostname=openshift.{{ hailstorm_dns_domain }}
+openshift_master_api_port=443
+openshift_master_public_console_url=https://openshift.{{ hailstorm_dns_domain }}/console
+openshift_master_logging_public_url=https://kibana.{{ ocp_apps_dns_domain }}
+openshift_master_metrics_public_url=https://hawkular-metrics.{{ ocp_apps_dns_domain }}/hawkular/metrics
+
+{% if openshift_key is defined %}
+openshift_master_named_certificates=[{"certfile": "/root/openshift.crt", "keyfile": "/root/openshift.key", "cafile": "/root/openshift-ca.crt"}]
+openshift_master_overwrite_named_certificates=true
+{% endif %}
+
+#don't automatically deploy router to allow finer-grained control
+#openshift_hosted_manage_registry=false
+openshift_hosted_manage_router=false
+openshift_router_selector="region=infra"
+openshift_registry_selector="region=infra"
+
+#openshift_docker_options="--log-opt max-size=1M --log-opt max-file=3"
+#os_sdn_network_plugin_name="redhat/openshift-ovs-multitenant"
+#openshift_docker_additional_registries
+#openshift_docker_insecure_registries
+#openshift_master_overwrite_named_certificates=true
+
+# Nuage SDN specific parameters
+openshift_use_openshift_sdn=False
+openshift_use_nuage=True
+os_sdn_network_plugin_name=cni
+vsd_api_url=https://vsd.{{ hailstorm_dns_domain }}:7443
+vsp_version=v5_0
+nuage_monitor_image_version=5.1.1-5
+nuage_vrs_image_version=5.1.1-9
+nuage_cni_image_version=5.1.1-5
+enterprise=OpenShift_Org
+domain=openshift
+vsc_active_ip=192.168.12.164
+vsc_standby_ip=192.168.12.165
+uplink_interface=eth0
+nuage_openshift_monitor_log_dir=/var/log/nuage-openshift-monitor
+nuage_interface_mtu=1450
+nuage_openshift_monitor_rest_server_port=9443
+vsd_user=ose-admin
+vsd_user_cert_file=/usr/local/ose-admin.pem
+vsd_user_key_file=/usr/local/ose-admin-Key.pem
+openshift_node_kubelet_args={'max-pods': ['110'], 'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80'], 'make-iptables-util-chains': ['false']}
+openshift_master_cluster_hostname=openshift.{{ hailstorm_dns_domain }}
+nuage_openshift_monitor_rest_server_port=9443
+
+# Metrics deployment
+openshift_hosted_metrics_deploy=false
+openshift_metrics_hawkular_hostname=hawkular-metrics.{{ ocp_apps_dns_domain }}
+openshift_metrics_cassandra_storage_type=dynamic
+openshift_metrics_cassandra_replicas=1
+openshift_metrics_cassandra_limits_memory=2Gi
+openshift_metrics_hawkular_replicas=1
+openshift_metrics_duration=5
+openshift_metrics_hawkular_nodeselector={"region":"infra"}
+openshift_metrics_cassandra_nodeselector={"region":"infra"}
+openshift_metrics_heapster_nodeselector={"region":"infra"}
+
+# Logging deployment
+openshift_hosted_logging_deploy=false
+openshift_logging_es_pvc_dynamic=true
+openshift_logging_use_ops=false
+openshift_logging_kibana_hostname=kibana.{{ ocp_apps_dns_domain }}
+openshift_logging_curator_default_days=7
+openshift_logging_curator_nodeselector={"region":"infra"}
+openshift_logging_kibana_nodeselector={"region":"infra"}
+openshift_logging_es_nodeselector={"region":"infra"}
+
+# host group for masters
+[masters]
+{% for master in groups["ocp-master-group"] %}
+{{ hostvars[master].hostname }}
+{% endfor %}
+
+[etcd]
+{% for master in groups["ocp-master-group"] %}
+{{ hostvars[master].hostname }}
+{% endfor %}
+
+# host group for nodes, includes region info
+[nodes]
+{% for master in groups["ocp-master-group"] %}
+{{ hostvars[master].hostname }} openshift_hostname={{ hostvars[master].hostname_short }} openshift_node_labels="{{ hostvars[master].openshift_node_labels }}"
+{% endfor %}
+{% for node in groups["ocp-node-group"] %}
+{{ hostvars[node].hostname }} openshift_hostname={{ hostvars[node].hostname_short }} openshift_node_labels="{{ hostvars[node].openshift_node_labels }}"
+{% endfor %}
+
+# Specify load balancer host
+[lb]
+{% for lb in groups["ocp-l2-or-rhv-lb-group"] %}
+{{ hostvars[lb].hostname }}
+{% endfor %}
