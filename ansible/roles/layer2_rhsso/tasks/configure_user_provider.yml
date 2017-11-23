@@ -1,0 +1,45 @@
+# Add a user provider backend to RH_SSO
+# Author: Daniel Fröhlich
+# Requires a variable map named "item" with the following attributes:
+#      name: Display Name of the provider how it is displayed in the sso console
+#      type: one of "ipa" or "ad"
+#      priority: Priority, lower is used first
+#      usersDN: where are the users located in the tree?
+#      usersFilter: optional filter to apply in ldap search format
+#      bindDN: username to access the provider
+#      bindCredential: password for accessing the provider
+#      connectionUrl: how to connect to the provider in format "protocol://hostname:port", e.g. "ldaps://ipa.myDomain.de:636"
+#      groupsDN:where are the groups located in the tree
+#      groupsFilter: filter to apply for groups in ldap search format e.g. "(name=FunnyPrefix*)"
+
+- name: check existance of user provider {{item.name}}
+  shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh get components -r infra --fields 'id' -q name={{item.name}}  --format=csv --noquotes
+  register: existingProviderId
+  changed_when: false
+
+- block:
+    - name: prepare user provider json for type {{item.type}}
+      template: src=create_{{item.type}}_ldap_provider.json.j2 dest=/root/create_{{item.name}}_ldap_provider.json
+
+    - name: create user provider {{item.name}}
+      shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh \
+        create components -r infra -f /root/create_{{item.name}}_ldap_provider.json
+
+    - name: get new provider id
+      shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh get components -r infra --fields 'id' -q name={{item.name}}  --format=csv --noquotes
+      register: newProviderId
+      changed_when: false
+
+    - name: prepare group mapper json
+      template: src=create_group_mapper.json.j2 dest=/root/create_group_mapper_{{item.name}}.json
+
+    - name: create group mapper
+      shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh \
+        create components -r infra -f /root/create_group_mapper_{{item.name}}.json \
+        -s parentId={{ newProviderId.stdout }}
+
+    - name: force full sync
+      shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh create user-storage/{{ newProviderId.stdout }}/sync?action=triggerFullSync  -r infra -o
+      register: syncResult
+      failed_when: syncResult.rc != 0 or (syncResult.stdout|from_json)['failed'] !=0
+  when: existingProviderId.stdout == ""
