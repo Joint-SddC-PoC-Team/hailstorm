@@ -153,6 +153,7 @@
 - hosts: overcloud-controller-group:overcloud-compute-group
   remote_user: root
   gather_facts: false
+  serial: 1
   roles:
     - role: layer2_rhosp_overcloud_configure_syslog
       tags:  ['layer2', 'rhosp', 'overcloud', 'overcloud-configure', 'overcloud-configure-syslog']

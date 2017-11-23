@@ -38,9 +38,9 @@ install-host    l1host="FE-SDDC-RH10r" ansible_host=10.116.127.154 activation_ke
 
 #### BEGIN ADDITIONAL L2 VMS
 
-# Elasticsearch, FluentD, Kibana
+# Elasticsearch, FluentD, Kibana - needs RHOSP CV since it installs python-neutronclient and other packages
 [efk-group]
-efk             l1host="FE-SDDC-RH12r" ansible_host=10.116.127.174 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+efk             l1host="FE-SDDC-RH12r" ansible_host=10.116.127.174 activation_key="AK-RHOSP-{{ stage }}"
 
 # the Infrastructure server (DNS, SMTP/IMAP)
 [infrastructure-group]
@@ -71,6 +71,7 @@ si8ads13 ansible_host=10.116.127.9 ad_domain_name="{{ hailstorm_dns_domain }}" 
 si8ads14 ansible_host=10.116.127.6 ad_domain_name="de-rh.{{ hailstorm_dns_domain }}" ad_netbios_name="ad-{{ inventory_hostname_short }}" ad_password="{{ root_password }}"
 si8ads15 ansible_host=10.116.127.5 ad_domain_name="emea-rh.{{ hailstorm_dns_domain }}" ad_netbios_name="ad-{{ inventory_hostname_short }}" ad_password="{{ root_password }}"
 
+
 [windows-group:vars]
 ansible_user=Administrator
 ansible_password="{{ root_password }}"
@@ -83,6 +84,22 @@ ansible_winrm_server_cert_validation=ignore
 si8ads13
 
 #### END SYSTEM CONTEXT EMULATION
+
+#### BEGIN SAMPLE WINDOWS IMAGE
+
+[windows-sample-group]
+windows_sample ansible_host=10.116.127.10
+
+
+[windows-sample-group:vars]
+ansible_user=Administrator
+ansible_password="{{ root_password }}"
+ansible_port=5986
+ansible_connection=winrm
+# The following is necessary for Python 2.7.9+ (or any older Python that has backported SSLContext, eg, Python 2.7.5 on RHEL7) when using default WinRM self-signed certificates:
+ansible_winrm_server_cert_validation=ignore
+
+#### END SAMPLE WINDOWS IMAGE
 
 
 
@@ -430,6 +447,7 @@ dev-client-group
 tower
 storage-console
 windows-group
+windows-sample-group
 
 # to let it participate in the calculation of ansible_host
 # and the ssh proxy command used to communicate with all layer2/3 hosts
