@@ -38,9 +38,9 @@ install-host    l1host="FE-SDDC-RH10r" ansible_host=10.116.127.154 activation_ke
 
 #### BEGIN ADDITIONAL L2 VMS
 
-# Elasticsearch, FluentD, Kibana
+# Elasticsearch, FluentD, Kibana - needs RHOSP CV since it installs python-neutronclient and other packages
 [efk-group]
-efk             l1host="FE-SDDC-RH12r" ansible_host=10.116.127.174 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"
+efk             l1host="FE-SDDC-RH12r" ansible_host=10.116.127.174 activation_key="AK-RHOSP-{{ stage }}"
 
 # the Infrastructure server (DNS, SMTP/IMAP)
 [infrastructure-group]
