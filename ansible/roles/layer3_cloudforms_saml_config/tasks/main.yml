@@ -11,16 +11,16 @@
     - manageiq-external-auth-saml.conf
 
 - name: create saml metadata
-  shell: cd /etc/httpd/saml2 && /usr/libexec/mod_auth_mellon/mellon_create_metadata.sh https://cloudforms.{{ hailstorm_dns_domain }} https://cloudforms.{{ hailstorm_dns_domain }}/saml2 creates=/etc/httpd/saml2/cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.xml
+  shell: cd /etc/httpd/saml2 && /usr/libexec/mod_auth_mellon/mellon_create_metadata.sh https://cloudforms.{{ hailstorm_dns_domain }} https://cloudforms.{{ hailstorm_dns_domain }}/saml2 creates=/etc/httpd/saml2/cloudforms.{{ hailstorm_dns_domain }}.xml
 
 - name: link key and cert
   file: state=link src=/etc/httpd/saml2/{{ item.src }} dest=/etc/httpd/saml2/{{ item.dest }}
   with_items:
-    - src: "https_cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.key"
+    - src: "https_cloudforms.{{ hailstorm_dns_domain|regex_replace('\\d','_') }}.key"
       dest: miqsp-key.key
-    - src: "https_cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.cert"
+    - src: "https_cloudforms.{{ hailstorm_dns_domain|regex_replace('\\d','_') }}.cert"
       dest: miqsp-cert.cert
-    - src: "https_cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.xml"
+    - src: "https_cloudforms.{{ hailstorm_dns_domain|regex_replace('\\d','_') }}.xml"
       dest: miqsp-metadata.xml
 
 - set_fact:
@@ -39,3 +39,4 @@
 
 - set_fact:
     cf_saml_metadata: "{{ temp_miqsp_metadata.stdout }}"
+

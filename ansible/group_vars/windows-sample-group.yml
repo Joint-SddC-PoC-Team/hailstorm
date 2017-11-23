@@ -1,0 +1,17 @@
+---
+mem: 2048
+vcpu: 2
+disk:
+  path: "{{ inventory_hostname_short }}.qcow2"
+  size: 20
+  format: qcow2
+
+windows: true
+windows_install_dvd: BOSCH_WINDOWS_DVD.iso
+#windows_product_key:
+
+nic_attachments:
+  - "{{ infrastructure_network_services }}"
+  - "{{ infrastructure_network_admin }}"
+default_route_via: "{{ infrastructure_network_services }}"
+name_service_via: "{{ infrastructure_network_services }}"

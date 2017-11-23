@@ -1,0 +1,9 @@
+- name: Deleting all found VMInterfaces
+  delegate_to: localhost
+  nuage_vspk:
+    auth: "{{ nuage_auth }}"
+    type: VMInterface
+    state: absent
+    id: "{{ item.ID }}"
+  with_items: "{{ nuage_vminterfaces_results.entities }}"
+  when: nuage_vminterfaces_results.entities is defined

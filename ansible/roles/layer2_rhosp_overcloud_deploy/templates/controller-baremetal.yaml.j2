@@ -95,10 +95,8 @@ resources:
       config:
         os_net_config:
           network_config:
-            -
-              type: linux_bond
+            - type: ovs_bridge
               name: br-provisioning
-              bonding_options: {get_param: BondInterfaceOvsOptions}
               use_dhcp: false
               dns_servers: {get_param: DnsServers}
               addresses:
@@ -113,103 +111,95 @@ resources:
                   ip_netmask: 169.254.169.254/32
                   next_hop: {get_param: EC2MetadataIp}
               members:
-                -
-                  type: interface
-                  name: nic3
-                  # force the MAC address of the bridge to this interface
-                  primary: true
-                -
-                  type: interface
-                  name: nic4
-                  primary: false
+               -
+                 type: ovs_bond
+                 name: bond0
+                 ovs_options: "bond_mode=active-backup"
+                 members:
+                   -
+                     type: interface
+                     name: eno3
+                     primary: true
+                   -
+                     type: interface
+                     name: eno4
+                     primary: false
 
-            - type: linux_bond
+               - type: vlan
+                 device: bond0
+                 vlan_id:
+                   get_param: InternalApiNetworkVlanID
+                 addresses:
+                 - ip_netmask:
+                     get_param: InternalApiIpSubnet
+               - type: vlan
+                 device: bond0
+                 vlan_id:
+                   get_param: TenantNetworkVlanID
+                 addresses:
+                 - ip_netmask:
+                     get_param: TenantIpSubnet
+               - type: vlan
+                 device: bond0
+                 vlan_id:
+                   get_param: StorageNetworkVlanID
+                 addresses:
+                 - ip_netmask:
+                     get_param: StorageIpSubnet
+               - type: vlan
+                 device: bond0
+                 vlan_id:
+                   get_param: ManagementNetworkVlanID
+                 addresses:
+                 - ip_netmask:
+                     get_param: ManagementIpSubnet
+
+{% if current_lifecycle_env.osp_storage_backend == 'ceph_hyperconverged' %}
+               -
+                 type: vlan 
+                 device: bond0
+                 vlan_id:
+                   get_param: StorageMgmtNetworkVlanID
+                 addresses:
+                 - ip_netmask:
+                     get_param: StorageMgmtIpSubnet
+{% endif %}
+
+            - type: ovs_bridge
               name: br-services
               addresses:
-                - ip_netmask: {get_param: ExternalIpSubnet}
-              members:
-                -
-                  type: interface
-                  name: nic1
-                  # force the MAC address of the bridge to this interface
-                  primary: true
-                -
-                  type: interface
-                  name: nic2
-                  primary: false
-
+                 - ip_netmask: {get_param: ExternalIpSubnet}
               routes:
                 -
                   ip_netmask: 0.0.0.0/0
                   default: true
                   next_hop: {get_param: ExternalInterfaceDefaultRoute}
-
-            - type: linux_bridge
-              name: br-admin
               members:
               - type: linux_bond
-                name: bond0
-                ovs_options:
+                name: bond1
+                bonding_options: "mode=active-backup"
+                members:
+                 - type: interface
+                   name: eno1
+                   primary: true
+                 - type: interface
+                   name: eno2
+
+            - type: ovs_bridge
+              name: br-admin
+              dns_servers:
+                get_param: DnsServers
+              members:
+              - type: linux_bond
+                name: bond2
+                bonding_options:
                   get_param: BondInterfaceOvsOptions
                 members:
                 - type: interface
-                  name: nic5
+                  name: eno49
                   primary: true
                 - type: interface
-                  name: nic6
-            - type: vlan
-              device: bond0
-              vlan_id:
-                get_param: InternalApiNetworkVlanID
-              addresses:
-              - ip_netmask:
-                  get_param: InternalApiIpSubnet
-            - type: vlan
-              device: bond0
-              vlan_id:
-                get_param: TenantNetworkVlanID
-              addresses:
-              - ip_netmask:
-                  get_param: TenantIpSubnet
-            - type: vlan
-              device: bond0
-              vlan_id:
-                get_param: StorageNetworkVlanID
-              addresses:
-              - ip_netmask:
-                  get_param: StorageIpSubnet
-            - type: vlan
-              device: bond0
-              vlan_id:
-                get_param: ManagementNetworkVlanID
-              addresses:
-              - ip_netmask:
-                  get_param: ManagementIpSubnet
-            -
-              type: vlan 
-              device: bond0
-              vlan_id:
-                get_param: StorageMgmtNetworkVlanID
-              addresses:
-              - ip_netmask:
-                  get_param: StorageMgmtIpSubnet
-{# BEGIN COMMENTED OUT % if infrastructure_network_bgp1 is defined %}
-            -
-              type: vlan 
-              device: bond0
-              vlan_id:
-                get_param: "{{ infrastructure_network_bgp1.vlan }}"
-              use_dhcp: false
-{% endif %}
-{% if infrastructure_network_bgp2 is defined %}
-            -
-              type: vlan 
-              device: bond0
-              vlan_id:
-                get_param: "{{ infrastructure_network_bgp2.vlan }}"
-              use_dhcp: false
-{% endif % END COMMENTED OUT ###}
-
+                  name: eno50
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.

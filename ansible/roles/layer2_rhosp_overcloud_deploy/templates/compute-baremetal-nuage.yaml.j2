@@ -91,12 +91,9 @@ resources:
       config:
         os_net_config:
           network_config:
-            -
-              type: linux_bond
+            - type: linux_bond
               name: br-provisioning
-              bonding_options: {get_param: BondInterfaceOvsOptions}
-              use_dhcp: false
-              dns_servers: {get_param: DnsServers}
+              bonding_options: "mode=active-backup"
               addresses:
                 -
                   ip_netmask:
@@ -108,80 +105,49 @@ resources:
                 -
                   ip_netmask: 169.254.169.254/32
                   next_hop: {get_param: EC2MetadataIp}
+              dns_servers: {get_param: DnsServers}
+              use_dhcp: false
               members:
                 -
                   type: interface
-                  name: nic3
-                  # force the MAC address of the bridge to this interface
+                  name: eno3
                   primary: true
                 -
                   type: interface
-                  name: nic4
+                  name: eno4
                   primary: false
-
-            - type: linux_bond
-              name: br-services
-              addresses:
-                - ip_netmask: {get_param: ExternalIpSubnet}
-              members:
-                -
-                  type: interface
-                  name: nic1
-                  # force the MAC address of the bridge to this interface
-                  primary: true
-                -
-                  type: interface
-                  name: nic2
-                  primary: false
-
-              routes:
-                -
-                  ip_netmask: 0.0.0.0/0
-                  default: true
-                  next_hop: {get_param: ExternalInterfaceDefaultRoute}
-
-            - type: linux_bond
-              name: bond0
-              ovs_options:
-                get_param: BondInterfaceOvsOptions
-              members:
-              - type: interface
-                name: nic5
-                primary: true
-              - type: interface
-                name: nic6
             - type: vlan
-              device: bond0
+              device: br-provisionng
               vlan_id:
                 get_param: InternalApiNetworkVlanID
               addresses:
               - ip_netmask:
                   get_param: InternalApiIpSubnet
             - type: vlan
-              device: bond0
+              device: br-provisioning
               vlan_id:
                 get_param: TenantNetworkVlanID
               addresses:
               - ip_netmask:
                   get_param: TenantIpSubnet
             - type: vlan
-              device: bond0
+              device: br-provisioning
               vlan_id:
                 get_param: StorageNetworkVlanID
               addresses:
               - ip_netmask:
                   get_param: StorageIpSubnet
             - type: vlan
-              device: bond0
+              device: br-provisioning
               vlan_id:
                 get_param: ManagementNetworkVlanID
               addresses:
               - ip_netmask:
                   get_param: ManagementIpSubnet
-{% if override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend) == 'ceph_hyperconverged' %}
+{% if (override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend)) == 'ceph_hyperconverged' %}
             -
               type: vlan 
-              device: bond0
+              device: br-provisioning
               vlan_id:
                 get_param: StorageMgmtNetworkVlanID
               addresses:
@@ -190,6 +156,34 @@ resources:
 {% endif %}
 
 
+            - type: linux_bond
+              name: br-services
+              bonding_options: "mode=active-backup"
+              addresses:
+                 - ip_netmask: {get_param: ExternalIpSubnet}
+              routes:
+                -
+                  ip_netmask: 0.0.0.0/0
+                  default: true
+                  next_hop: {get_param: ExternalInterfaceDefaultRoute}
+              members:
+               - type: interface
+                 name: eno1
+                 primary: true
+               - type: interface
+                 name: eno2
+
+            - type: linux_bond
+              name: br-admin
+              bonding_options:
+                get_param: BondInterfaceOvsOptions
+              members:
+                - type: interface
+                  name: eno49
+                  primary: true
+                - type: interface
+                  name: eno50
+              
 
 outputs:
   OS::stack_id:

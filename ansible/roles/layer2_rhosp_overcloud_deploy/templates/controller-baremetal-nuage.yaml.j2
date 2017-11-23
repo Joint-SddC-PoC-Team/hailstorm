@@ -95,10 +95,9 @@ resources:
       config:
         os_net_config:
           network_config:
-            -
-              type: linux_bond
+            - type: linux_bind
               name: br-provisioning
-              bonding_options: {get_param: BondInterfaceOvsOptions}
+              bonding_options: "mode=active-backup"
               use_dhcp: false
               dns_servers: {get_param: DnsServers}
               addresses:
@@ -115,45 +114,13 @@ resources:
               members:
                 -
                   type: interface
-                  name: nic3
-                  # force the MAC address of the bridge to this interface
+                  name: eno3
                   primary: true
                 -
                   type: interface
-                  name: nic4
+                  name: eno4
                   primary: false
 
-            - type: linux_bond
-              name: br-services
-              addresses:
-                - ip_netmask: {get_param: ExternalIpSubnet}
-              members:
-                -
-                  type: interface
-                  name: nic1
-                  # force the MAC address of the bridge to this interface
-                  primary: true
-                -
-                  type: interface
-                  name: nic2
-                  primary: false
-
-              routes:
-                -
-                  ip_netmask: 0.0.0.0/0
-                  default: true
-                  next_hop: {get_param: ExternalInterfaceDefaultRoute}
-
-            - type: linux_bond
-              name: bond0
-              ovs_options:
-                get_param: BondInterfaceOvsOptions
-              members:
-              - type: interface
-                name: nic5
-                primary: true
-              - type: interface
-                name: nic6
             - type: vlan
               device: bond0
               vlan_id:
@@ -182,6 +149,8 @@ resources:
               addresses:
               - ip_netmask:
                   get_param: ManagementIpSubnet
+
+{% if current_lifecycle_env.osp_storage_backend == 'ceph_hyperconverged' %}
             -
               type: vlan 
               device: bond0
@@ -190,23 +159,37 @@ resources:
               addresses:
               - ip_netmask:
                   get_param: StorageMgmtIpSubnet
-{# BEGIN COMMENTED OUT % if infrastructure_network_bgp1 is defined %}
-            -
-              type: vlan 
-              device: bond0
-              vlan_id:
-                get_param: "{{ infrastructure_network_bgp1.vlan }}"
-              use_dhcp: false
 {% endif %}
-{% if infrastructure_network_bgp2 is defined %}
-            -
-              type: vlan 
-              device: bond0
-              vlan_id:
-                get_param: "{{ infrastructure_network_bgp2.vlan }}"
-              use_dhcp: false
-{% endif % END COMMENTED OUT ###}
 
+            - type: linux_bond
+              name: br-services
+              bonding_options: "mode=active-backup"
+              addresses:
+                 - ip_netmask: {get_param: ExternalIpSubnet}
+              routes:
+                -
+                  ip_netmask: 0.0.0.0/0
+                  default: true
+                  next_hop: {get_param: ExternalInterfaceDefaultRoute}
+              members:
+               - type: interface
+                 name: eno1
+                 primary: true
+               - type: interface
+                 name: eno2
+
+            - type: linux_bond
+              name: br-admin
+              bonding_options:
+                get_param: BondInterfaceOvsOptions
+              dns_servers:
+                get_param: DnsServers
+              members:
+                - type: interface
+                  name: eno49
+                  primary: true
+                - type: interface
+                  name: eno50
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.

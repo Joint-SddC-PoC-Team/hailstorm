@@ -30,7 +30,7 @@ resource_registry:
   OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external.yaml
   OS::TripleO::Compute::Ports::InternalApiPort: ../network/ports/internal_api.yaml
   OS::TripleO::Compute::Ports::StoragePort: ../network/ports/storage.yaml
-{% if override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend) == 'ceph_hyperconverged' %}
+{% if (override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend)) == 'ceph_hyperconverged' %}
   OS::TripleO::Compute::Ports::StorageMgmtPort: ../network/ports/storage_mgmt.yaml
 {% else %}
   OS::TripleO::Compute::Ports::StorageMgmtPort: ../network/ports/noop.yaml

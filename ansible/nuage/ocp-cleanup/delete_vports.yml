@@ -1,0 +1,9 @@
+- name: Deleting all found VPorts
+  delegate_to: localhost
+  nuage_vspk:
+    auth: "{{ nuage_auth }}"
+    type: VPort
+    state: absent
+    id: "{{ item.ID }}"
+  with_items: "{{ nuage_vports_results.entities }}"
+  when: nuage_vports_results.entities is defined

@@ -1,0 +1,51 @@
+---
+- hosts: localhost
+
+  vars:
+    nuage_auth:
+      api_username: csproot
+      api_password: csproot
+      api_enterprise: csp
+      api_url: https://10.116.127.156:8443
+      api_version: v5_0
+    vsr1: "r1"
+    vsr2: "r2"
+
+  tasks:
+  - name: Fetching VSR1
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Gateway
+      command: find
+      match_filter: "name is '{{ vsr1 }}'"
+    register: nuage_vsr1
+
+  - name: Update VSR1
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Gateway
+      state: present
+      id: "{{ nuage_vsr1.id }}"
+      properties:
+        pending: False
+
+  - name: Fetching VSR2
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Gateway
+      command: find
+      match_filter: "name is '{{ vsr2 }}'"
+    register: nuage_vsr2
+
+  - name: Update VSR2
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Gateway
+      state: present
+      id: "{{ nuage_vsr2.id }}"
+      properties:
+        pending: False

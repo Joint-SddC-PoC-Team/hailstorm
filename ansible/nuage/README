@@ -1,0 +1,4 @@
+This needs ansible-2.4 to run
+
+on the install-host, use source /opt/ansible-2.4.0.0/bin/activate
+to switch to the ansible-2.4 virtual env
