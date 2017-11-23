@@ -11,13 +11,13 @@
       "true"
     ],
     "usersDn": [
-      "{{item.usersDN }}"
+      "{{item.usersDN}}"
     ],
     "connectionPooling": [
       "true"
     ],
     "cachePolicy": [
-      "DEFAULT"
+      "no_cache"
     ],
     "useKerberosForPasswordAuthentication": [
       "false"
@@ -27,7 +27,7 @@
       "3600"
     ],
     "usernameLDAPAttribute": [
-      "uid"
+      "cn"
     ],
     "bindDn": [
       "{{item.bindDN}}"
@@ -36,13 +36,13 @@
       "{{item.bindCredential}}"
     ],
     "vendor": [
-      "rhds"
+      "ad"
     ],
     "uuidLDAPAttribute": [
-      "uidNumber"
+      "objectGUID"
     ],
     "connectionUrl": [
-      "{{item.connectionUrl }}"
+      "{{item.connectionUrl}}"
     ],
     "allowKerberosAuthentication": [
       "false"
@@ -61,7 +61,7 @@
       "false"
     ],
     "searchScope": [
-      "2"
+      "1"
     ],
     "useTruststoreSpi": [
       "ldapsOnly"
@@ -69,19 +69,19 @@
     "keyTab": [],
     "maxLifespan": [],
     "priority": [
-      "110"
+      "120"
     ],
     "kerberosRealm": [],
     "userObjectClasses": [
-      "posixAccount"
+      "person, organizationalPerson, user"
     ],
     "evictionMinute": [],
     "rdnLDAPAttribute": [
-      "uid"
+      "cn"
     ],
     "evictionDay": [],
     "editMode": [
-      "READ_ONLY"
+      "WRITABLE"
     ],
     "readTimeout": [],
     "batchSizeForSync": [
