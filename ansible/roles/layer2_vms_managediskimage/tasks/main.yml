@@ -1,0 +1,39 @@
+---
+- block:
+    - name: stat disk image
+      stat: path={{ layer1_binary_dir }}/{{ disk.path }}
+      register: foo_stat
+
+    - set_fact:
+        disk_image_exists_in_binary_dir: "{{ foo_stat.stat.exists }}"
+
+  delegate_to: "{{ infrastructure_delegate_kvm_host }}"
+  when: mode=="checkvmimage"
+
+- block:
+    - name: get list of vms
+      virt: command=list_vms
+      delegate_to: "{{ infrastructure_delegate_kvm_host }}"
+      register: virt_vms
+
+    - name: destroy vm
+      virt: state=destroyed name={{ inventory_hostname_short }}
+      when: inventory_hostname_short in virt_vms.list_vms
+
+    - name: undefine vm
+      virt: command=undefine name={{ inventory_hostname_short }}
+      when: inventory_hostname_short in virt_vms.list_vms
+
+    - name: stat disk image
+      stat: path={{ layer1_qcow_storage.path }}/{{ disk.path }}
+      register: foo_stat
+
+    - name: Move disk image to binary dir
+      command: mv {{ layer1_qcow_storage.path }}/{{ disk.path }} {{ layer1_binary_dir }}/{{ disk.path }}
+      when: foo_stat.stat.exists
+
+    - name: set access permissions
+      file: path={{ layer1_binary_dir }}/{{ disk.path }} mode=0644
+
+  delegate_to: "{{ infrastructure_delegate_kvm_host }}"
+  when: mode=="movevmimage"

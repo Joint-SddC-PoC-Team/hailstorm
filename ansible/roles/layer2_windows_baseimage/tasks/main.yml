@@ -1,0 +1,35 @@
+- name: Install cloud-init
+  win_package:
+    path: http://{{ hostvars['satellite'].hostname }}/pub/{{ satellite_www_dir }}/CloudbaseInitSetup_x64.msi
+    product_id: '{ED85F19F-057A-4EE6-BC8D-F576DEACE78D}'
+    arguments: /qn /l*v c:\cloudbaseiinit_installlog.txt
+
+# this is already done in autounattend.xml
+# - name: Hide Ansible Windows User
+#   win_shell: REG.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" /v Ansible /t REG_DWORD /d 0 /f
+
+#https://technet.microsoft.com/en-us/library/hh825104.aspx
+- name: disable local Administrator account
+  win_shell: net user administrator /active:no
+
+- name: create unattend.xml
+  win_template: src=unattend.xml.j2 dest=C:\unattend.xml
+  register: unattend
+
+- name: invoke sysprep & shut down system
+  win_shell: C:\Windows\System32\Sysprep\Sysprep.exe /generalize /oobe /quiet /unattend:c:\unattend.xml
+  when: unattend|changed
+
+# - name: remove unattend.xml
+#   win_file: name=c:\unattend.xml state=absent
+
+# - name: shutdown System
+#   raw: Stop-Computer -Force
+
+- name: wait for VM to shut down
+  virt: command=info name={{ inventory_hostname_short }}
+  register: virt_result
+  delegate_to: "{{ infrastructure_delegate_kvm_host }}"
+  until: virt_result[inventory_hostname_short].state == 'shutdown'
+  retries: 30
+  delay: 10

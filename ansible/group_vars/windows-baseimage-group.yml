@@ -3,11 +3,10 @@ mem: 2048
 vcpu: 2
 disk:
   path: "{{ inventory_hostname_short }}.qcow2"
-  size: 20
+  size: 18
   format: qcow2
 
 windows: true
-windows_install_dvd: BOSCH_WINDOWS_DVD.iso
 #windows_product_key:
 
 nic_attachments:

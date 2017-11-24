@@ -1,8 +1,0 @@
-- name: Install cloud-init
-  win_package:
-    path: http://{{ hostvars['satellite'].hostname }}/pub/bosch/CloudbaseInitSetup_x64.msi
-    product_id: '{ED85F19F-057A-4EE6-BC8D-F576DEACE78D}'
-    arguments: /qn /l*v c:\cloudbaseiinit_installlog.txt
-
-- name: invoke sysprep
-  win_shell: C:\Windows\System32\Sysprep\Sysprep.exe /generalize /oobe /quiet /shutdown

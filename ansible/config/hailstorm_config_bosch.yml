@@ -24,7 +24,7 @@ lifecycle_environments:
     # controlled node placement fails on the second scale up since an unmapped hostname (overcloud-compute-3) is assigned
     #Controlled Node Placement with OSP10 or later
     osp_controlled_node_placement: false
-    osp_glance_use_swift: true
+    osp_glance_use_swift: false
     osp_in_baremetal: false
     #TLS with OSP10 or later
     osp_use_tls: true
@@ -51,10 +51,12 @@ lifecycle_environments:
         image: rhel-server-7.4-x86_64-kvm.qcow2
       - name: CirrOS
         image: cirros-0.3.4-x86_64-disk.img
-      - name: Windows
+      - name: Windows_Cloudbase
         image: windows_server_2012_r2_standard_eval_kvm_20151021.qcow2.gz
       - name: Cloudforms
         image: cfme-rhos-5.8.2.3-1.x86_64.qcow2
+      - name: Windows
+        image: windows_baseimage.qcow2
     rhev_templates:
       - name: RHEL7
         image: rhel-server-7.4-x86_64-kvm.qcow2
@@ -145,9 +147,9 @@ rhel_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Ente
 rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure|td-agent|Red Hat JBoss Enterprise Application Platform.*)$"
 #sap_subscription_pool_regex: "^(Employee SKU|Red Hat Enterprise Linux Server for SAP HANA.*)$"
 rhev_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Virtualization.*|Red Hat Enterprise Linux Server, Standard.*|td-agent)$"
-rhosp_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat (Enterprise Linux )?OpenStack Platform.*|td-agent)$"
+rhosp_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat (Enterprise Linux )?OpenStack Platform.*|Red Hat Ceph Storage.*|td-agent)$"
 ose_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform.*|Red Hat Gluster Storage.*|td-agent)$"
-cloudforms_subscription_pool_regex: "^(CloudForms Employee Subscription|Red Hat Cloud Suite.*|Red Hat OpenStack Platform.*|td-agent)$"
+cloudforms_subscription_pool_regex: "^(CloudForms Employee Subscription|Red Hat Cloud Suite.*|Red Hat CloudForms.*|Red Hat OpenStack Platform.*|td-agent)$"
 ceph_subscription_pool_regex: "^(Employee SKU|Red Hat Ceph Storage.*|Red Hat OpenStack Platform.*|td-agent)$"
 
 # REPOSITORIES

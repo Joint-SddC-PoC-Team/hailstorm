@@ -1,30 +1,31 @@
 ---
-- hosts: windows-sample-group
-  remote_user: root
-  gather_facts: false
-  roles:
-     - { role: layer2_vms, tags: [ 'layer2', 'vm' ], mode: create }
-
 - hosts: satellite-group
   remote_user: root
   gather_facts: false
   roles:
     - role: layer2_satellite_publish_installables
       mode: create
-      satellite_www_dir: bosch
+      satellite_www_dir: customer
       installables:
         - CloudbaseInitSetup_x64.msi
-        - Altiris_agent/AeXNSCHTTPs.exe
-        - Altiris_agent/Altiris_PatchMgmtAgent_Win64.msi
-        - Altiris_agent/SoftwareManagementSolution_Plugin_x64.msi
-        - Altiris_agent/Symantec_InventoryAgent_x64.msi
-        - Altiris_agent/Symantec_ServerInventoryAgent_x64.msi
-        - Altiris_agent/install_agent.bat
-        - Certificates/BOSCH-CA1-DE.cer
-        - Certificates/BOSCH-CA-DE.cer
 
-- hosts: windows-sample-group
+- hosts: windows-baseimage-group
   remote_user: root
   gather_facts: false
   roles:
-     - { role: layer2_windows_cloudinit, tags: [ 'layer2', 'vm' ], mode: create }
+    - role: layer2_vms_managediskimage
+      mode: checkvmimage
+      tags: [ 'layer2' ]
+    - role: layer2_vms
+      tags: [ 'layer2', 'vm' ]
+      mode: create
+      when: not disk_image_exists_in_binary_dir
+    - role: layer2_windows_baseimage
+      tags: [ 'layer2', 'vm' ]
+      mode: create
+      satellite_www_dir: customer
+      when: not disk_image_exists_in_binary_dir
+    - role: layer2_vms_managediskimage
+      mode: movevmimage
+      tags: [ 'layer2', 'move' ]
+      when: not disk_image_exists_in_binary_dir

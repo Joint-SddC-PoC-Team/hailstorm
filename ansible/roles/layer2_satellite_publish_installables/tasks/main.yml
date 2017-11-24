@@ -29,12 +29,11 @@
 
 - name: create target directory on satellites web server
   file:
-    path: /var/www/html/pub/{{ satellite_www_dir }}/{{ item|regex_replace('(.*)/.+','\1') }}
+    path: /var/www/html/pub/{{ satellite_www_dir }}{% if '/' in item %}/{{ item|regex_replace('(.*)/.+','\1') }}{% endif %}
     state: directory
     owner: root
     group: root
     mode: 0755
-  when: "'/' in item"
   with_items: "{{ installables }}"
 
 - name: copy installables from layer1

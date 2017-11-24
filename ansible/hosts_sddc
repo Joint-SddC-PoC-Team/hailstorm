@@ -87,11 +87,11 @@ si8ads13
 
 #### BEGIN SAMPLE WINDOWS IMAGE
 
-[windows-sample-group]
-windows_sample ansible_host=10.116.127.10 enable_virtio_win=true
+[windows-baseimage-group]
+windows_baseimage ansible_host=10.116.127.10 enable_virtio_win=true windows_install_dvd=SW_DVD9_Windows_Svr_Std_and_DataCtr_2012_R2_64Bit_English_-4_MLF_X19-82891.ISO
 
-[windows-sample-group:vars]
-ansible_user=Administrator
+[windows-baseimage-group:vars]
+ansible_user=Ansible
 ansible_password="{{ root_password }}"
 ansible_port=5986
 ansible_connection=winrm
@@ -449,7 +449,7 @@ dev-client-group
 tower
 storage-console
 windows-group
-windows-sample-group
+windows-baseimage-group
 
 # to let it participate in the calculation of ansible_host
 # and the ssh proxy command used to communicate with all layer2/3 hosts
