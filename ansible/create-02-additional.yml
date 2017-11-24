@@ -94,4 +94,4 @@
       tags: [ 'layer2', 'efk', 'proxy-client' ]
       mode: create
     - { role: layer2_efk_centos_opstools, tags: [ 'layer2', 'efk', 'efk-install'], mode: create, when: "current_lifecycle_env.openstack_version >= 10" }
-    - { role: layerX_syslog_client, tags: [ 'layer2', 'proxy', 'syslog',  'syslog-client'], mode: create }
+    - { role: layerX_syslog_client, tags: [ 'layer2', 'efk', 'syslog',  'syslog-client'], mode: create }

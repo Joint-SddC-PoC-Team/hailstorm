@@ -1,0 +1,91 @@
+{
+  "name": "{{item.name}}",
+  "providerId": "ldap",
+  "providerType": "org.keycloak.storage.UserStorageProvider",
+  "config": {
+    "serverPrincipal": [],
+    "fullSyncPeriod": [
+      "86400"
+    ],
+    "pagination": [
+      "true"
+    ],
+    "usersDn": [
+      "{{item.usersDN}}"
+    ],
+    "connectionPooling": [
+      "true"
+    ],
+    "cachePolicy": [
+      "no_cache"
+    ],
+    "useKerberosForPasswordAuthentication": [
+      "false"
+    ],
+    "evictionHour": [],
+    "changedSyncPeriod": [
+      "3600"
+    ],
+    "usernameLDAPAttribute": [
+      "cn"
+    ],
+    "bindDn": [
+      "{{item.bindDN}}"
+    ],
+    "bindCredential": [
+      "{{item.bindCredential}}"
+    ],
+    "vendor": [
+      "ad"
+    ],
+    "uuidLDAPAttribute": [
+      "objectGUID"
+    ],
+    "connectionUrl": [
+      "{{item.connectionUrl}}"
+    ],
+    "allowKerberosAuthentication": [
+      "false"
+    ],
+    "syncRegistrations": [
+      "false"
+    ],
+    "authType": [
+      "simple"
+    ],
+    "connectionTimeout": [],
+    "customUserSearchFilter": [
+      "{{item.usersFilter}}"
+    ],
+    "debug": [
+      "false"
+    ],
+    "searchScope": [
+      "1"
+    ],
+    "useTruststoreSpi": [
+      "ldapsOnly"
+    ],
+    "keyTab": [],
+    "maxLifespan": [],
+    "priority": [
+      "120"
+    ],
+    "kerberosRealm": [],
+    "userObjectClasses": [
+      "person, organizationalPerson, user"
+    ],
+    "evictionMinute": [],
+    "rdnLDAPAttribute": [
+      "cn"
+    ],
+    "evictionDay": [],
+    "editMode": [
+      "WRITABLE"
+    ],
+    "readTimeout": [],
+    "batchSizeForSync": [
+      "1000"
+    ]
+  }
+}

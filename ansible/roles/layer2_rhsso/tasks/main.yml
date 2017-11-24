@@ -1,6 +1,6 @@
 - block:
     - include: create.yml
-      tags: ["rhsso"]
+      tags: ["rhsso", "rhsso-install", "rhsso-config"]
   when: mode=="create"
 
 - block:

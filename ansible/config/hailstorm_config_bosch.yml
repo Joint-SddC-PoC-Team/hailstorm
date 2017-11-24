@@ -973,3 +973,31 @@ nuage:
   # bridges for the external network on the KVM host
   ports_to_hv_bridges_vsr1: "['tenant','services','ospf1','bgp1','nuage_vsr'{% if infrastructure_network_guests.physical_underlay == false %},'guests'{% endif %}]"
   ports_to_hv_bridges_vsr2: "['tenant','services','ospf2','bgp2','nuage_vsr'{% if infrastructure_network_guests.physical_underlay == false %},'guests'{% endif %}]"
+
+# RH SSO Stuff:
+rhsso:
+  userProviders:
+    - name: ldap_ipa_hailstorm
+      type: ipa
+      priority: 100
+      usersDN: cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      usersFilter: (&(objectClass=posixAccount))
+      bindDN: uid=rhsso-bind-user,cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      bindCredential: "{{ root_password }}"
+      connectionUrl: ldaps://ipa.{{ hailstorm_dns_domain }}:636
+      groupsDN: cn=groups,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      groupsClasses: groupofnames
+      groupsFilter: ""
+
+
+    - name: ldap_ad_rh-sddc
+      type: ad
+      priority: 120
+      usersDN: cn=users,dc=rh-sddc,dc=test-bosch,dc=com
+      usersFilter: ""
+      bindDN: cn=Administrator,cn=users,dc=rh-sddc,dc=test-bosch,dc=com
+      bindCredential: "{{ root_password }}"
+      connectionUrl: ldap://10.32.105.65:389
+      groupsDN: cn=users,dc=rh-sddc,dc=test-bosch,dc=com
+      groupsClasses: group
+      groupsFilter: ""

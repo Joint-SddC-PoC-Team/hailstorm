@@ -29,9 +29,62 @@
     - name: openshift-ca.crt
       value: "{{ openshift_cacert }}"
 
-- name: create /etc/ansible/hosts
+- name: grab hailstorm private key
+  command: cat binary/{{ hailstorm_ssh_priv_key_file }}
+  delegate_to: localhost
+  register: hailstorm_private_key
+
+- name: create the hailstorm key on the OSE installer
+  copy: content="{{ hailstorm_private_key.stdout }}" dest=/root/.ssh/{{ hailstorm_ssh_priv_key_file }} mode=0400
+
+- name: create /etc/ansible/hosts for OVS multitenant SDN
   template: src=hosts.j2 dest=/etc/ansible/hosts
   register: ansible_hosts
+  when: enable_nuage is not defined
+
+- name: create /etc/ansible/hosts for Nuage SDN
+  template: src=hosts_nuagesdn.j2 dest=/etc/ansible/hosts
+  register: ansible_hosts
+  when: enable_nuage is defined
+
+- name: Register Nuage SDN files repo IP
+  command: dig {{ layer1_ansible_host }} +short
+  delegate_to: localhost
+  register: nuage_files_IP
+  when: enable_nuage is defined
+
+- name: copy over Nuage SDN certs and docker images from layer1 host (where it has to be copied to beforehand!)
+  command: rsync -e "ssh -i /root/.ssh/{{ hailstorm_ssh_priv_key_file }} -o StrictHostKeyChecking=no" -aviPHAXS root@{{ nuage_files_IP.stdout }}:{{ nfs_nuage_binary_dir }}/ocp .
+  when: enable_nuage is defined
+
+- name: distribute Nuage master image in master nodes
+  command: ansible masters -m copy -a "src=/root/ocp/dockerimages/nuage-master-docker-5.1.1-5.tar dest=/root/nuage-master-docker-5.1.1-5.tar"
+  when: enable_nuage is defined
+- name: distribute Nuage cni image in all the nodes
+  command: ansible nodes -m copy -a "src=/root/ocp/dockerimages/nuage-cni-docker-5.1.1-5.tar dest=/root/nuage-cni-docker-5.1.1-5.tar"
+  when: enable_nuage is defined
+- name: distribute Nuage vrs image in all the nodes
+  command: ansible nodes -m copy -a "src=/root/ocp/dockerimages/nuage-vrs-docker-5.1.1-9.tar dest=/root/nuage-vrs-docker-5.1.1-9.tar"
+  when: enable_nuage is defined
+
+- name: docker load Nuage SDN master images into master nodes
+  command: ansible masters -a "docker load -i /root/nuage-master-docker-5.1.1-5.tar"
+  when: enable_nuage is defined
+- name: docker load Nuage SDN cni images into all nodes
+  command: ansible nodes -a "docker load -i /root/nuage-cni-docker-5.1.1-5.tar"
+  when: enable_nuage is defined
+- name: docker load Nuage SDN vrs images into all nodes
+  command: ansible nodes -a "docker load -i /root/nuage-vrs-docker-5.1.1-9.tar"
+  when: enable_nuage is defined
+
+- name: clean images files from the installer host
+  file: 
+    state: absent
+    path: "/root/ocp/dockerimages"
+  when: enable_nuage is defined
+- name: clean images files from all the nodes
+  command: ansible nodes -a "rm -f /root/nuage*tar"
+  when: enable_nuage is defined
 
 - name: ensure that /etc/origin/master exists on all masters
   shell: ansible masters -m file -a "path=/etc/origin/master state=directory"
@@ -60,4 +113,4 @@
       until: job_result.finished
       retries: 480
       delay: 15
-  when: ansible_hosts|changed
+  when: ansible_hosts is defined
