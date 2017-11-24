@@ -1,0 +1,301 @@
+/configure system name "r2.hailstorm5.coe.muc.redhat.com"
+/configure system time ntp no shutdown
+/configure system time sntp shutdown
+/configure system time zone UTC
+/configure system
+/configure log
+/configure system vsd system-id "r2"
+/configure system xmpp server "vsd" domain-name "xmpp.hailstorm5.coe.muc.redhat.com" create username "r2"
+/configure card 1 card-type iom-v
+/configure card 1 mda 1 mda-type m20-v
+/configure card 1 mda 1 no shutdown
+/configure card 1 no shutdown
+/configure port-xc pxc 1 create description "PXC_port"
+/configure port-xc pxc 1 create port 1/1/20
+/configure port-xc pxc 1 create no shutdown
+/configure port 1/1/1 shutdown
+/configure port 1/1/1 description "Tenant_network"
+/configure port 1/1/1 ethernet mode access
+/configure port 1/1/1 no shutdown
+/configure port 1/1/2 shutdown
+/configure port 1/1/2 description "Services_network"
+/configure port 1/1/2 ethernet mode access
+/configure port 1/1/2 no shutdown
+/configure port 1/1/3 shutdown
+/configure port 1/1/3 description "OSPF1_network"
+/configure port 1/1/3 ethernet mode access
+/configure port 1/1/3 no shutdown
+/configure port 1/1/4 shutdown
+/configure port 1/1/4 description "BGP1_network"
+/configure port 1/1/4 ethernet mode access
+/configure port 1/1/4 no shutdown
+/configure port 1/1/5 shutdown
+/configure port 1/1/5 description "Nuage_VSR_network"
+/configure port 1/1/5 ethernet mode access
+/configure port 1/1/5 no shutdown
+/configure port 1/1/6 shutdown
+/configure port 1/1/6 description "Guests_network"
+/configure port 1/1/6 ethernet mode access
+/configure port 1/1/6 no shutdown
+/configure port 1/1/7 shutdown
+/configure port 1/1/7 ethernet
+/configure port 1/1/8 shutdown
+/configure port 1/1/8 ethernet
+/configure port 1/1/9 shutdown
+/configure port 1/1/9 ethernet
+/configure port 1/1/10 shutdown
+/configure port 1/1/10 ethernet
+/configure port 1/1/11 shutdown
+/configure port 1/1/11 ethernet
+/configure port 1/1/12 shutdown
+/configure port 1/1/12 ethernet
+/configure port 1/1/13 shutdown
+/configure port 1/1/13 ethernet
+/configure port 1/1/14 shutdown
+/configure port 1/1/14 ethernet
+/configure port 1/1/15 shutdown
+/configure port 1/1/15 ethernet
+/configure port 1/1/16 shutdown
+/configure port 1/1/16 ethernet
+/configure port 1/1/17 shutdown
+/configure port 1/1/17 ethernet
+/configure port 1/1/18 shutdown
+/configure port 1/1/18 ethernet
+/configure port 1/1/19 shutdown
+/configure port 1/1/19 ethernet
+/configure port 1/1/20 ethernet dot1x tunneling
+/configure port 1/1/20 ethernet mode hybrid
+/configure port 1/1/20 ethernet encap-type dot1q
+/configure port 1/1/20 no shutdown
+/configure port pxc-1.a ethernet
+/configure port pxc-1.a no shutdown
+/configure port pxc-1.b ethernet
+/configure port pxc-1.b no shutdown
+/configure router management
+/configure router Base interface "system" address 1.1.1.12/32
+/configure router Base interface "system" no shutdown
+/configure router Base interface "to_infravprn" address 10.100.1.0/31
+/configure router Base interface "to_infravprn" port pxc-1.a:0
+/configure router Base interface "to_infravprn" no shutdown
+/configure router Base autonomous-system 65000
+/configure router Base ospf 0 asbr
+/configure router Base ospf 0 area 0.0.0.0 interface "system" no shutdown
+/configure router Base ospf 0 area 0.0.0.0 interface "to_infravprn" mtu 1500
+/configure router Base ospf 0 area 0.0.0.0 interface "to_infravprn" no shutdown
+/configure router Base ospf 0 no shutdown
+/configure router Base policy-options begin
+/configure router Base policy-options policy-statement "announce_to_rb" entry 10 from protocol direct
+/configure router Base policy-options policy-statement "announce_to_rb" entry 10 action accept
+/configure router Base policy-options policy-statement "announce_to_rb" entry 20 from protocol static
+/configure router Base policy-options policy-statement "announce_to_rb" entry 20 action accept
+/configure router Base policy-options policy-statement "policy-201-export"
+/configure router Base policy-options policy-statement "policy-201-import"
+/configure router Base policy-options policy-statement "policy-202-export"
+/configure router Base policy-options policy-statement "policy-202-import"
+/configure router Base policy-options policy-statement "policy-203-export"
+/configure router Base policy-options policy-statement "policy-203-import"
+/configure router Base policy-options policy-statement "policy-204-export"
+/configure router Base policy-options policy-statement "policy-204-import"
+/configure router Base policy-options policy-statement "policy-2001-export"
+/configure router Base policy-options policy-statement "policy-2001-import"
+/configure router Base policy-options policy-statement "policy-2002-export"
+/configure router Base policy-options policy-statement "policy-2002-import"
+/configure router Base policy-options commit
+/configure service customer 1 create description "Default customer"
+/configure service vsd domain vrf201 type vrf-vxlan create description "vrf201"
+/configure service vsd domain vrf201 type vrf-vxlan create no shutdown
+/configure service vsd domain vrf202 type vrf-vxlan create description "vrf202"
+/configure service vsd domain vrf202 type vrf-vxlan create no shutdown
+/configure service vsd domain vrf203 type vrf-vxlan create description "vrf203"
+/configure service vsd domain vrf203 type vrf-vxlan create no shutdown
+/configure service vsd domain vrf204 type vrf-vxlan create description "vrf204"
+/configure service vsd domain vrf204 type vrf-vxlan create no shutdown
+/configure service vsd domain vrf2001 type vrf-vxlan create
+/configure service vsd domain vrf2001  description "vrf2001 FIP"
+/configure service vsd domain vrf2001 no shutdown
+/configure service vsd domain vrf2002 type vrf-vxlan create
+/configure service vsd domain vrf2002  description "vrf2002 mgmt data"
+/configure service vsd domain vrf2002 no shutdown
+/configure service vprn 1000 customer 1 create interface "to_OSPF1" create
+/configure service vprn 1000 customer 1 create interface "to_BGP1" create
+/configure service vprn 1000 customer 1 create interface "to-vpls201" create
+/configure service vprn 1000 customer 1 create interface "to-vpls202" create
+/configure service vprn 1000 customer 1 create interface "to-vpls203" create
+/configure service vprn 1000 customer 1 create interface "to-vpls204" create
+/configure service vprn 1000 customer 1 create interface "to-vpls2001" create
+/configure service vprn 2000 customer 1 create interface "to_GRT" create
+/configure service vprn 2000 customer 1 create interface "to_vsr1" create
+/configure service vprn 2000 customer 1 create interface "to_tenant" create
+/configure service vpls 201 customer 1 create allow-ip-int-bind
+/configure service vpls 201 customer 1 create bgp route-distinguisher 65000:201
+/configure service vpls 201 customer 1 create bgp vsi-export "policy-201-export"
+/configure service vpls 201 customer 1 create bgp vsi-import "policy-201-import"
+/configure service vpls 201 customer 1 create bgp-evpn ip-route-advertisement
+/configure service vpls 201 customer 1 create bgp-evpn mpls shutdown
+/configure service vpls 201 customer 1 create stp shutdown
+/configure service vpls 201 customer 1 create service-name "vpls201"
+/configure service vpls 201 customer 1 create vsd-domain "vrf201"
+/configure service vpls 201 customer 1 create no shutdown
+/configure service vpls 202 customer 1 create allow-ip-int-bind
+/configure service vpls 202 customer 1 create bgp route-distinguisher 65000:102
+/configure service vpls 202 customer 1 create bgp vsi-export "policy-202-export"
+/configure service vpls 202 customer 1 create bgp vsi-import "policy-202-import"
+/configure service vpls 202 customer 1 create bgp-evpn ip-route-advertisement
+/configure service vpls 202 customer 1 create bgp-evpn mpls shutdown
+/configure service vpls 202 customer 1 create stp shutdown
+/configure service vpls 202 customer 1 create service-name "vpls202"
+/configure service vpls 202 customer 1 create vsd-domain "vrf202"
+/configure service vpls 202 customer 1 create no shutdown
+/configure service vpls 203 customer 1 create allow-ip-int-bind
+/configure service vpls 203 customer 1 create bgp route-distinguisher 65000:103
+/configure service vpls 203 customer 1 create bgp vsi-export "policy-203-export"
+/configure service vpls 203 customer 1 create bgp vsi-import "policy-203-import"
+/configure service vpls 203 customer 1 create bgp-evpn ip-route-advertisement
+/configure service vpls 203 customer 1 create bgp-evpn mpls shutdown
+/configure service vpls 203 customer 1 create stp shutdown
+/configure service vpls 203 customer 1 create service-name "vpls203"
+/configure service vpls 203 customer 1 create vsd-domain "vrf203"
+/configure service vpls 203 customer 1 create no shutdown
+/configure service vpls 204 customer 1 create allow-ip-int-bind
+/configure service vpls 204 customer 1 create bgp route-distinguisher 65000:104
+/configure service vpls 204 customer 1 create bgp vsi-export "policy-204-export"
+/configure service vpls 204 customer 1 create bgp vsi-import "policy-204-import"
+/configure service vpls 204 customer 1 create bgp-evpn ip-route-advertisement
+/configure service vpls 204 customer 1 create bgp-evpn mpls shutdown
+/configure service vpls 204 customer 1 create stp shutdown
+/configure service vpls 204 customer 1 create service-name "vpls204"
+/configure service vpls 204 customer 1 create vsd-domain "vrf204"
+/configure service vpls 204 customer 1 create no shutdown
+/configure service vpls 2001 customer 1 create
+/configure service vpls 2001 allow-ip-int-bind
+/configure service vpls 2001 bgp route-distinguisher 65000:1001
+/configure service vpls 2001 bgp vsi-export "policy-2001-export"
+/configure service vpls 2001 bgp vsi-import "policy-2001-import"
+/configure service vpls 2001 bgp-evpn ip-route-advertisement
+/configure service vpls 2001 service-name "vpls2001"
+/configure service vpls 2001 vsd-domain "vrf2001"
+/configure service vpls 2001 no shutdown
+/configure service vpls 2002 customer 1 create
+/configure service vpls 2002 allow-ip-int-bind
+/configure service vpls 2002 bgp route-distinguisher 65000:1002
+/configure service vpls 2002 bgp vsi-export "policy-2002-export"
+/configure service vpls 2002 bgp vsi-import "policy-2002-import"
+/configure service vpls 2002 bgp-evpn ip-route-advertisement
+/configure service vpls 2002 service-name "vpls2002"
+/configure service vpls 2002 vsd-domain "vrf2002"
+/configure service vpls 2002 no shutdown
+/configure service vprn 1000 customer 1 create router-id 1.1.1.12
+/configure service vprn 1000 auto-bind-tunnel resolution any
+/configure service vprn 1000 customer 1 create autonomous-system 65500
+/configure service vprn 1000 customer 1 create route-distinguisher 65500:1000
+/configure service vprn 1000 customer 1 create vrf-target target:65500:1000
+/configure service vprn 1000 customer 1 create interface "to_OSPF1" create address 10.116.11.38/28
+/configure service vprn 1000 customer 1 create interface "to_OSPF1" create ipv6
+/configure service vprn 1000 customer 1 create interface "to_OSPF1" create sap 1/1/3 create
+/configure service vprn 1000 customer 1 create interface "to_BGP1" create address 10.116.111.60/28
+/configure service vprn 1000 customer 1 create interface "to_BGP1" create ipv6
+/configure service vprn 1000 customer 1 create interface "to_BGP1" create sap 1/1/4 create
+/configure service vprn 1000 customer 1 create interface "to_guests" create address 10.32.96.169/20
+/configure service vprn 1000 customer 1 create interface "to_guests" create vrrp 3 backup 10.32.96.254
+/configure service vprn 1000 customer 1 create interface "to_guests" create vrrp 3 priority 200
+/configure service vprn 1000 customer 1 create interface "to_guests" create vrrp 3 ping-reply
+/configure service vprn 1000 customer 1 create interface "to_guests" create vrrp 3 traceroute-reply
+/configure service vprn 1000 customer 1 create interface "to_guests" create sap 1/1/6 create
+/configure service vprn 1000 customer 1 create interface "to_guests" remote-proxy-arp
+/configure service vprn 1000 customer 1 create interface "to-vpls201" create ipv6
+/configure service vprn 1000 customer 1 create interface "to-vpls201" create vpls "vpls201" evpn-tunnel
+/configure service vprn 1000 customer 1 create interface "to-vpls202" create ipv6
+/configure service vprn 1000 customer 1 create interface "to-vpls202" create vpls "vpls202" evpn-tunnel
+/configure service vprn 1000 customer 1 create interface "to-vpls203" create ipv6
+/configure service vprn 1000 customer 1 create interface "to-vpls203" create vpls "vpls203" evpn-tunnel
+/configure service vprn 1000 customer 1 create interface "to-vpls204" create ipv6
+/configure service vprn 1000 customer 1 create interface "to-vpls204" create vpls "vpls204" evpn-tunnel
+/configure service vprn 1000 interface "to-vpls2001" create
+/configure service vprn 1000 interface "to-vpls2001" vpls "vpls2001"
+/configure service vprn 1000 interface "to-vpls2001" ipv6
+/configure service vprn 1000 interface "to-vpls2001" vpls "vpls2001" evpn-tunnel
+/configure service vprn 1000 customer 1 create static-route-entry 0.0.0.0/0 next-hop 10.32.111.254 no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 10.116.104.0/24 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 10.116.105.0/24 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 10.116.106.0/24 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 10.116.107.0/24 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 10.116.108.0/24 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 10.116.109.0/24 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 10.116.110.0/24 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 10.116.111.0/24 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 2a03:cc00:16:105::/64 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 2a03:cc00:16:106::/64 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 2a03:cc00:16:107::/64 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 2a03:cc00:16:108::/64 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 2a03:cc00:16:109::/64 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 2a03:cc00:16:110::/64 black-hole no shutdown
+/configure service vprn 1000 customer 1 create static-route-entry 2a03:cc00:16:111::/64 black-hole no shutdown
+/configure service vprn 1000 customer 1 create bgp group "RB" family ipv4 ipv6
+/configure service vprn 1000 customer 1 create bgp group "RB" import "announce_to_rb"
+/configure service vprn 1000 customer 1 create bgp group "RB" peer-as 65011
+/configure service vprn 1000 customer 1 create bgp group "RB" neighbor 10.116.11.50
+/configure service vprn 1000 customer 1 create bgp group "RB" neighbor 10.116.111.51
+/configure service vprn 1000 customer 1 create bgp no shutdown
+/configure service vprn 1000 customer 1 create ospf3 0 export "announce_to_rb"
+/configure service vprn 1000 customer 1 create ospf3 0 area 0.0.0.10 interface "to_OSPF1" mtu 1500
+/configure service vprn 1000 customer 1 create ospf3 0 area 0.0.0.10 interface "to_OSPF1" no shutdown
+/configure service vprn 1000 customer 1 create ospf3 0 no shutdown
+/configure service vprn 1000 customer 1 create service-name "HUB_VPRN"
+/configure service vprn 1000 customer 1 create no shutdown
+/configure service vprn 2000 customer 1 create router-id 1.1.1.12
+/configure service vprn 2000 auto-bind-tunnel resolution any
+/configure service vprn 2000 customer 1 create route-distinguisher 65000:2000
+/configure service vprn 2000 customer 1 create vrf-target target:65000:2000
+/configure service vprn 2000 customer 1 create interface "to_GRT" create address 10.100.1.1/31
+/configure service vprn 2000 customer 1 create interface "to_GRT" create sap pxc-1.b:0 create
+/configure service vprn 2000 customer 1 create interface "to_vsr1" create address 192.168.16.3/24
+/configure service vprn 2000 customer 1 create interface "to_vsr1" create sap 1/1/5 create
+/configure service vprn 2000 customer 1 create interface "to_tenant" create address 192.168.12.168/24
+/configure service vprn 2000 customer 1 create interface "to_tenant" create vrrp 1 backup 192.168.12.254
+/configure service vprn 2000 customer 1 create interface "to_tenant" create vrrp 1 priority 200
+/configure service vprn 2000 customer 1 create interface "to_tenant" create vrrp 1 ping-reply
+/configure service vprn 2000 customer 1 create interface "to_tenant" create vrrp 1 traceroute-reply
+/configure service vprn 2000 customer 1 create interface "to_tenant" create sap 1/1/1 create
+/configure service vprn 2000 customer 1 create interface "to_mgmt" create address 10.116.127.169/24
+/configure service vprn 2000 customer 1 create interface "to_mgmt" create vrrp 2 backup 10.116.127.179
+/configure service vprn 2000 customer 1 create interface "to_mgmt" create vrrp 2 priority 200
+/configure service vprn 2000 customer 1 create interface "to_mgmt" create vrrp 2 ping-reply
+/configure service vprn 2000 customer 1 create interface "to_mgmt" create vrrp 2 traceroute-reply
+/configure service vprn 2000 customer 1 create interface "to_mgmt" create sap 1/1/2 create
+/configure service vprn 2000 interface "to_ocp" create
+/configure service vprn 2000 interface "to_ocp" vpls "vpls2002"
+/configure service vprn 2000 interface "to_ocp" ipv6
+/configure service vprn 2000 interface "to_ocp" vpls "vpls2002" evpn-tunnel
+/configure service vprn 2000 customer 1 create ospf 21.11.11.2 area 0.0.0.0 interface "to_GRT" mtu 1500
+/configure service vprn 2000 customer 1 create ospf 21.11.11.2 area 0.0.0.0 interface "to_GRT" no shutdown
+/configure service vprn 2000 customer 1 create ospf 21.11.11.2 area 0.0.0.0 interface "to_vsr1" no shutdown
+/configure service vprn 2000 customer 1 create ospf 21.11.11.2 area 0.0.0.0 interface "to_tenant" no shutdown
+/configure service vprn 2000 customer 1 create ospf 21.11.11.2 area 0.0.0.0 interface "to_mgmt" no shutdown
+/configure service vprn 2000 customer 1 create ospf 21.11.11.2 no shutdown
+/configure service vprn 2000 customer 1 create service-name "INFRA_VPRN"
+/configure service vprn 2000 customer 1 create no shutdown
+/configure service vpls 201 customer 1 create allow-ip-int-bind
+/configure service vpls 202 customer 1 create allow-ip-int-bind
+/configure service vpls 203 customer 1 create allow-ip-int-bind
+/configure service vpls 204 customer 1 create allow-ip-int-bind
+/configure router Base ospf 0 no shutdown
+/configure router Base bgp connect-retry 2
+/configure router Base bgp min-route-advertisement 1
+/configure router Base bgp outbound-route-filtering extended-community send-orf
+/configure router Base bgp rapid-withdrawal
+/configure router Base bgp rapid-update evpn
+/configure router Base bgp group "internal" family evpn
+/configure router Base bgp group "internal" type internal
+/configure router Base bgp group "internal" neighbor 1.1.1.1
+/configure router Base bgp group "internal" neighbor 1.1.1.2
+/configure router Base bgp group "internal" neighbor 1.1.1.3
+/configure router Base bgp group "internal" neighbor 1.1.1.4
+/configure router Base bgp group "internal" neighbor 1.1.1.11
+/configure router Base bgp no shutdown
+/configure system time ntp server 10.116.127.153
+/configure system xmpp server "vsd" domain-name "xmpp.hailstorm5.coe.muc.redhat.com" create username "r2" no shutdown
+/bof static-route 0.0.0.0/1 next-hop 10.116.127.1
+/bof primary-dns 10.116.127.153
+/bof dns-domain hailstorm5.coe.muc.redhat.com
+/bof save
+/admin save
