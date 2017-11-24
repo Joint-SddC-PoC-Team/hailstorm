@@ -104,7 +104,7 @@
   remote_user: root
   gather_facts: false
   roles:
-#   - { role: layer3_cloudforms_openshift_provider, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-ocp' ], mode: create }
+   - { role: layer3_cloudforms_openshift_provider, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-ocp' ], mode: create }
 
 - hosts: cloudforms-wk-rhev
   remote_user: root
