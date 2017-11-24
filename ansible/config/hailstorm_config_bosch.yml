@@ -986,7 +986,9 @@ rhsso:
       bindCredential: "{{ root_password }}"
       connectionUrl: ldaps://ipa.{{ hailstorm_dns_domain }}:636
       groupsDN: cn=groups,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      groupsClasses: groupofnames
       groupsFilter: ""
+
 
     - name: ldap_ad_rh-sddc
       type: ad
@@ -997,4 +999,5 @@ rhsso:
       bindCredential: "{{ root_password }}"
       connectionUrl: ldap://10.32.105.65:389
       groupsDN: cn=users,dc=rh-sddc,dc=test-bosch,dc=com
+      groupsClasses: group
       groupsFilter: ""
