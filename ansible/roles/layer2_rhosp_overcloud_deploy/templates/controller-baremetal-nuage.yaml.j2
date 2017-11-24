@@ -95,7 +95,7 @@ resources:
       config:
         os_net_config:
           network_config:
-            - type: linux_bind
+            - type: linux_bond
               name: br-provisioning
               bonding_options: "mode=active-backup"
               use_dhcp: false
@@ -122,28 +122,28 @@ resources:
                   primary: false
 
             - type: vlan
-              device: bond0
+              device: br-provisioning
               vlan_id:
                 get_param: InternalApiNetworkVlanID
               addresses:
               - ip_netmask:
                   get_param: InternalApiIpSubnet
             - type: vlan
-              device: bond0
+              device: br-provisioning
               vlan_id:
                 get_param: TenantNetworkVlanID
               addresses:
               - ip_netmask:
                   get_param: TenantIpSubnet
             - type: vlan
-              device: bond0
+              device: br-provisioning
               vlan_id:
                 get_param: StorageNetworkVlanID
               addresses:
               - ip_netmask:
                   get_param: StorageIpSubnet
             - type: vlan
-              device: bond0
+              device: br-provisioning
               vlan_id:
                 get_param: ManagementNetworkVlanID
               addresses:
@@ -153,7 +153,7 @@ resources:
 {% if current_lifecycle_env.osp_storage_backend == 'ceph_hyperconverged' %}
             -
               type: vlan 
-              device: bond0
+              device: br-provisioning
               vlan_id:
                 get_param: StorageMgmtNetworkVlanID
               addresses:
