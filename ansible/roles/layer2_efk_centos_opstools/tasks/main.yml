@@ -50,7 +50,14 @@
       delay: 15
       when: hosts|changed or config|changed
 
-
+    - name: set htpasswd
+      htpasswd:
+        path: "{{ item }}"
+        name: admin
+        password: "{{ root_password }}"
+      with_items:
+        - /etc/httpd/conf/htpasswd-kibana
+        - /etc/httpd/conf/htpasswd-uchiwa
 
 ## install curator
 
