@@ -12,7 +12,7 @@
             "membership.user.ldap.attribute" : [ "uid" ],
             "membership.ldap.attribute" : [ "member" ],
             "groups.dn" : [ "{{item.groupsDN}}" ],
-            "group.object.classes" : [ "group" ],
+            "group.object.classes" : [ "{{item.groupsClasses}}" ],
             "drop.non.existing.groups.during.sync" : [ "false" ],
             "mapped.group.attributes" : [ "description" ]
           }
