@@ -541,7 +541,68 @@ external_network_config:
         - from_port: 5986
           to_port: 5986
           proto: tcp
-
+      - expose_machine: si8ads14
+        on_host_prefix: 10.32.105.66/32
+        via_network: services
+        ports:
+        - from_port: 53
+          to_port: 53
+          proto: tcp
+        - from_port: 53
+          to_port: 53
+          proto: udp
+        - from_port: 389
+          to_port: 389
+          proto: tcp
+        - from_port: 636
+          to_port: 636
+          proto: tcp
+        - from_port: 3389
+          to_port: 3389
+          proto: tcp
+        - from_port: 3389
+          to_port: 3389
+          proto: udp
+        - from_port: 80
+          to_port: 80
+          proto: tcp
+        - from_port: 443
+          to_port: 443
+          proto: tcp
+        - from_port: 5986
+          to_port: 5986
+          proto: tcp
+      - expose_machine: si8ads15
+        on_host_prefix: 10.32.105.67/32
+        via_network: services
+        ports:
+        - from_port: 53
+          to_port: 53
+          proto: tcp
+        - from_port: 53
+          to_port: 53
+          proto: udp
+        - from_port: 389
+          to_port: 389
+          proto: tcp
+        - from_port: 636
+          to_port: 636
+          proto: tcp
+        - from_port: 3389
+          to_port: 3389
+          proto: tcp
+        - from_port: 3389
+          to_port: 3389
+          proto: udp
+        - from_port: 80
+          to_port: 80
+          proto: tcp
+        - from_port: 443
+          to_port: 443
+          proto: tcp
+        - from_port: 5986
+          to_port: 5986
+          proto: tcp
 
 nic_bonding:
 #   - name: <bonddevice>
