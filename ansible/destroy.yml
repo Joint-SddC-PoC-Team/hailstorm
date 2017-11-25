@@ -221,6 +221,7 @@
       tags: [ 'layer3', 'ocp', 'ocp-osp','ocp-osp-lb' ]
       mode: destroy
       when: ocp_is_deployed_on == 'osp'
+      stack_name: overcloud
     - role: layerX_dns
       tags: [ 'layer2', 'ocp', 'ocp-osp', 'vm','dnat' ]
       mode: destroy_floating_ip

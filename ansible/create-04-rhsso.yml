@@ -22,13 +22,13 @@
       tags: [ 'layer3', 'rhsso', 'vm', 'dnat' ]
       mode: create
       when: rhsso_is_deployed_on == 'osp'
-    - role: layerX_etc_hosts
-      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'etc-hosts' ]
-      mode: create
-      hosts:
-        - satellite
-        - ipa
-      when: rhsso_is_deployed_on == 'osp'
+    # - role: layerX_etc_hosts
+    #   tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'etc-hosts' ]
+    #   mode: create
+    #   hosts:
+    #     - satellite
+    #     - ipa
+    #   when: rhsso_is_deployed_on == 'osp'
     - role: layerX_dns
       tags: [ 'layer3', 'rhsso', 'vm', 'dnat' ]
       mode: update_floating_ip
@@ -66,5 +66,8 @@
     - { role: layer2_ipa_certificate, tags: ['layer2', 'rhsso', 'rhsso-cert', 'rhsso-install'], mode: create, certcn: 'sso.{{ hailstorm_dns_domain }}', factprefix: rhsso }
     - { role: layer2_rhsso, tags: [ 'layer2', 'rhsso', 'rhsso-install', 'rhsso-config' ], mode: create }
     - role: layerX_syslog_client
-      tags: [ 'layer2', 'rhosp', 'syslog',  'syslog-client']
+      tags: [ 'layer2', 'rhsso', 'syslog',  'syslog-client']
+      mode: create
+    - role: layerX_splunk_client
+      tags: [ 'layer2', 'rhsso', 'splunk',  'splunk-client']
       mode: create

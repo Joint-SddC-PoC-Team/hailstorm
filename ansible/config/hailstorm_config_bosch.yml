@@ -7,6 +7,12 @@ hailstorm_ssh_priv_key_file: hailstorm
 satellite_manifestfile: manifest.zip
 tower_license_key_file: tower_license.json
 
+# splunk_agent_server: "change.me"
+# splunk_agent_port: 8089
+# splunk_agent_user: "admin"
+# splunk_agent_password: "changeme"
+# splunk_agent_rpm_url: http://someplace/splunkforwarder-latest-linux-2.6-x86_64.rpm
+
 lifecycle_environments:
   - name: 'DEV'
     prior: 'Library'
@@ -35,7 +41,6 @@ lifecycle_environments:
     rhv_version: 4
     cloudforms_version: 5.8
     cloudforms_ova_appliance: cfme-rhevm-5.8.2.3-1.x86_64.rhevm.ova
-    splunk_agent_rpm: splunkforwarder-7.0.0-c8a78efdd40f-linux-2.6-x86_64.rpm
     use_install_host: True
     ansible_use_version: 2.3.2.0
     ansible_available_versions: [2.2.2.0,2.4.0.0,2.2.1.0]

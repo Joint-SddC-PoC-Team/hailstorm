@@ -161,3 +161,6 @@
     - role: layerX_syslog_client
       tags: [ 'layer2', 'rhosp', 'syslog',  'syslog-client']
       mode: create
+    - role: layerX_splunk_client
+      tags: [ 'layer2', 'rhosp', 'splunk',  'splunk-client']
+      mode: create

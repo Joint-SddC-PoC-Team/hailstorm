@@ -15,16 +15,16 @@
       tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat' ]
       mode: create
       when: cf_is_deployed_on == 'osp'
-    - role: layerX_etc_hosts
-      tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'etc-hosts' ]
-      mode: create
-      hosts:
-        - satellite
-        - ipa
-        - rh-sso
-        - openstack
-        - rhosp-director
-      when: cf_is_deployed_on == 'osp'
+    # - role: layerX_etc_hosts
+    #   tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'etc-hosts' ]
+    #   mode: create
+    #   hosts:
+    #     - satellite
+    #     - ipa
+    #     - rh-sso
+    #     - openstack
+    #     - rhosp-director
+    #   when: cf_is_deployed_on == 'osp'
     - role: layerX_dns
       tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat', 'cf-provider', 'cf-provider-rhev', 'cf-provider-ocp', 'cf-provider-osp' ]
       mode: update_floating_ip
@@ -119,3 +119,9 @@
   # RHEL after cloudforms config, to ensure the hostname is set before subscribing
     - { role: layer2_rhel, tags: [ 'layer3', 'cf', 'rhel', 'cf-rhel'], mode: create }
     - { role: layer2_tdagent, tags: [ 'layer3', 'cf', 'tdagent', 'cf-tdagent'], mode: create }
+    # - role: layerX_syslog_client
+    #   tags: [ 'layer2', 'rhosp', 'syslog',  'syslog-client']
+    #   mode: create
+    - role: layerX_splunk_client
+      tags: [ 'layer2', 'rhosp', 'splunk',  'splunk-client']
+      mode: create

@@ -68,17 +68,20 @@
       mode: create
       group: "{{ groups['ocp-osp-vm-group']+groups['ocp-osp-lbaas-group'] }}"
       when: ocp_is_deployed_on == 'osp'
-    - role: layerX_etc_hosts
-      tags: [ 'layer3', 'ocp', 'ocp-osp', 'etc-hosts' ]
-      mode: create
-      hosts:
-        - satellite
-        - ipa
-        - openstack
-        - rh-sso
-      when: ocp_is_deployed_on == 'osp'
+    # - role: layerX_etc_hosts
+    #   tags: [ 'layer3', 'ocp', 'ocp-osp', 'etc-hosts' ]
+    #   mode: create
+    #   hosts:
+    #     - satellite
+    #     - ipa
+    #     - openstack
+    #     - rh-sso
+    #   when: ocp_is_deployed_on == 'osp'
     - role: layerX_syslog_client
-      tags: [ 'layer2', 'rhosp', 'syslog',  'syslog-client']
+      tags: [ 'layer2', 'ocp', 'syslog',  'syslog-client']
+      mode: create
+    - role: layerX_splunk_client
+      tags: [ 'layer2', 'ocp', 'splunk',  'splunk-client']
       mode: create
 
 # # write floatign IPs to DNAT DNS
