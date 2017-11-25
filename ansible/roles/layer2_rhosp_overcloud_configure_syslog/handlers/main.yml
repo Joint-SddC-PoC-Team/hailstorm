@@ -11,6 +11,7 @@
   service:
     name: "{{ item }}"
     state: restarted
+  ignore_errors: true
   with_items:
      - openstack-aodh-evaluator
      - openstack-aodh-listener
