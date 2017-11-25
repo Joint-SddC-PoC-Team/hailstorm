@@ -46,6 +46,8 @@
           - "{% if enable_nuage is defined %}nova-nuage-config.yaml{% endif %}"
   when: mode=="create" or mode=="prepare"
 
+- include: create_ansible_inventory.yml
+  when: mode=="create"
 
 - block:
     - include: destroy_overcloud.yml
