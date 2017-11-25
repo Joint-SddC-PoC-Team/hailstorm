@@ -65,3 +65,6 @@
     - { role: layerX_ipa_client, tags: [ 'layer2', 'rhsso',  'ipa-client'], mode: create }
     - { role: layer2_ipa_certificate, tags: ['layer2', 'rhsso', 'rhsso-cert', 'rhsso-install'], mode: create, certcn: 'sso.{{ hailstorm_dns_domain }}', factprefix: rhsso }
     - { role: layer2_rhsso, tags: [ 'layer2', 'rhsso', 'rhsso-install', 'rhsso-config' ], mode: create }
+    - role: layerX_syslog_client
+      tags: [ 'layer2', 'rhosp', 'syslog',  'syslog-client']
+      mode: create

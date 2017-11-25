@@ -157,6 +157,12 @@ external_network_config:
       - from_port: 443
         to_port: 443
         proto: tcp
+      - from_port: 514
+        to_port: 514
+        proto: tcp
+      - from_port: 514
+        to_port: 514
+        proto: udp
       - from_port: 993
         to_port: 993
         proto: tcp

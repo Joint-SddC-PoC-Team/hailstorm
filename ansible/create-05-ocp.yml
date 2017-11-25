@@ -77,6 +77,9 @@
         - openstack
         - rh-sso
       when: ocp_is_deployed_on == 'osp'
+    - role: layerX_syslog_client
+      tags: [ 'layer2', 'rhosp', 'syslog',  'syslog-client']
+      mode: create
 
 # # write floatign IPs to DNAT DNS
 # - hosts: infrastructure
