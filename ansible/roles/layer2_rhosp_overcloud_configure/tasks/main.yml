@@ -41,10 +41,6 @@
       tags: ['overcloud-config-tenants']
     - include: configure_neutron.yml
       tags: ['overcloud-config-neutron']
-      when: current_lifecycle_env.openstack_version <= 10
-    - include: configure_neutron_osp11.yml
-      tags: ['overcloud-config-neutron']
-      when: current_lifecycle_env.openstack_version >= 11
     - include: configure_security.yml
       tags: ['overcloud-config-security']
     - include: create_flavors.yml
