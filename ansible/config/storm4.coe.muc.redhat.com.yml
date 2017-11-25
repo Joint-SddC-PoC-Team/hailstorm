@@ -167,7 +167,7 @@ external_network_config:
           proto: tcp
         - from_port: 514
           to_port: 514
-          proto: udp  
+          proto: udp
         - from_port: 993
           to_port: 993
           proto: tcp
@@ -195,6 +195,9 @@ external_network_config:
             proto: tcp
           - from_port: 443
             to_port: 443
+            proto: tcp
+          - from_port: 4000
+            to_port: 4000
             proto: tcp
           - from_port: 9200
             to_port: 9200

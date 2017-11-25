@@ -191,6 +191,9 @@ external_network_config:
         - from_port: 443
           to_port: 443
           proto: tcp
+        - from_port: 4000
+          to_port: 4000
+          proto: tcp
         - from_port: 9200
           to_port: 9200
           proto: tcp
