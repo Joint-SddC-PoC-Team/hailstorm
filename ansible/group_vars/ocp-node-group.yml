@@ -59,3 +59,5 @@ vm_secgroups:
 
 vm_additional_disks:
   - 53687091200
+
+pool_regex: "{{ osp_appnode_subscription_pool_regex }}"

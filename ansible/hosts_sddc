@@ -41,7 +41,7 @@ install-host    ansible_host=10.116.127.154 activation_key="AK-CV-OS-RHEL7-SERVE
 
 # Elasticsearch, FluentD, Kibana - needs RHOSP CV since it installs python-neutronclient and other packages
 [efk-group]
-efk             ansible_host=10.116.127.174 activation_key="AK-CV-RHOSP-{{ stage }}"
+efk             ansible_host=10.116.127.174 activation_key="AK-CV-OPSTOOLS-{{ stage }}"
 
 # the Infrastructure server (DNS, SMTP/IMAP)
 [infrastructure-group]
@@ -258,15 +258,15 @@ rh-sso
 #### BEGIN OPENSHIFT
 
 [ocp-master-group]
-ocp-master1  Xansible_host=10.116.127.20 jump_host=ocp-bastion openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
-ocp-master2  Xansible_host=10.116.127.21 jump_host=ocp-bastion openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
-ocp-master3  Xansible_host=10.116.127.22 jump_host=ocp-bastion openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-master1  Xansible_host=10.116.127.20 jump_host=ocp-bastion openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOCP-INFRA-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-master2  Xansible_host=10.116.127.21 jump_host=ocp-bastion openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOCP-INFRA-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-master3  Xansible_host=10.116.127.22 jump_host=ocp-bastion openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false'}" activation_key="AK-CV-RHOCP-INFRA-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
 
 [ocp-node-group]
-ocp-infranode1 Xansible_host=10.116.127.23 jump_host=ocp-bastion openshift_node_labels="{'region': 'infra', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
-ocp-infranode2 Xansible_host=10.116.127.24 jump_host=ocp-bastion openshift_node_labels="{'region': 'infra', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
-ocp-node1      Xansible_host=10.116.127.25 jump_host=ocp-bastion openshift_node_labels="{'region': 'primary', 'zone': 'east', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
-ocp-node2      Xansible_host=10.116.127.26 jump_host=ocp-bastion openshift_node_labels="{'region': 'primary', 'zone': 'west', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOSE3-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-infranode1 Xansible_host=10.116.127.23 jump_host=ocp-bastion openshift_node_labels="{'region': 'infra', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOCP-INFRA-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-infranode2 Xansible_host=10.116.127.24 jump_host=ocp-bastion openshift_node_labels="{'region': 'infra', 'zone': 'default', 'logging-infra-fluentd': 'true'}" activation_key="AK-CV-RHOCP-INFRA-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-node1      Xansible_host=10.116.127.25 jump_host=ocp-bastion openshift_node_labels="{'region': 'primary', 'zone': 'east', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOCP-APPNODE-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
+ocp-node2      Xansible_host=10.116.127.26 jump_host=ocp-bastion openshift_node_labels="{'region': 'primary', 'zone': 'west', 'logging-infra-fluentd': 'true'}"  activation_key="AK-CV-RHOCP-APPNODE-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7"
 
 # comment out the entry if you do not want a load balancer VM set up
 [ocp-l2-or-rhv-lb-group]
@@ -365,7 +365,7 @@ ansible-jump-demo-vms  activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" osp_te
 #### BEGIN DEMO CONTENT
 
 [dev-client-group]
-#dev-client     ansible_host=10.116.127.37 activation_key="AK-CV-RHOSE3-CLIENT-{{ stage }}"
+#dev-client     ansible_host=10.116.127.37 activation_key="AK-CV-RHOCP-INFRA-CLIENT-{{ stage }}"
 
 [lookbusy-rhev-group]
 #lookbusy-rhev   ansible_host=10.116.127.39 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}" rhev_image="RHEL7" nic_attachments="[ {{ infrastructure_network_services }},{{ infrastructure_network_admin }} ]"

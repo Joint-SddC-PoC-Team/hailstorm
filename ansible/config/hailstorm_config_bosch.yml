@@ -149,12 +149,14 @@ cf_is_deployed_on: "{% if groups['cf-osp-vm-group']|length > 0 %}osp{% elif grou
 # RED HAT SUBSCRIPTIONS
 satellite_subscription_pool_regex: "^(Red Hat Satellite Employee Subscription|Red Hat Satellite)$"
 rhel_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Enterprise Linux Server, Standard.*|EPEL.7|CentOS.7|td.agent)$"
-rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure|td-agent|Red Hat JBoss Enterprise Application Platform.*)$"
+rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure|td.agent|Red Hat JBoss Enterprise Application Platform.*)$"
 #sap_subscription_pool_regex: "^(Employee SKU|Red Hat Enterprise Linux Server for SAP HANA.*)$"
-rhev_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Virtualization.*|Red Hat Enterprise Linux Server, Standard.*|td-agent)$"
-rhosp_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat (Enterprise Linux )?OpenStack Platform.*|Red Hat Ceph Storage.*|td-agent)$"
-ose_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform.*|Red Hat Gluster Storage.*|td-agent)$"
-cloudforms_subscription_pool_regex: "^(CloudForms Employee Subscription|Red Hat Cloud Suite.*|Red Hat CloudForms.*|Red Hat OpenStack Platform.*|td-agent)$"
+rhev_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Virtualization.*|Red Hat Enterprise Linux Server, Standard.*|td.agent)$"
+rhosp_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat (Enterprise Linux )?OpenStack Platform.*|Red Hat Ceph Storage.*|td.agent)$"
+opstools_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat (Enterprise Linux )?OpenStack Platform.*|EPEL.7|CentOS.7|td.agent)$"
+ocp_appnode_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform.*|Red Hat Gluster Storage.*|td.agent)$"
+ocp_infra_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform.*|Red Hat Gluster Storage.*|td.agent)$"
+cloudforms_subscription_pool_regex: "^(CloudForms Employee Subscription|Red Hat Cloud Suite.*|Red Hat CloudForms.*|Red Hat OpenStack Platform.*|td.agent)$"
 ceph_subscription_pool_regex: "^(Employee SKU|Red Hat Ceph Storage.*|Red Hat OpenStack Platform.*|td-agent)$"
 
 # REPOSITORIES
@@ -636,16 +638,28 @@ satellite_activation_keys_and_host_collections:
     activation_key_subscription_regex: "{{ rhosp_subscription_pool_regex }}"
     override: "rhel-7-server-satellite-tools-{{ satellite_version }}-rpms"
 
+  - activation_key: AK-CV-OPSTOOLS
+    content_view: "CV-RHOSP"
+    host_collection: "RHOSP"
+    activation_key_subscription_regex: "{{ opstools_subscription_pool_regex }}"
+    override: "rhel-7-server-satellite-tools-{{ satellite_version }}-rpms"
+
   # - activation_key: AK-CV-RHOSE3-CLIENT
   #   content_view: "CV-RHOSE3-CLIENT"
   #   host_collection: "RHOSE3"
   #   activation_key_subscription_regex: "{{ ose_subscription_pool_regex }}"
   #   override: "rhel-7-server-satellite-tools-{{ satellite_version }}-rpms"
 
-  - activation_key: AK-CV-RHOSE3
+  - activation_key: AK-CV-RHOCP-APPNODE
     content_view: "CV-RHOSE3"
     host_collection: "RHOSE3"
-    activation_key_subscription_regex: "{{ ose_subscription_pool_regex }}"
+    activation_key_subscription_regex: "{{ ocp_appnode_subscription_pool_regex }}"
+    override: "rhel-7-server-satellite-tools-{{ satellite_version }}-rpms"
+
+  - activation_key: AK-CV-RHOCP-INFRA
+    content_view: "CV-RHOSE3"
+    host_collection: "RHOSE3"
+    activation_key_subscription_regex: "{{ ocp_infra_subscription_pool_regex }}"
     override: "rhel-7-server-satellite-tools-{{ satellite_version }}-rpms"
 
   - activation_key: AK-CV-CLOUDFORMS

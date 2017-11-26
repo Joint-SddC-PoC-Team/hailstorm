@@ -79,7 +79,8 @@
         state: present
         org_id: "{{ hostvars['satellite'].organization_id }}"
         activationkey: "{{ activation_key }}"
-        pool: "{{ pool_regex }}"
+        #comment out pool since this seems to consume a new subscription every time it runs - we'll get the subs via activation key
+        #pool: "{{ pool_regex }}"
         consumer_name: "{{ hostname }}"
       register: rh_sub
       retries: 5
