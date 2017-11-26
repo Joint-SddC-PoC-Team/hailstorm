@@ -23,9 +23,10 @@
 #  with_items: kvm_images.results
 
 - name: ensure that VMs are running
-  virt: name="{{ inventory_hostname_short }}" state=running uri=qemu:///system
+  virt: name="{{ inventory_hostname_short }}" state=running autostart=true uri=qemu:///system
   when: skip_install is not defined or skip_install != true
   delegate_to: "{{ infrastructure_delegate_kvm_host }}"
+
 - name: wait for VMs finishing (re)booting
   wait_for: host={{ ansible_host }} port=22 delay=0 timeout=900
   when: skip_install is not defined or skip_install != true
