@@ -5,7 +5,7 @@
       lineinfile:
         dest: /etc/hosts
         line: "{{ hostvars[item].osp_internal_ip }} {{ item }} {{ item }}.{{ hailstorm_dns_domain }}{% for name in (hostvars[item].additional_dns|default('')).split(',') %}{% if name != '' and name[0] != '*' %} {{ name }} {{ name }}.{{ hailstorm_dns_domain }}{% endif %}{% endfor %}"
-        regexp: "{{ hostvars[item].osp_internal_ip }} {{ item }} {{ item }}\\.{{ hailstorm_dns_domain }}.*$"
+        regexp: "\\d+\\.\\d+\\.\\d+\\.\\d+ {{ item }} {{ item }}\\.{{ hailstorm_dns_domain }}.*$"
       when: hostvars[item].osp_internal_ip|default('') != ''
       with_items: "{{ group }}"
 
