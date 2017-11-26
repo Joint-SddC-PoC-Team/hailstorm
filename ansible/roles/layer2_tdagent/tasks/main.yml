@@ -22,9 +22,13 @@
         - "permissions"
       when: not (tdagent_configs is undefined or tdagent_configs is none or tdagent_configs | length == 0)
 
-    - name: add additional tdagent configs
+    - name: add additional tdagent configs to forward to efk
       template: src=forward_all_to_efk.conf.j2 dest=/etc/td-agent/config.d/99_forward_all_to_efk.conf
       register: configs2
+
+    - name: add rsyslog output plugin
+      shell: td-agent-gem install fluent-plugin-remote_syslog
+      when: forward_to_rsyslog|default(false,true)
 
     - name: enable & (re)start tdagent
       service: name=td-agent state=restarted enabled=yes

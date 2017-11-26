@@ -12,11 +12,24 @@
 </filter>
 
 <match **>
-  @type forward
-  heartbeat_type tcp
-  <server>
-    name {{ hostvars['efk'].vm_nics[0].ip }}
-    host {{ hostvars['efk'].vm_nics[0].ip }}
-    port 4000
-  </server>
+  @type copy
+  <store>
+    @type forward
+    heartbeat_type tcp
+    <server>
+      name {{ hostvars['efk'].hostname }}
+      host {{ hostvars['efk'].hostname }}
+      port 4000
+    </server>
+  </store>
+
+{% if forward_to_rsyslog|default(false,true) %}{% for node in groups['infrastructure-group'] %}
+  <store>
+   @type remote_syslog
+   host {{ hostvars[node].hostname }}
+   hostname {{ inventory_hostname_short }}
+   port 514
+   tag fluentd
+  </store>
+{% endfor %}{% endif %}
 </match>
