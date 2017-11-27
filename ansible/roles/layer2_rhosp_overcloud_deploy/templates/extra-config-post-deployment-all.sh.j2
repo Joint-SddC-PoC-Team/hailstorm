@@ -43,7 +43,7 @@ function nova_control {
   sudo systemctl restart openstack-nova-api.service openstack-nova-cert.service openstack-nova-conductor.service openstack-nova-consoleauth.service openstack-nova-novncproxy.service openstack-nova-scheduler.service
 
   {% if enable_nuage is defined %}
-  sudo crudini --set /etc/neutron/plugins/nuage/nuage_plugin.ini RESTPROXY nuage_pat default_enabled
+  sudo crudini --set /etc/neutron/plugins/nuage/plugin.ini RESTPROXY nuage_pat default_enabled
   sudo systemctl restart neutron-server
   {% endif %}
 }
