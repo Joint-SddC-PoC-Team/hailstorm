@@ -9,6 +9,14 @@
 #TODO: change docker storage config if necessary
     - name: configure docker storage
       shell: docker-storage-setup && touch /.docker-storage-is-setup  creates=/.docker-storage-is-setup
+    - name: Block docker.io registry
+      lineinfile:
+        dest: /etc/containers/registries.conf
+        insertafter: 'EOF'
+        line: '{{item}}'
+      with_items:
+      - 'block_registries:'
+      - '  - docker.io'      
     - name: ensure docker is running
       service: name=docker state=started enabled=yes
     - name: allow NFS access from containers
