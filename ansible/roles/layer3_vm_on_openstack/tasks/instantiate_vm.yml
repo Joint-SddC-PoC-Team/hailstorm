@@ -41,7 +41,7 @@
           {% if not loop.last %},{% endif %}
           {% endfor %} ]
         auto_ip: False
-        config_drive: True
+        #config_drive: True
         #security_groups: "{% if vm_secgroups is defined and vm_secgroups %}{{  secgroup in vm_secgroups|default([])|join(',') }}{% else %}default-{{osp_tenant}}{% endif %}"
         security_groups: "{{ vm_secgroups|default(['default-' + osp_tenant]) }}"
         availability_zone: "nova"
