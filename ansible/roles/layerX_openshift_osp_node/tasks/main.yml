@@ -5,6 +5,14 @@
       template:
         src: docker.j2
         dest: /etc/sysconfig/docker-storage-setup
+    - name: Block docker.io registry
+      lineinfile:
+        dest: /etc/containers/registries.conf
+        insertafter: 'EOF'
+        line: '{{item}}'
+      with_items:
+      - 'block_registries:'
+      - '  - docker.io'
     - name: ensure docker is running
       service: name=docker state=started enabled=yes
     - name: remove DNS2 config from ifcfg-eth0
