@@ -62,8 +62,8 @@ infrastructure_network_guests:
   #BOSCH
   default_gw_host_prefix: "10.32.111.254/20"
   #vlan                   -1
-  floating_start:         "{% if infrastructure_network_master is defined %}10.32.105.160{% else %}{{ external_network_config.guest_network_osp_floating_start }}{% endif %}"
-  floating_end:           "{% if infrastructure_network_master is defined %}10.32.105.179{% else %}{{ external_network_config.guest_network_osp_floating_end }}{% endif %}"
+  floating_start:         "{% if infrastructure_network_master is defined %}10.116.104.1{% else %}{{ external_network_config.guest_network_osp_floating_start }}{% endif %}"
+  floating_end:           "{% if infrastructure_network_master is defined %}10.116.104.254{% else %}{{ external_network_config.guest_network_osp_floating_end }}{% endif %}"
   dns_server:             "10.32.96.1"
   # the following are only relevant when forward_mode == 'nat'
   #dhcp_start: 10.116.121.2
