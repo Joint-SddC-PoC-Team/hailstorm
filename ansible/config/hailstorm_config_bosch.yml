@@ -54,14 +54,19 @@ lifecycle_environments:
     osp_kvm_images:
       - name: RHEL7
         image: rhel-server-7.4-x86_64-kvm.qcow2
+        type: qcow2
       - name: CirrOS
         image: cirros-0.3.4-x86_64-disk.img
+        type: qcow2
       - name: Windows_Cloudbase
         image: windows_server_2012_r2_standard_eval_kvm_20151021.qcow2.gz
+        type: qcow2
       - name: Cloudforms
         image: cfme-rhos-5.8.2.3-1.x86_64.qcow2
+        type: qcow2
       - name: Windows
         image: windows_baseimage.qcow2
+        type: qcow2
     rhev_templates:
       - name: RHEL7
         image: rhel-server-7.4-x86_64-kvm.qcow2
@@ -1014,11 +1019,11 @@ rhsso:
     - name: ldap_ad_rh-sddc
       type: ad
       priority: 120
-      usersDN: cn=users,dc=rh-sddc,dc=test-bosch,dc=com
+      usersDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       usersFilter: ""
-      bindDN: cn=Administrator,cn=users,dc=rh-sddc,dc=test-bosch,dc=com
+      bindDN: cn=Administrator,cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       bindCredential: "{{ root_password }}"
-      connectionUrl: ldap://10.32.105.65:389
-      groupsDN: cn=users,dc=rh-sddc,dc=test-bosch,dc=com
+      connectionUrl: ldap://si8ads13.{{ hailstorm_dns_domain }}:389
+      groupsDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       groupsClasses: group
       groupsFilter: ""

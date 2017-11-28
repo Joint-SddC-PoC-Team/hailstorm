@@ -4,7 +4,7 @@
     content: "{% for ssl_cert in http_proxy.certificates %}{{ lookup('file','binary/' + ssl_cert) }}\n{% endfor %}"
     owner: root
     group: root
-    mode: 0640
+    mode: 0644
   register: copy_ca
   when: http_proxy is defined and http_proxy.certificates is defined
 

@@ -1,4 +1,4 @@
-- name: Create host aggregates configuration 
+- name: Create host aggregates configuration
   os_nova_host_aggregate:
     auth: "{{ os_auth_hailstorm }}"
     name: "{{ item.name }}"
@@ -7,4 +7,4 @@
     validate_certs: False
   with_items: "{{ osp_host_aggregates }}"
   delegate_to: localhost
-  when: False
+#  when: False

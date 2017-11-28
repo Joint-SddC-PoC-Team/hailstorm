@@ -2,16 +2,16 @@
     - name: install IPA client package
       yum: name=ipa-client state=latest
 
-    - name: add entries to /etc/hosts (for DNAT IP)
-      lineinfile: dest=/etc/hosts line="{{ item }}"
-      with_items:
-        - "{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','ipa')|first).on_host_prefix|ipaddr('address') }} ipa {{ hostvars['ipa'].hostname }}"
-      when: >
-        hostvars['ipa'].vm_nics[0].netname not in (vm_nics|map(attribute='netname')|list)
-        and
-        external_network_config is defined
-        and
-        external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','ipa')|list|length > 0
+    # - name: add entries to /etc/hosts (for DNAT IP)
+    #   lineinfile: dest=/etc/hosts line="{{ item }}"
+    #   with_items:
+    #     - "{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','ipa')|first).on_host_prefix|ipaddr('address') }} ipa {{ hostvars['ipa'].hostname }}"
+    #   when: >
+    #     hostvars['ipa'].vm_nics[0].netname not in (vm_nics|map(attribute='netname')|list)
+    #     and
+    #     external_network_config is defined
+    #     and
+    #     external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','ipa')|list|length > 0
 
 
     - name: check if IPA client is installed

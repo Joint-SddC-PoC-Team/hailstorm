@@ -26,7 +26,7 @@ lifecycle_environments:
     # controlled node placement fails on the second scale up since an unmapped hostname (overcloud-compute-3) is assigned
     #Controlled Node Placement with OSP10 or later
     osp_controlled_node_placement: false
-    osp_glance_use_swift: true
+    osp_glance_use_swift: false
     osp_in_baremetal: false
     #TLS with OSP10 or later
     osp_use_tls: true
@@ -51,14 +51,19 @@ lifecycle_environments:
     osp_kvm_images:
       - name: RHEL7
         image: rhel-server-7.4-x86_64-kvm.qcow2
+        type: qcow2
       - name: CirrOS
         image: cirros-0.3.4-x86_64-disk.img
+        type: qcow2
       - name: Windows_Cloudbase
         image: windows_server_2012_r2_standard_eval_kvm_20151021.qcow2.gz
+        type: qcow2
       - name: Cloudforms
         image: cfme-rhos-5.8.2.3-1.x86_64.qcow2
-      - name: Windows
-        image: windows_baseimage.qcow2
+        type: qcow2
+      # - name: Windows
+      #   image: windows_baseimage.qcow2
+      #   type: qcow2
     rhev_templates:
       - name: RHEL7
         image: rhel-server-7.4-x86_64-kvm.qcow2
@@ -987,3 +992,30 @@ nuage:
   # bridges for the external network on the KVM host
   ports_to_hv_bridges_vsr1: "['tenant','services','ospf1','bgp1','nuage_vsr'{% if infrastructure_network_guests.physical_underlay == false %},'guests'{% endif %}]"
   ports_to_hv_bridges_vsr2: "['tenant','services','ospf2','bgp2','nuage_vsr'{% if infrastructure_network_guests.physical_underlay == false %},'guests'{% endif %}]"
+
+# RH SSO Stuff:
+rhsso:
+  userProviders:
+    - name: ldap_ipa_hailstorm
+      type: ipa
+      priority: 100
+      usersDN: cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      usersFilter: (&(objectClass=posixAccount))
+      bindDN: uid=rhsso-bind-user,cn=users,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      bindCredential: "{{ root_password }}"
+      connectionUrl: ldaps://ipa.{{ hailstorm_dns_domain }}:636
+      groupsDN: cn=groups,cn=accounts,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      groupsClasses: groupofnames
+      groupsFilter: ""
+
+    - name: ldap_ad_rh-sddc
+      type: ad
+      priority: 120
+      usersDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      usersFilter: ""
+      bindDN: cn=Administrator,cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      bindCredential: "{{ root_password }}"
+      connectionUrl: ldap://si8ads13.{{ hailstorm_dns_domain }}:389
+      groupsDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      groupsClasses: group
+      groupsFilter: ""
