@@ -19,9 +19,10 @@
         enable_dhcp: False
         allocation_pool_start: "{{ item.floating_start|default(None) }}"
         allocation_pool_end: "{{ item.floating_end|default(None) }}"
-        gateway_ip: "{{ item.default_gw_host_prefix | ipaddr('address') }}"
+        gateway_ip: "{% if item.default_gw_host_prefix is defined %}{{ item.default_gw_host_prefix | ipaddr('address') }}{% endif %}"
+        no_gateway_ip: "{% if item.default_gw_host_prefix is defined %}false{% else %}true{% endif %}"
         network_name: "{{ item.netname }}"
-        cidr:  "{{ item.default_gw_host_prefix | ipaddr('network') }}/{{ item.default_gw_host_prefix | ipaddr('prefix') }}"
+        cidr:  "{% if item.default_gw_host_prefix is defined %}{{ item.default_gw_host_prefix | ipaddr('network') }}/{{ item.default_gw_host_prefix | ipaddr('prefix') }}{% else %}{{ item.cidr }}{% endif %}"
         validate_certs: False
       with_items: "{{ overcloud_provider_networks|select|list }}"
 
