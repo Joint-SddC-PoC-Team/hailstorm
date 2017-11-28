@@ -88,7 +88,7 @@ si8ads13
 #### BEGIN SAMPLE WINDOWS IMAGE
 
 [windows-baseimage-group]
-windows_baseimage ansible_host=10.116.127.10 enable_virtio_win=true windows_install_dvd=SW_DVD9_Windows_Svr_Std_and_DataCtr_2012_R2_64Bit_English_-4_MLF_X19-82891.ISO
+windows_baseimage ansible_host=10.116.127.177 enable_virtio_win=true windows_install_dvd=SW_DVD9_Windows_Svr_Std_and_DataCtr_2012_R2_64Bit_English_-4_MLF_X19-82891.ISO
 
 [windows-baseimage-group:vars]
 ansible_user=Ansible
