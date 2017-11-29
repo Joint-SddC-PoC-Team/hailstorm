@@ -7,8 +7,55 @@
        script_hostname = evm[:hostname]
        script_domainname = evm[:domainname]
        ssh_key = evm[:sshkey]
-    %>rem cmd
+    %>#ps1_sysnative
     net user Administrator <%=ssh_key%>
+    
+    C:
+    mkdir C:\temp
+    cd C:\temp
+    
+    curl http://satellite.rh-sddc.test-bosch.com/pub/customer/Certificates/BOSCH-CA-DE.cer -outfile C:\temp\BOSCH-CA-DE.cer
+    certutil.exe -addstore Root C:\temp\BOSCH-CA-DE.cer
+    timeout 20 /NOBREAK
+    del C:\temp\BOSCH-CA-DE.cer
+    
+    # curl http://satellite.rh-sddc.test-bosch.com/pub/customer/Certificates/BOSCH-CA1-DE.cer -outfile C:\temp\BOSCH-CA1-DE.cer
+    # certutil.exe -addstore Root C:\temp\BOSCH-CA1-DE.cer
+    # timeout 20 /NOBREAK
+    # del C:\temp\BOSCH-CA1-DE.cer
+    
+    curl http://satellite.rh-sddc.test-bosch.com/pub/customer/Altiris_agent/AeXNSCHTTPs.exe -outfile C:\temp\AeXNSCHTTPs.exe
+    C:\temp\AeXNSCHTTPs.exe
+    timeout 20 /NOBREAK
+    del C:\temp\AeXNSCHTTPs.exe
+    
+    curl http://satellite.rh-sddc.test-bosch.com/pub/customer/Altiris_agent/SoftwareManagementSolution_Plugin_x64.msi -outfile C:\temp\SoftwareManagementSolution_Plugin_x64.msi
+    C:\temp\SoftwareManagementSolution_Plugin_x64.msi /qn /norestart
+    timeout 20 /NOBREAK
+    del C:\temp\SoftwareManagementSolution_Plugin_x64.msi
+    
+    curl http://satellite.rh-sddc.test-bosch.com/pub/customer/Altiris_agent/Symantec_InventoryAgent_x64.msi -outfile C:\temp\Symantec_InventoryAgent_x64.msi
+    C:\temp\Symantec_InventoryAgent_x64.msi /qn /norestart
+    timeout 20 /NOBREAK
+    del C:\temp\Symantec_InventoryAgent_x64.msi
+    
+    curl http://satellite.rh-sddc.test-bosch.com/pub/customer/Altiris_agent/Symantec_ServerInventoryAgent_x64.msi -outfile C:\temp\Symantec_ServerInventoryAgent_x64.msi
+    C:\temp\Symantec_ServerInventoryAgent_x64.msi /qn /norestart
+    timeout 30 /NOBREAK
+    del C:\temp\Symantec_ServerInventoryAgent_x64.msi
+    
+    # Here we need feedback from Bosch on why they have a Win64.msi file, and in their own env do use a x64.msi file.
+    # The Win64.msi file doesn't work, as we don't know the Product ID...
+    # And the MSIEXEC fails...
+    
+    curl http://satellite.rh-sddc.test-bosch.com/pub/customer/Altiris_agent/Altiris_PatchMgmtAgent_Win64.msi -outfile C:\temp\Altiris_PatchMgmtAgent_Win64.msi
+    C:\temp\Altiris_PatchMgmtAgent_Win64.msi /qn /norestart
+    timeout 60 /NOBREAK
+    del C:\temp\Altiris_PatchMgmtAgent_Win64.msi
+    
+    ## Run patches
+    ## C:\Program Files\Altiris\Altiris Agent\Agents\PatchMgmtAgent\AeXPatchUtil.exe /Xa
+    
   pxe_image_type_id: 919000000000004
   type: CustomizationTemplateCloudInit
   system:
