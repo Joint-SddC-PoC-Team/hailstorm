@@ -1015,15 +1015,41 @@ rhsso:
       groupsClasses: groupofnames
       groupsFilter: ""
 
-
+# RH-SDDC - si8ads13
     - name: ldap_ad_rh-sddc
       type: ad
-      priority: 120
+      priority: 200
       usersDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       usersFilter: ""
       bindDN: cn=Administrator,cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       bindCredential: "{{ root_password }}"
       connectionUrl: ldap://si8ads13.{{ hailstorm_dns_domain }}:389
       groupsDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      groupsClasses: group
+      groupsFilter: ""
+
+# DE-RH.RH-SDDC - si8ads14
+    - name: ldap_ad_rh-sddc-de
+      type: ad
+      priority: 300
+      usersDN: cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      usersFilter: ""
+      bindDN: cn=Administrator,cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      bindCredential: "{{ root_password }}"
+      connectionUrl: ldap://si8ads14.{{ hailstorm_dns_domain }}:389
+      groupsDN: cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      groupsClasses: group
+      groupsFilter: ""
+
+# EMEA-RH.RH-SDDC - si8ads15
+    - name: ldap_ad_rh-sddc-emea
+      type: ad
+      priority: 400
+      usersDN: cn=users,dc=emea-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      usersFilter: ""
+      bindDN: cn=Administrator,cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      bindCredential: "{{ root_password }}"
+      connectionUrl: ldap://si8ads15.{{ hailstorm_dns_domain }}:389
+      groupsDN: cn=users,dc=emea-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       groupsClasses: group
       groupsFilter: ""
