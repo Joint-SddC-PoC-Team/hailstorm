@@ -1000,6 +1000,72 @@ nuage:
   ports_to_hv_bridges_vsr1: "['tenant','services','ospf1','bgp1','nuage_vsr'{% if infrastructure_network_guests.physical_underlay == false %},'guests'{% endif %}]"
   ports_to_hv_bridges_vsr2: "['tenant','services','ospf2','bgp2','nuage_vsr'{% if infrastructure_network_guests.physical_underlay == false %},'guests'{% endif %}]"
 
+# This info is coming from frame document:
+# (https://docs.google.com/document/d/11ZiAVsj5UadNB2pzeRZ2egG6IogfXPaZMHyV3sXAnwM/edit#)
+active_directory:
+  si8ads13:
+    host: si8ads13.{{ hailstorm_dns_domain }}
+    user: Administrator
+    password: "{{ root_password }}"
+    users:
+      - username: TestUser1
+        password: "{{ root_password }}"
+        first: FirstName2
+        last: LastName2
+        desc: TestUser1 in AD1
+        groups:
+          - TestGroup1
+          - TestGroup2
+      - username: TestUser2
+        password: "{{ root_password }}"
+        first: FirstName
+        last: LastName2
+        desc: TestUser2 in AD1
+        groups:
+          - TestGroup1
+          - TestGroup2
+    groups:
+      - name: TestGroup1
+        desc: TestGroup in AD1
+      - name: TestGroup2
+        desc: TestGroup in AD1
+      - name: TestGroup3
+        desc: TestGroup in AD1
+
+
+  si8ads14:
+    host: si8ads14.{{ hailstorm_dns_domain }}
+    user: Administrator
+    password: "{{ root_password }}"
+    users:
+      - username: TestUser30
+        password: "{{ root_password }}"
+        first: User30First
+        last: User30Last
+        desc: TestUser in AD2
+        groups:
+          - TestGroup1AD2
+    groups:
+      - name: TestGroup1AD2
+        desc: A Group in 2nd Active Directory
+
+  si8ads15:
+    host: si8ads15.{{ hailstorm_dns_domain }}
+    user: Administrator
+    password: "{{ root_password }}"
+    users:
+      - username: TestUser31
+        password: "{{ root_password }}"
+        first: User31First
+        last: User31Last
+        desc: TestUser in AD3
+        groups:
+          - TestGroup1AD3
+    groups:
+      - name: TestGroup1AD3
+        desc: A Group in 3nd Active Directory
+
+
 # RH SSO Stuff:
 rhsso:
   userProviders:
@@ -1016,40 +1082,40 @@ rhsso:
       groupsFilter: ""
 
 # RH-SDDC - si8ads13
-    - name: ldap_ad_rh-sddc
+    - name: ldap_ad_rh-sddc-si8ads13
       type: ad
       priority: 200
       usersDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       usersFilter: ""
-      bindDN: cn=Administrator,cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
-      bindCredential: "{{ root_password }}"
-      connectionUrl: ldap://si8ads13.{{ hailstorm_dns_domain }}:389
+      bindDN: cn={{ active_directory.si8ads13.user}},cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      bindCredential: "{{ active_directory.si8ads13.password}}"
+      connectionUrl: ldap://{{ active_directory.si8ads13.host}}:389
       groupsDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       groupsClasses: group
       groupsFilter: ""
 
 # DE-RH.RH-SDDC - si8ads14
-    - name: ldap_ad_rh-sddc-de
+    - name: ldap_ad_rh-sddc-de-si8ads14
       type: ad
       priority: 300
       usersDN: cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       usersFilter: ""
-      bindDN: cn=Administrator,cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
-      bindCredential: "{{ root_password }}"
-      connectionUrl: ldap://si8ads14.{{ hailstorm_dns_domain }}:389
+      bindDN: cn={{ active_directory.si8ads14.user}},cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      bindCredential: "{{ active_directory.si8ads14.password}}"
+      connectionUrl: ldap://{{ active_directory.si8ads14.host}}:389
       groupsDN: cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       groupsClasses: group
       groupsFilter: ""
 
 # EMEA-RH.RH-SDDC - si8ads15
-    - name: ldap_ad_rh-sddc-emea
+    - name: ldap_ad_rh-sddc-emea-si8ads15
       type: ad
       priority: 400
       usersDN: cn=users,dc=emea-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       usersFilter: ""
-      bindDN: cn=Administrator,cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
-      bindCredential: "{{ root_password }}"
-      connectionUrl: ldap://si8ads15.{{ hailstorm_dns_domain }}:389
+      bindDN: cn={{ active_directory.si8ads15.user}},cn=users,dc=emea-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
+      bindCredential: "{{ active_directory.si8ads15.password}}"
+      connectionUrl: ldap://{{ active_directory.si8ads15.host}}:389
       groupsDN: cn=users,dc=emea-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       groupsClasses: group
       groupsFilter: ""

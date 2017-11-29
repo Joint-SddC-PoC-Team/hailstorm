@@ -106,6 +106,7 @@
     - nailgun
     - vspk
     - pywinrm
+    - python-ldap
 
 - name: Install pip packages to be able to use ansible modules inside virtualenv
   pip:
@@ -113,5 +114,5 @@
     virtualenv="/opt/ansible-{{ item[1] }}"
     state=latest
   with_nested:
-    - ['setuptools', 'vcversioner', 'pytz', 'pbr', 'shade', 'nailgun', 'vspk', 'pywinrm']
+    - ['setuptools', 'vcversioner', 'pytz', 'pbr', 'shade', 'nailgun', 'vspk', 'pywinrm', 'python-ldap']
     - "{{current_lifecycle_env.ansible_available_versions}}"
