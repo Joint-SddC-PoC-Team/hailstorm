@@ -56,7 +56,15 @@
     timeout 60 /NOBREAK
     del C:\temp\Altiris_PatchMgmtAgent_Win64.msi
     
-    ### Here we would also need to perform the PROXY configuration, which is not yet done.
+    # set the prox conf (see: https://martin.hoppenheit.info/blog/2015/set-windows-proxy-with-powershell/)
+    
+    $reg = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
+    $settings = Get-ItemProperty -Path $reg
+    # $settings.ProxyServer
+    # $settings.ProxyEnable
+    # http_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/    # Set-ItemProperty -Path $reg -Name ProxyServer -Value "proxy.example.org:8080"
+    Set-ItemProperty -Path $reg -Name ProxyServer -Value "de\cdd8fe:<password>@rb-proxy-de.bosch.com:8080"
+    Set-ItemProperty -Path $reg -Name ProxyEnable -Value 1
     
     ## Run patches
     ## C:\Program Files\Altiris\Altiris Agent\Agents\PatchMgmtAgent\AeXPatchUtil.exe /Xa
