@@ -18,6 +18,7 @@ lifecycle_environments:
       "*": "2017-10-27"
       "CV-OS-RHEL7-SERVER": "2017-10-28"
       "CV-RHOSP": "2017-10-01"
+      "CV-RHOSE3": "2017-11-30"
     errata_for_demo_scenario:
       - RHSA-2017:0286
       - RHSA-2016:1940
@@ -312,6 +313,7 @@ satellite_product_config:
       # - name: "Red Hat OpenShift Container Platform 3.4 (RPMs)"
       - name: "Red Hat OpenShift Container Platform 3.5 (RPMs)"
       - name: "Red Hat OpenShift Container Platform 3.6 (RPMs)"
+      - name: "Red Hat OpenShift Container Platform 3.7 (RPMs)"
   - product: Red Hat Virtualization
     basearch: x86_64
     repos:
@@ -508,6 +510,8 @@ satellite_content_config:
         repository: "Red Hat OpenShift Container Platform 3.5 RPMs x86_64"
       - product: "Red Hat OpenShift Container Platform"
         repository: "Red Hat OpenShift Container Platform 3.6 RPMs x86_64"
+      - product: "Red Hat OpenShift Container Platform"
+        repository: "Red Hat OpenShift Container Platform 3.7 RPMs x86_64"
       - product: "Red Hat Enterprise Linux Server"
         repository: "Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server"
       - product: "Red Hat Enterprise Linux Server"
