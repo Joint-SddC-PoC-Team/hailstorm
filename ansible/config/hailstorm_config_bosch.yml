@@ -1006,36 +1006,71 @@ nuage:
 
 # This info is coming from frame document:
 # (https://docs.google.com/document/d/11ZiAVsj5UadNB2pzeRZ2egG6IogfXPaZMHyV3sXAnwM/edit#)
+password_for_all_test_users: "{{ root_password }}"
 active_directory:
   si8ads13:
     host: si8ads13.{{ hailstorm_dns_domain }}
     user: Administrator
     password: "{{ root_password }}"
     users:
-      - username: TestUser1
-        password: "{{ root_password }}"
-        first: FirstName2
-        last: LastName2
-        desc: TestUser1 in AD1
-        groups:
-          - TestGroup1
-          - TestGroup2
-      - username: TestUser2
-        password: "{{ root_password }}"
-        first: FirstName
-        last: LastName2
-        desc: TestUser2 in AD1
-        groups:
-          - TestGroup1
-          - TestGroup2
+      - {username: UserTest1, first: Vorname1, last: LastName1, groups: [SDDC_TestGroup1AD1, SDDC_TestGroup2AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: UserTest2, first: Vorname2, last: LastName2, groups: [SDDC_TestGroup3AD1, SDDC_TestGroup2AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: UserTest2, first: Vorname2, last: LastName2, groups: [SDDC_TestGroup3AD1, SDDC_TestGroup2AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user1, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user2, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user3, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user4, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user5, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user6, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user7, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user8, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user9, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user10, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user11, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user12, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user13, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user14, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user15, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user16, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user17, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user18, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user19, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user20, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: nuageadmin, first: Nuage, last: Administrator, groups: [Nuage_Everybody_NA, Nuage_Administrators_NA], desc: Nuage administrator, password: "{{ password_for_all_test_users }}" }
+      - {username: nuageregular, first: Nuage, last: Regular, groups: [Nuage_Everybody_NA], desc: Nuage regular user, password: "{{ password_for_all_test_users }}" }
+      - {username: nuagedesigner, first: Nuage, last: Designer, groups: [Nuage_Everybody_NA, Nuage_Network Designers_NA], desc: Nuage Designer, password: "{{ password_for_all_test_users }}" }
+      - {username: nuagecustom, first: Nuage, last: Custom, groups: [Nuage_Everybody_NA, Nuage_Custom_group_NA], desc: Nuage custom group, password: "{{ password_for_all_test_users }}" }
     groups:
-      - name: TestGroup1
-        desc: TestGroup in AD1
-      - name: TestGroup2
-        desc: TestGroup in AD1
-      - name: TestGroup3
-        desc: TestGroup in AD1
-
+      - { name: SDDC_TestGroup1AD1, desc: TestGroup in AD1 }
+      - { name: SDDC_TestGroup2AD1, desc: TestGroup in AD1 }
+      - { name: SDDC_TestGroup3AD1, desc: TestGroup in AD1 }
+      - { name: SDDC_OCP_admin, desc: "A project manager. If used in a local binding, an admin user will have rights to view any resource in the project and modify any resource in the project except for quota."}
+      - { name: SDDC_OCP_basic-user, desc: "A user that can get basic information about projects and users."}
+      - { name: SDDC_OCP_cluster-admin, desc: "A super-user that can perform any action in any project. When granted to a user within a local policy, they have full control over quota and every action on every resource in the project."}
+      - { name: SDDC_OCP_cluster-status, desc: "A user that can get basic cluster status information."}
+      - { name: SDDC_OCP_edit, desc: "A user that can modify most objects in a project, but does not have the power to view or modify roles or bindings."}
+      - { name: SDDC_OCP_self-provisioner, desc: "A user that can create their own projects."}
+      - { name: SDDC_OCP_view, desc: "A user who cannot make any modifications, but can see most objects in a project. They cannot view or modify roles or bindings."}
+      - { name: SDDC_CFME_Administrator, desc: "Administrator of the virtual infrastructure. Can access all infrastructure functionality. Cannot change server configuration."}
+      - { name: SDDC_CFME_Approver, desc: "Approver of processes, but not operations. Can view items in the virtual infrastructure, view all aspects of policies and assign policies to policy profiles. Cannot perform actions on infrastructure items."}
+      - { name: SDDC_CFME_Auditor, desc: "Able to see virtual infrastructure for auditing purposes. Can view all infrastructure items. Cannot perform actions on them."}
+      - { name: SDDC_CFME_ContainerAdministrator, desc: "Administrator with capabilities to configure, view and execute tasks on all containers and related underlying infrastructure. Has access to Nodes, Pods and Projects dashboards."}
+      - { name: SDDC_CFME_ContainerOperator, desc: "This role can view and execute tasks related to containers and related underlying infrastructure. The Container Operator has access to locked versions of the same dashboards as the Container Administrator."}
+      - { name: SDDC_CFME_Desktop, desc: "Access to VDI pages."}
+      - { name: SDDC_CFME_Operator, desc: "Performs operations of virtual infrastructure. Can view and perform all functions on virtual infrastructure items including starting and stopping virtual machines. Cannot assign policy, but can view policy simulation from Virtual Machine page."}
+      - { name: SDDC_CFME_Security, desc: "Enforces security for the virtual environment. Can assign policies to policy profiles, control user accounts, and view all parts of virtual infrastructure. Cannot create policies or perform actions on virtual infrastructure."}
+      - { name: SDDC_CFME_SuperAdministrator, desc: "Administrator of Red Hat CloudForms and the virtual infrastructure. Can access all functionality and configuration areas."}
+      - { name: SDDC_CFME_Support, desc: "Access to features required by a support department such as diagnostics (logs). Can view all infrastructure items and logs. Cannot perform actions on them."}
+      - { name: SDDC_CFME_TenantAdministrator, desc: "Configures settings applicable to a Tenant. Sets Branding, maps groups/roles, configures LDAP credentials, and configures dashboard settings."}
+      - { name: SDDC_CFME_TenantQuotaAdministrator, desc: "Configures quota limits for the tenant, applying usage constraints for CPU, Memory, Storage, Maximum number of VMs, and Maximum number of Templates."}
+      - { name: SDDC_CFME_User, desc: "User of the virtual infrastructure. Can view all virtual infrastructure items. Cannot perform actions on them."}
+      - { name: SDDC_CFME_UserLimitedSelfService, desc: "Limited User of virtual machines. Can make provision requests. Can access some functions on the virtual machine that the user owns including changing power state."}
+      - { name: SDDC_CFME_User, desc: "Self Service	User of virtual machines. Can make provision requests. Can access some functions on the virtual machine that the user owns and that the user’s LDAP groups own including changing power state."}
+      - { name: SDDC_CFME_VmUser, desc: "User of virtual machines. Can access all functions on the virtual machine including changing power state and viewing its console. Cannot assign policy, but can view policy simulation from virtual machine page."}
+      - { name: Nuage_Administrators_NA, desc: Nuage Administrators }
+      - { name: Nuage_Everybody_NA, desc: Nuage Users }
+      - { name: Nuage_Network Designers_NA, desc: Nuage Network Designers }
+      - { name: Nuage_Custom_group_NA, desc: Nuage Custom Group }
 
   si8ads14:
     host: si8ads14.{{ hailstorm_dns_domain }}
@@ -1048,9 +1083,9 @@ active_directory:
         last: User30Last
         desc: TestUser in AD2
         groups:
-          - TestGroup1AD2
+          - SDDC_TestGroup1AD2
     groups:
-      - name: TestGroup1AD2
+      - name: SDDC_TestGroup1AD2
         desc: A Group in 2nd Active Directory
 
   si8ads15:
@@ -1064,9 +1099,9 @@ active_directory:
         last: User31Last
         desc: TestUser in AD3
         groups:
-          - TestGroup1AD3
+          - SDDC_TestGroup1AD3
     groups:
-      - name: TestGroup1AD3
+      - name: SDDC_TestGroup1AD3
         desc: A Group in 3nd Active Directory
 
 
@@ -1090,36 +1125,36 @@ rhsso:
       type: ad
       priority: 200
       usersDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
-      usersFilter: ""
+      usersFilter: "(&(name=User*))"
       bindDN: cn={{ active_directory.si8ads13.user}},cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       bindCredential: "{{ active_directory.si8ads13.password}}"
       connectionUrl: ldap://{{ active_directory.si8ads13.host}}:389
       groupsDN: cn=users,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       groupsClasses: group
-      groupsFilter: ""
+      groupsFilter: "(&(name=SDDC*))"
 
 # DE-RH.RH-SDDC - si8ads14
     - name: ldap_ad_rh-sddc-de-si8ads14
       type: ad
       priority: 300
       usersDN: cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
-      usersFilter: ""
+      usersFilter: "(&(name=User*))"
       bindDN: cn={{ active_directory.si8ads14.user}},cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       bindCredential: "{{ active_directory.si8ads14.password}}"
       connectionUrl: ldap://{{ active_directory.si8ads14.host}}:389
       groupsDN: cn=users,dc=de-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       groupsClasses: group
-      groupsFilter: ""
+      groupsFilter: "(&(name=SDDC*))"
 
 # EMEA-RH.RH-SDDC - si8ads15
     - name: ldap_ad_rh-sddc-emea-si8ads15
       type: ad
       priority: 400
       usersDN: cn=users,dc=emea-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
-      usersFilter: ""
+      usersFilter: "(&(name=User*))"
       bindDN: cn={{ active_directory.si8ads15.user}},cn=users,dc=emea-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       bindCredential: "{{ active_directory.si8ads15.password}}"
       connectionUrl: ldap://{{ active_directory.si8ads15.host}}:389
       groupsDN: cn=users,dc=emea-rh,dc={{ hailstorm_dns_domain | regex_replace('\.',',dc=') }}
       groupsClasses: group
-      groupsFilter: ""
+      groupsFilter: "(&(name=SDDC*))"
