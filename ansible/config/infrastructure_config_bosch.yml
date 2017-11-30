@@ -38,7 +38,7 @@ infrastructure_network_services:
   bridge: 'services'
   forward_mode: 'bridge'
   default_gw_host_prefix: 10.116.127.254/24
-  dns_server: 10.116.57.11
+  #dns_server: 10.116.57.11
   #vlan:                   2813
   nuage_start:            10.116.127.156
   nuage_end:              10.116.127.171
@@ -65,7 +65,7 @@ infrastructure_network_guests:
   #vlan                   -1
   floating_start:         "{% if infrastructure_network_master is defined %}10.116.104.1{% else %}{{ external_network_config.guest_network_osp_floating_start }}{% endif %}"
   floating_end:           "{% if infrastructure_network_master is defined %}10.116.104.254{% else %}{{ external_network_config.guest_network_osp_floating_end }}{% endif %}"
-  dns_server:             "10.116.57.17"
+  dns_server:             "{{ infrastructure_address_default_dns }}"
   # the following are only relevant when forward_mode == 'nat'
   #dhcp_start: 10.116.121.2
   #dhcp_end:   10.116.121.128
