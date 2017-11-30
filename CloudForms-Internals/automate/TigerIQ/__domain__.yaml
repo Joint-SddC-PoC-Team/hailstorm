@@ -7,7 +7,7 @@ object:
     description: 
     display_name: 
     priority: 2
-    enabled: true
+    enabled: false
     tenant_id: 1
     source: user
     top_level_namespace: 

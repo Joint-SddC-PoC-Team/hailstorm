@@ -8,5 +8,5 @@ object:
     display_name: 
     system: false
     priority: 3
-    enabled: true
+    enabled: false
     tenant_id: 919000000000001
