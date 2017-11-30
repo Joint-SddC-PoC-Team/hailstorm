@@ -71,17 +71,19 @@
        update-ca-trust
        update-ca-certificates
 
-       # set global proxy options in inoit file
+       # set global proxy options in init file
 
-       # export http_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/
-       # export https_proxy=$http_proxy
-       # export ftp_proxy=$http_proxy
-       # export rsync_proxy=$http_proxy
-       # export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com,.{{ hailstorm_dns_domain }}"
-       # > /etc/profile.d/proxy.sh
+       # cat export http_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/ > /etc/profile.d/proxy.sh
+       cat export http_proxy=https://de\cdd8fe:<password>@rb-proxy-de.bosch.com:8080/ > /etc/profile.d/proxy.sh
+       # cat export http_proxy=https://de\cdd8fe:<password>@rb-proxy-unix-de01.bosch.com:8080/ > /etc/profile.d/proxy.sh
+       cat export https_proxy=$http_proxy >> /etc/profile.d/proxy.sh
+       cat export ftp_proxy=$http_proxy >> /etc/profile.d/proxy.sh
+       cat export rsync_proxy=$http_proxy >> /etc/profile.d/proxy.sh
+       # cat export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com,.{{ hailstorm_dns_domain }}" >> /etc/profile.d/proxy.sh
+       cat export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com" >> /etc/profile.d/proxy.sh
 
-       # chown root.root /etc/profile.d/proxy.sh
-       # chmode 755 /etc/profile.d/proxy.sh
+       chown root.root /etc/profile.d/proxy.sh
+       chmod 644 /etc/profile.d/proxy.sh
 
        # register in Bosch Satellite
 
