@@ -31,11 +31,11 @@
       shell: grep -E '{{ item.regexp }}' /etc/sysconfig/docker || true
       changed_when: false
       with_items:
-        - line: HTTP_PROXY='{{ http_proxy.protocol }}{% if http_proxy.username is defined %}{{ http_proxy.username }}{% if http_proxy.password is defined %}:{{ http_proxy.password }}{% endif %}:{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port is defined %}{{ http_proxy.port }}{% endif %}'
+        - line: HTTP_PROXY='{{ http_proxy.protocol }}://{% if http_proxy.username is defined %}{{ http_proxy.username }}{% if http_proxy.password is defined %}:{{ http_proxy.password }}{% endif %}{% endif %}@{{ http_proxy.proxyname }}{% if http_proxy.port is defined %}:{{ http_proxy.port }}{% endif %}'
           regexp: ^HTTP_PROXY=.*
-        - line: HTTPS_PROXY='{{ http_proxy.protocol }}{% if http_proxy.username is defined %}{{ http_proxy.username }}{% if http_proxy.password is defined %}:{{ http_proxy.password }}{% endif %}:{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port is defined %}{{ http_proxy.port }}{% endif %}'
+        - line: HTTPS_PROXY='{{ http_proxy.protocol }}://{% if http_proxy.username is defined %}{{ http_proxy.username }}{% if http_proxy.password is defined %}:{{ http_proxy.password }}{% endif %}{% endif %}@{{ http_proxy.proxyname }}{% if http_proxy.port is defined %}:{{ http_proxy.port }}{% endif %}'
           regexp: ^HTTPS_PROXY=.*
-        - line: ^NO_PROXY=.{{ hailstorm_dns_domain }}
+        - line: NO_PROXY=.{{ hailstorm_dns_domain }}
           regexp: ^NO_PROXY=.*
       register: temp_docker_proxy_config
 
