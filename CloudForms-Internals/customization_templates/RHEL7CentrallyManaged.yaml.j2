@@ -56,8 +56,8 @@
        # Add Proxy infos
 
        cd /tmp
-       curl http://satellite.rh-sddc.test-bosch.com/pub/customer/Certificates/BoschInternetProxyCA2.crt -o BoschInternetProxyCA2.crt
-       curl http://satellite.rh-sddc.test-bosch.com/pub/customer/Certificates/ProxyHTTP.crt -o ProxyHTTP.crt
+       curl http://satellite.<%=script_domainname%>/pub/customer/Certificates/BoschInternetProxyCA2.crt -o BoschInternetProxyCA2.crt
+       curl http://satellite.<%=script_domainname%>/pub/customer/Certificates/ProxyHTTP.crt -o ProxyHTTP.crt
 
        # copy files to appropriate location
 
