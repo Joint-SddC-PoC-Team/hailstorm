@@ -155,7 +155,7 @@ cf_is_deployed_on: "{% if groups['cf-osp-vm-group']|length > 0 %}osp{% elif grou
 # RED HAT SUBSCRIPTIONS
 satellite_subscription_pool_regex: "^(Red Hat Satellite Employee Subscription|Red Hat Satellite)$"
 rhel_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Enterprise Linux Server, Standard.*|EPEL.7|CentOS.7|td.agent)$"
-rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure|td.agent|Red Hat JBoss Enterprise Application Platform.*)$"
+rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure|td.agent|Red Hat JBoss Enterprise Application Platform.*|Red Hat JBoss Web Server.*)$"
 #sap_subscription_pool_regex: "^(Employee SKU|Red Hat Enterprise Linux Server for SAP HANA.*)$"
 rhev_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Virtualization.*|Red Hat Enterprise Linux Server, Standard.*|td.agent)$"
 rhosp_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat (Enterprise Linux )?OpenStack Platform.*|Red Hat Ceph Storage.*|td.agent)$"
