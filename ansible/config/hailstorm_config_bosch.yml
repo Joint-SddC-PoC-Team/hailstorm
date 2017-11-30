@@ -1032,6 +1032,10 @@ active_directory:
       - {username: user18, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
       - {username: user19, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
       - {username: user20, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: nuageadmin, first: Nuage, last: Administrator, groups: [Nuage_Everybody_NA, Nuage_Administrators_NA], desc: Nuage administrator, password: "{{ password_for_all_test_users }}" }
+      - {username: nuageregular, first: Nuage, last: Regular, groups: [Nuage_Everybody_NA], desc: Nuage regular user, password: "{{ password_for_all_test_users }}" }
+      - {username: nuagedesigner, first: Nuage, last: Designer, groups: [Nuage_Everybody_NA, Nuage_Network Designers_NA], desc: Nuage Designer, password: "{{ password_for_all_test_users }}" }
+      - {username: nuagecustom, first: Nuage, last: Custom, groups: [Nuage_Everybody_NA, Nuage_Custom_group_NA], desc: Nuage custom group, password: "{{ password_for_all_test_users }}" }
     groups:
       - { name: SDDC_TestGroup1AD1, desc: TestGroup in AD1 }
       - { name: SDDC_TestGroup2AD1, desc: TestGroup in AD1 }
@@ -1059,6 +1063,10 @@ active_directory:
       - { name: SDDC_CFME_UserLimitedSelfService, desc: "Limited User of virtual machines. Can make provision requests. Can access some functions on the virtual machine that the user owns including changing power state."}
       - { name: SDDC_CFME_User, desc: "Self Service	User of virtual machines. Can make provision requests. Can access some functions on the virtual machine that the user owns and that the user’s LDAP groups own including changing power state."}
       - { name: SDDC_CFME_VmUser, desc: "User of virtual machines. Can access all functions on the virtual machine including changing power state and viewing its console. Cannot assign policy, but can view policy simulation from virtual machine page."}
+      - { name: Nuage_Administrators_NA, desc: Nuage Administrators }
+      - { name: Nuage_Everybody_NA, desc: Nuage Users }
+      - { name: Nuage_Network Designers_NA, desc: Nuage Network Designers }
+      - { name: Nuage_Custom_group_NA, desc: Nuage Custom Group }
 
   si8ads14:
     host: si8ads14.{{ hailstorm_dns_domain }}
