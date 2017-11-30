@@ -59,6 +59,9 @@
   roles:
     - { role: layer2_vms, tags: [ 'layer2', 'satellite', 'vm', 'satellite-vm' ], mode: create }
     - { role: layer2_rhel, tags: [ 'layer2','satellite', 'rhel','satellite-rhel' ], mode: create }
+    - role: layerX_proxy_client
+      tags: [ 'layer2', 'satellite', 'proxy-client' ]
+      mode: create
     - { role: layer2_satellite, tags: [ 'layer2','satellite' ], mode: create }
 
 #### IPA ####
