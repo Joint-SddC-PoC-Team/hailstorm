@@ -22,6 +22,7 @@ lifecycle_environments:
       "*": "2017-10-27"
       "CV-OS-RHEL7-SERVER": "2017-10-28"
       "CV-RHOSP": "2017-10-01"
+      "CV-RHOSE3": "2017-11-30"
     errata_for_demo_scenario:
       - RHSA-2017:0286
       - RHSA-2016:1940
@@ -154,7 +155,7 @@ cf_is_deployed_on: "{% if groups['cf-osp-vm-group']|length > 0 %}osp{% elif grou
 # RED HAT SUBSCRIPTIONS
 satellite_subscription_pool_regex: "^(Red Hat Satellite Employee Subscription|Red Hat Satellite)$"
 rhel_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Enterprise Linux Server, Standard.*|EPEL.7|CentOS.7|td.agent)$"
-rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure|td.agent|Red Hat JBoss Enterprise Application Platform.*)$"
+rhsso_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat OpenShift Container Platform Broker/Master Infrastructure|td.agent|Red Hat JBoss Enterprise Application Platform.*|Red Hat JBoss Web Server.*)$"
 #sap_subscription_pool_regex: "^(Employee SKU|Red Hat Enterprise Linux Server for SAP HANA.*)$"
 rhev_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat Virtualization.*|Red Hat Enterprise Linux Server, Standard.*|td.agent)$"
 rhosp_subscription_pool_regex: "^(Employee SKU|Red Hat Cloud Suite.*|Red Hat (Enterprise Linux )?OpenStack Platform.*|Red Hat Ceph Storage.*|td.agent)$"
@@ -318,6 +319,7 @@ satellite_product_config:
       # - name: "Red Hat OpenShift Container Platform 3.4 (RPMs)"
       - name: "Red Hat OpenShift Container Platform 3.5 (RPMs)"
       - name: "Red Hat OpenShift Container Platform 3.6 (RPMs)"
+      - name: "Red Hat OpenShift Container Platform 3.7 (RPMs)"
   - product: Red Hat Virtualization
     basearch: x86_64
     repos:
@@ -514,6 +516,8 @@ satellite_content_config:
         repository: "Red Hat OpenShift Container Platform 3.5 RPMs x86_64"
       - product: "Red Hat OpenShift Container Platform"
         repository: "Red Hat OpenShift Container Platform 3.6 RPMs x86_64"
+      - product: "Red Hat OpenShift Container Platform"
+        repository: "Red Hat OpenShift Container Platform 3.7 RPMs x86_64"
       - product: "Red Hat Enterprise Linux Server"
         repository: "Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server"
       - product: "Red Hat Enterprise Linux Server"

@@ -53,37 +53,46 @@
 
        sleep 60
 
-       # add subscription manager
-       # yum -t -y -e 0 install subscription-manager
+       # Add Proxy infos
 
-       rpm -ivh http://satellite.<%=script_domainname%>/pub/katello-ca-consumer-latest.noarch.rpm
+       cd /tmp
+       curl http://satellite.<%=script_domainname%>/pub/customer/Certificates/BoschInternetProxyCA2.crt -o BoschInternetProxyCA2.crt
+       curl http://satellite.<%=script_domainname%>/pub/customer/Certificates/ProxyHTTP.crt -o ProxyHTTP.crt
 
-       echo "Registering the System"
-       subscription-manager register --org="Default_Organization" --name=<%=script_hostname%>.<%=script_domainname%> --activationkey="AK-DEMO-RHEL7-MANAGED-{{ stage }}"
+       # copy files to appropriate location
 
-       # add the rhel rpms to install katello agent
-       # subscription-manager repos --enable=rhel-7-server-satellite-tools-{{ satellite_version }}-rpms
+       cp /tmp/BoschInternetProxyCA2.crt /etc/pki/ca-trust/source/anchors/
+       cp /tmp/ProxyHTTP.crt /etc/pki/ca-trust/source/anchors/
+       chown root.root /etc/pki/ca-trust/source/anchors/BoschInternetProxyCA2.crt
+       chown root.root /etc/pki/ca-trust/source/anchors/ProxyHTTP.crt
+       chmod 644 /etc/pki/ca-trust/source/anchors/BoschInternetProxyCA2.crt
+       chmod 644 /etc/pki/ca-trust/source/anchors/ProxyHTTP.crt
 
-       echo "Installing Katello Agent"
-       yum -t -y -e 0 install katello-agent
-       chkconfig goferd on
-       systemctl restart goferd
-       katello-package-upload
+       update-ca-trust
+       update-ca-certificates
+
+       # set global proxy options in init file
+
+       # cat export http_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/ > /etc/profile.d/proxy.sh
+       cat export http_proxy=https://de\cdd8fe:<password>@rb-proxy-de.bosch.com:8080/ > /etc/profile.d/proxy.sh
+       # cat export http_proxy=https://de\cdd8fe:<password>@rb-proxy-unix-de01.bosch.com:8080/ > /etc/profile.d/proxy.sh
+       cat export https_proxy=$http_proxy >> /etc/profile.d/proxy.sh
+       cat export ftp_proxy=$http_proxy >> /etc/profile.d/proxy.sh
+       cat export rsync_proxy=$http_proxy >> /etc/profile.d/proxy.sh
+       # cat export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com,.{{ hailstorm_dns_domain }}" >> /etc/profile.d/proxy.sh
+       cat export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com" >> /etc/profile.d/proxy.sh
+
+       chown root.root /etc/profile.d/proxy.sh
+       chmod 644 /etc/profile.d/proxy.sh
+
+       # register in Bosch Satellite
+
+       curl http://si0bos32.de.bosch.com/pub/bootstrap/bootstrap-rhel7-64bit.txt|bash
 
        # ensure that OpenSSH does not do reverse lookups to speed up login process
        echo "UseDNS no" >> /etc/ssh/sshd_config
        systemctl restart sshd
 
-    <% if script_ldapentry != nil && script_ldapentry['mail'] != nil && script_ldapentry['mail'][0] != nil  %>
-       sendmail <%= script_ldapentry['mail'][0] %><<EOF
-       Subject: Your centrally managed virtual machine <%= script_hostname %> is ready
-       To: <%= script_ldapentry['mail'][0] %>
-       From: cloudforms@<%=script_domainname%>
-
-       Your centrally managed VM <%= script_hostname %> is ready.
-       .
-       EOF
-    <% end %>
     runcmd:
      - [ cloud-init-per, once, foreman-userdata, /tmp/foreman-userdata.sh ]
     output: {all: '| tee -a /root/install.userdata.log'}

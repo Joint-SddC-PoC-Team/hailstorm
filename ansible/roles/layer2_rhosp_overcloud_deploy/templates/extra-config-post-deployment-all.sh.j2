@@ -33,7 +33,7 @@ EOF
   {% endif %}
 
   {% if enable_nuage is defined %}
-  grep -q -e "^NETWORK_UPLINK_INTF=.*$" /etc/default/openvswitch && sed -i 's/^NETWORK_UPLINK_INTF=.*$/NETWORK_UPLINK_INTF=br-tenant/g' /etc/default/openvswitch || echo "NETWORK_UPLINK_INTF=br-tenant" >>/etc/default/openvswitch
+  grep -q -e "^NETWORK_UPLINK_INTF=.*$" /etc/default/openvswitch && sed -i 's/^NETWORK_UPLINK_INTF=.*$/NETWORK_UPLINK_INTF={{ infrastructure_network_tenant.osp_bridge }}/g' /etc/default/openvswitch || echo "NETWORK_UPLINK_INTF={{ infrastructure_network_tenant.osp_bridge }}" >>/etc/default/openvswitch
   sudo systemctl restart openvswitch
   {% endif %}
 }
