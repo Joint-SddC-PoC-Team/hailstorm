@@ -320,7 +320,7 @@ cloudforms-db01       jump_host=cloudforms-ui01 Xansible_host=10.116.127.201 act
 
 
 [cloudforms-ui]
-cloudforms-ui01   Xansible_host=10.116.127.202 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" cf_zone="WebUI" cf_type="ui" cf_use_rhsso=true cf_roles="automate,database_operations,notifier,user_interface,web_services,websocket" osp_tenant="{{ cf_tenant }}" osp_flavor="cf.xlarge" osp_image="Cloudforms" additional_dns="cloudforms"
+cloudforms-ui01   Xansible_host=10.116.127.202 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" cf_zone="WebUI" cf_type="ui" cf_use_rhsso=true cf_roles="automate,database_operations,notifier,user_interface,web_services,websocket,embedded_ansible,git_owner,ems_inventory,ems_operations,smartproxy" osp_tenant="{{ cf_tenant }}" osp_flavor="cf.xlarge" osp_image="Cloudforms" additional_dns="cloudforms"
 
 [cloudforms-wk-ocp]
 cloudforms-wk-ocp01   jump_host=cloudforms-ui01 Xansible_host=10.116.127.203 activation_key="AK-CV-CLOUDFORMS-{{ stage }}" cf_zone="OCP" cf_type="wk-ocp" cf_roles="automate,database_operations,ems_inventory,ems_metrics_collector,ems_metrics_coordinator,ems_metrics_processor,ems_operations,event,smartproxy,smartstate,user_interface,web_services,websocket" osp_tenant="{{ cf_tenant }}" osp_flavor="cf.xlarge" osp_image="Cloudforms"
