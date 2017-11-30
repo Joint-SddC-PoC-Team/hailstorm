@@ -116,6 +116,8 @@ infrastructure_network_internal_api:
 infrastructure_network_tenant:
   netname: 'tenant'
   bridge: 'tenant'
+  #osp_bridge for nuage openvswitch config
+  osp_bridge: 'br-tenant'
   forward_mode: 'nat'
   default_gw_host_prefix: 192.168.12.1/24
   vlan:       2812
