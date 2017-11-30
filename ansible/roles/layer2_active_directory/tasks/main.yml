@@ -3,5 +3,9 @@
   when: mode=="create"
 
 - block:
-    - include: dns-records-add.yml
-  when: mode=="setmx"
+    - include: users-add.yml
+  when: mode=="users"
+
+- block:
+    - include: groups-add.yml
+  when: mode=="groups"

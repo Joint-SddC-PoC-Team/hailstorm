@@ -41,5 +41,5 @@
     - name: force full sync
       shell: /opt/rh/rh-sso7/root/usr/share/keycloak/bin/kcadm.sh create user-storage/{{ newProviderId.stdout }}/sync?action=triggerFullSync  -r infra -o
       register: syncResult
-      failed_when: syncResult.rc != 0 or (syncResult.stdout|from_json)['failed'] !=0
+      failed_when: syncResult.rc != 0 or ((syncResult.stdout|from_json)['failed'] !=0 and 'users failed sync' not in (syncResult.stdout|from_json)['status'])
   when: existingProviderId.stdout == ""
