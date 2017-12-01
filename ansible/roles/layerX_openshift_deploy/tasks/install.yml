@@ -77,6 +77,10 @@
   command: ansible nodes -a "docker load -i /root/nuage-vrs-docker-5.1.1-9.tar"
   when: enable_nuage is defined
 
+- name: clone openshift-ansible installer for Nuage SDN integrated OpenShift
+  command: git clone https://github.com/openshift/openshift-ansible.git
+  when: enable_nuage is defined
+
 - name: clean images files from the installer host
   file: 
     state: absent
@@ -100,12 +104,21 @@
     - name: pause for IPTables to react
       pause: seconds=15
 
-    - name: run installer playbook
+    - name: run installer playbook with OVS based SDN
       shell: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml 2>&1 >~/openshift_install.log
       async: 7200
       poll: 0
       tags: ['playbook']
       register: playbook
+      when: enable_nuage is not defined
+
+    - name: run installer playbook for Nuage SDN integration
+      shell: git checkout tags/openshift-ansible-3.7.0-0.116.0 && ansible-playbook /root/openshift-ansible/playbooks/byo/config.yml 2>&1 >~/openshift_install.log
+      async: 7200
+      poll: 0
+      tags: ['playbook']
+      register: playbook
+      when: enable_nuage is defined
 
     - name: check on installer playbook completed
       async_status: jid={{ playbook.ansible_job_id }}
