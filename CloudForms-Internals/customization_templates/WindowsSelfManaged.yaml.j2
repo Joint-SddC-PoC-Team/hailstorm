@@ -59,7 +59,8 @@
     $settings = Get-ItemProperty -Path $reg
     # $settings.ProxyServer
     # $settings.ProxyEnable
-    # http_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/    # Set-ItemProperty -Path $reg -Name ProxyServer -Value "proxy.example.org:8080"
+    # http_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/
+    # Set-ItemProperty -Path $reg -Name ProxyServer -Value "proxy.example.org:8080"
     Set-ItemProperty -Path $reg -Name ProxyServer -Value "de\cdd8fe:<password>@rb-proxy-de.bosch.com:8080"
     Set-ItemProperty -Path $reg -Name ProxyEnable -Value 1
     
