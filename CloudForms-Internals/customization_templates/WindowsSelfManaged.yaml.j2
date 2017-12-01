@@ -17,7 +17,7 @@
     curl http://satellite.<%=script_domainname%>/pub/customer/Certificates/BOSCH-CA-DE.cer -outfile C:\temp\BOSCH-CA-DE.cer
     certutil.exe -addstore Root C:\temp\BOSCH-CA-DE.cer
     timeout 20 /NOBREAK
-    del C:\temp\BOSCH-CA-DE.cer
+    # del C:\temp\BOSCH-CA-DE.cer
     
     # curl http://satellite.<%=script_domainname%>/pub/customer/Certificates/BOSCH-CA1-DE.cer -outfile C:\temp\BOSCH-CA1-DE.cer
     # certutil.exe -addstore Root C:\temp\BOSCH-CA1-DE.cer
@@ -27,22 +27,22 @@
     curl http://satellite.<%=script_domainname%>/pub/customer/Altiris_agent/AeXNSCHTTPs.exe -outfile C:\temp\AeXNSCHTTPs.exe
     C:\temp\AeXNSCHTTPs.exe
     timeout 20 /NOBREAK
-    del C:\temp\AeXNSCHTTPs.exe
+    # del C:\temp\AeXNSCHTTPs.exe
     
     curl http://satellite.<%=script_domainname%>/pub/customer/Altiris_agent/SoftwareManagementSolution_Plugin_x64.msi -outfile C:\temp\SoftwareManagementSolution_Plugin_x64.msi
     C:\temp\SoftwareManagementSolution_Plugin_x64.msi /qn /norestart
     timeout 20 /NOBREAK
-    del C:\temp\SoftwareManagementSolution_Plugin_x64.msi
+    # del C:\temp\SoftwareManagementSolution_Plugin_x64.msi
     
     curl http://satellite.<%=script_domainname%>/pub/customer/Altiris_agent/Symantec_InventoryAgent_x64.msi -outfile C:\temp\Symantec_InventoryAgent_x64.msi
     C:\temp\Symantec_InventoryAgent_x64.msi /qn /norestart
     timeout 20 /NOBREAK
-    del C:\temp\Symantec_InventoryAgent_x64.msi
+    # del C:\temp\Symantec_InventoryAgent_x64.msi
     
     curl http://satellite.<%=script_domainname%>/pub/customer/Altiris_agent/Symantec_ServerInventoryAgent_x64.msi -outfile C:\temp\Symantec_ServerInventoryAgent_x64.msi
     C:\temp\Symantec_ServerInventoryAgent_x64.msi /qn /norestart
     timeout 30 /NOBREAK
-    del C:\temp\Symantec_ServerInventoryAgent_x64.msi
+    # del C:\temp\Symantec_ServerInventoryAgent_x64.msi
     
     # Here we need feedback from Bosch on why they have a Win64.msi file, and in their own env do use a x64.msi file.
     # The Win64.msi file doesn't work, as we don't know the Product ID...
@@ -51,7 +51,7 @@
     curl http://satellite.<%=script_domainname%>/pub/customer/Altiris_agent/Altiris_PatchMgmtAgent_Win64.msi -outfile C:\temp\Altiris_PatchMgmtAgent_Win64.msi
     C:\temp\Altiris_PatchMgmtAgent_Win64.msi /qn /norestart
     timeout 60 /NOBREAK
-    del C:\temp\Altiris_PatchMgmtAgent_Win64.msi
+    # del C:\temp\Altiris_PatchMgmtAgent_Win64.msi
     
     # set the prox conf (see: https://martin.hoppenheit.info/blog/2015/set-windows-proxy-with-powershell/)
     
@@ -62,7 +62,7 @@
     # http_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/
     # Set-ItemProperty -Path $reg -Name ProxyServer -Value "proxy.example.org:8080"
     Set-ItemProperty -Path $reg -Name ProxyServer -Value "de\cdd8fe:<password>@rb-proxy-de.bosch.com:8080"
-    Set-ItemProperty -Path $reg -Name ProxyEnable -Value 1
+    Set-ItemProperty -Path $reg -Name ProxyEnable -Value 0
     
     ## Run patches
     ## C:\Program Files\Altiris\Altiris Agent\Agents\PatchMgmtAgent\AeXPatchUtil.exe /Xa
