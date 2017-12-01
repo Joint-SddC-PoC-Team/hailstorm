@@ -5,6 +5,7 @@
     - role: layer2_satellite_publish_installables
       mode: create
       satellite_www_dir: customer
+      tags: ['layer2', 'publish-content']
       installables:
         - Altiris_agent/AeXNSCHTTPs.exe
         - Altiris_agent/Altiris_PatchMgmtAgent_Win64.msi
@@ -14,7 +15,10 @@
         - Altiris_agent/install_agent.bat
         - Certificates/BOSCH-CA1-DE.cer
         - Certificates/BOSCH-CA-DE.cer
-
+        - Certificates/BoschInternetProxyCA2.crt
+        - Certificates/BoschInternetProxyCA2.der
+        - Certificates/ProxyHTTP.crt
+        - Certificates/ProxyHTTP.der
 
 - hosts: rhevm-group
   remote_user: root

@@ -25,7 +25,7 @@
   gather_facts: false
   roles:
     - role: layer3_vm_on_openstack
-      tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'vm','dnat' ]
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'vm','dnat', 'ocp-prep' ]
       mode: create
       when: ocp_is_deployed_on == 'osp'
 
