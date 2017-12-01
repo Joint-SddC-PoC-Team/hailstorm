@@ -42,7 +42,7 @@
           - tls-inject-trust-anchor-environment.yaml
           - monitoring-environment.yaml
           - logging-environment.yaml
-          - "{% if current_lifecycle_env.osp_force_config_drive|default(false,true) %}force-config-drive-environment.yaml{% endif %}
+          - "{% if current_lifecycle_env.osp_force_config_drive|default(false,true) %}force-config-drive-environment.yaml{% endif %}"
           - "{% if enable_nuage is defined %}neutron-nuage-config.yaml{% endif %}"
           - "{% if enable_nuage is defined %}nova-nuage-config.yaml{% endif %}"
   when: mode=="create" or mode=="prepare"
@@ -88,7 +88,7 @@
           - tls-inject-trust-anchor-environment.yaml
           - monitoring-environment.yaml
           - logging-environment.yaml
-          - "{% if current_lifecycle_env.osp_force_config_drive|default(false,true) %}force-config-drive-environment.yaml{% endif %}
+          - "{% if current_lifecycle_env.osp_force_config_drive|default(false,true) %}force-config-drive-environment.yaml{% endif %}"
           - "{% if enable_nuage is defined %}neutron-nuage-config.yaml{% endif %}"
           - "{% if enable_nuage is defined %}nova-nuage-config.yaml{% endif %}"
   when: mode=="reset"
