@@ -62,7 +62,6 @@
        cat export ftp_proxy=$http_proxy >> /etc/profile.d/proxy.sh
        cat export rsync_proxy=$http_proxy >> /etc/profile.d/proxy.sh
        cat export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com,.{{ hailstorm_dns_domain }}" >> /etc/profile.d/proxy.sh
-       cat export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com" >> /etc/profile.d/proxy.sh
 
        chown root.root /etc/profile.d/proxy.sh
        chmod 644 /etc/profile.d/proxy.sh
