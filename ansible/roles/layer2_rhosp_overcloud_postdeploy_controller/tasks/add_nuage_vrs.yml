@@ -17,5 +17,15 @@
 - name: add nuage openvswitch selinux rules
   command: semodule -i /root/ovslocal6.pp
 
+- name: allow VLXAN traffic in iptables
+  lineinfile:
+    path: /etc/sysconfig/iptables
+    line: '{{ item }}'
+    insertbefore: "log all ipv4"
+  notify: reload_iptables
+  with_items:
+    - '-A INPUT -p udp -m multiport —dports 4789 -m comment —comment "Accept VXLAN" -m state —state NEW -j ACCEPT'
+    - '-A INPUT -p tcp -m multiport —dports 9697 -m comment —comment "Accept MetaData requests" -m state —state NEW -j ACCEPT'
+
 - name: Flush handlers
   meta: flush_handlers

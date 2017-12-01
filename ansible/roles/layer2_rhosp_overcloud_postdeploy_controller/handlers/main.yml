@@ -2,3 +2,8 @@
   service:
     name: openvswitch
     state: restarted
+
+- name: reload_iptables
+  service:
+    name: iptables
+    state: restarted
