@@ -1,0 +1,13 @@
+myself:
+ hosts:
+  localhost
+
+all:
+ vars:
+   nuage_auth:
+     api_username: csproot
+     api_password: csproot
+     api_enterprise: csp
+     api_url: https://10.167.42.51:8443
+     api_version: v5_0
+   openstack_enterprise_name: OpenStack_Org

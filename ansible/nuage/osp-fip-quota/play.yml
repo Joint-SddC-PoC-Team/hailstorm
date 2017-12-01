@@ -1,0 +1,60 @@
+- hosts: localhost
+
+  vars:
+    nuage_auth:
+      api_username: csproot
+      api_password: csproot
+      api_enterprise: csp
+      api_url: https://10.116.127.156:8443
+      api_version: v5_0
+    enterprise_name: OpenStack_Org
+    shared_enterprise: "Shared Infrastructure"
+
+
+  tasks:
+
+  # Creating a new enterprise profile
+  - name: Create Organisation profile
+    connection: local
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: EnterpriseProfile
+      state: present
+      properties:
+        name: "OpenStack_Org_Profile"
+        description: "Organisation profile for the OpenShift Enterprise"
+        floating_ips_quota: "10000"
+        allowed_forwarding_classes:
+        - A
+        - B
+        - C
+        - D
+        - E
+        - F
+        - G
+        - H
+        allow_advanced_qos_configuration: True
+    register: profile
+
+  - name: Get Enterprise
+    connection: local
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Enterprise
+      command: find
+      properties:
+        name: "{{ enterprise_name }}"
+    ignore_errors: yes
+    register: nuage_check_enterprise
+
+
+  - name: Update Enterprise profile
+    connection: local
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Enterprise
+      id: "{{ nuage_check_enterprise.id }}"
+      state: present
+      properties:
+        enterprise_profile_id: "{{ profile.id }}"
+    when: nuage_check_enterprise is defined

@@ -34,6 +34,7 @@
       parent_type: Enterprise
       command: find
     register: nuage_domains
+    ignore_errors: true
 
 #  - debug:
 #      var: nuage_domains
@@ -42,7 +43,7 @@
     delegate_to: localhost
     nuage_vspk:
       auth: "{{ nuage_auth }}"
-      type: VMInterface 
+      type: VMInterface
       command: find
       parent_id: "{{ item.ID }}"
       parent_type: Domain
@@ -96,6 +97,7 @@
       type: Enterprise
       id: "{{ nuage_enterprise.id }}"
       state: absent
+    ignore_errors: true
 
   - name: Finding Shared Infrastructure
     delegate_to: localhost
