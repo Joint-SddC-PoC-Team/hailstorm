@@ -23,7 +23,7 @@ parameter_defaults:
   TenantNetCidr: {{ infrastructure_network_tenant.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_tenant.default_gw_host_prefix | ipaddr('prefix') }}
   TenantAllocationPools: [{'start': '{{ infrastructure_network_tenant.osp_overcloud_start }}', 'end': '{{ infrastructure_network_tenant.osp_overcloud_end }}'}]
   TenantNetworkVlanID: {{ infrastructure_network_tenant.vlan }}
-  {% if enable_nuage is defined %}TenantInterfaceDefaultRoute: {{ infrastructure_network_tenant.default_gw_host_prefix | ipaddr('-2') | ipaddr('address') }}{% endif %}
+  {% if enable_nuage is defined %}TenantInterfaceDefaultRoute: {{ infrastructure_network_tenant.nuage_vsr_host_prefix | ipaddr('address') }}{% endif %}
 
   # Public Storage Access - e.g. Nova/Glance <--> Ceph
   StorageNetCidr: {{ infrastructure_network_storage.default_gw_host_prefix | ipaddr('network') }}/{{ infrastructure_network_storage.default_gw_host_prefix | ipaddr('prefix') }}
