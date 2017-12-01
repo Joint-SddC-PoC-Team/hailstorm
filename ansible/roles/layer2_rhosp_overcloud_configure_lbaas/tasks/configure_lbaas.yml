@@ -1,11 +1,11 @@
 # https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/11/html-single/networking_guide/#sec-lbaas
 - name: Install HAproxy
-  yum: 
+  yum:
     name: haproxy
     state: present
 
 - name: Add the LBaaS tables to the neutron database
-  shell:  neutron-db-manage --subproject neutron-lbaas --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head
+  shell:  neutron-db-manage --subproject neutron-lbaas --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini {% if enable_nuage is defined %}--config-file /etc/neutron/plugins/nuage/plugin.ini {% endif %}upgrade head
 
 - name: Change the service provider in neutron_lbaas.conf
   lineinfile:
@@ -19,7 +19,7 @@
   command: awk /^service_plugins=.*$/ /etc/neutron/neutron.conf
   register: check_lbaas_configured
   changed_when: False
-          
+
 - name: configre LBaaS v2 plugin in service_plugins under neutron.conf
   lineinfile:
     path: /etc/neutron/neutron.conf
@@ -30,6 +30,17 @@
     backup: yes
   when: not (check_lbaas_configured.stdout | search("neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2"))
   notify: restart_neutron
+
+- name: insert ovs_integration_bridge = alubr0 to [DEFAULT] section in neutron.conf
+  lineinfile:
+    path: /etc/neutron/neutron.conf
+    line: 'ovs_integration_bridge = alubr0'
+    insertafter: "^\\[DEFAULT\\]"
+    regexp: '^ovs_integration_bridge'
+    state: present
+    backup: yes
+  notify: restart_neutron
+  when: enable_nuage is defined
 
 - name: Enable Automatic Failover
   lineinfile:
@@ -50,8 +61,9 @@
 - name: Configure lbaas_agent.ini
   lineinfile:
     path: /etc/neutron/lbaas_agent.ini
-    line: "interface_driver =neutron.agent.linux.interface.OVSInterfaceDriver"
+    line: "interface_driver ={% if enable_nuage is defined %}nuage_neutron.lbaas.agent.nuage_interface.NuageInterfaceDriver{% else %}neutron.agent.linux.interface.OVSInterfaceDriver{% endif %}"
     insertafter: "^#interface_driver"
+    regexp: "^interface_driver"
     backup: yes
   notify: restart_neutron
 
@@ -76,5 +88,5 @@
     state: started
     enabled: True
 
-- name: Flush handlers  
+- name: Flush handlers
   meta: flush_handlers

@@ -111,6 +111,7 @@ infrastructure_network_tenant:
   osp_overcloud_end:   10.116.110.131
   nuage_start:         10.116.110.156
   nuage_end:           10.116.110.171
+  nuage_vsr_host_prefix: 10.116.110.166/32
   mac_prefix: "02:00:00:00:12:"
 
 # this is a network for accessing the storage systems (aka public APIs); if applicable the storage systems on their own should not utilize this network, e.g. for syncing; for that the Storage Management network should be used like it is done in OpenStack

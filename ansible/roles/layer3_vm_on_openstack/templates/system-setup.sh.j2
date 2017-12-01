@@ -16,4 +16,9 @@ echo "{{ root_password }}" | passwd root --stdin
 # ensure that OpenSSH does not do reverse lookups to speed up login process
 echo "UseDNS no" >> /etc/ssh/sshd_config
 
+#work around https://bugzilla.redhat.com/show_bug.cgi?id=1454491
+{# cloudforms already has a fix baked in, but it adds the wrong 192.168.122.1 #}
+sed -i 's/^nameserver 192.168.122.1//g' /etc/resolv.conf
+grep -q 'nameserver {{ infrastructure_address_default_dns }}' /etc/resolv.conf || echo 'nameserver {{ infrastructure_address_default_dns }}' >>/etc/resolv.conf
+
 exit 0
