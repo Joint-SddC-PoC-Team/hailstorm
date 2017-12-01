@@ -108,8 +108,8 @@ nuage_openshift_monitor_log_dir=/var/log/nuage-openshift-monitor
 nuage_interface_mtu=1450
 nuage_openshift_monitor_rest_server_port=9443
 vsd_user=ose-admin
-vsd_user_cert_file=/usr/local/ose-admin.pem
-vsd_user_key_file=/usr/local/ose-admin-Key.pem
+vsd_user_cert_file=/root/ocp/certs/ose-admin.pem
+vsd_user_key_file=/root/ocp/certs/ose-admin-Key.pem
 openshift_node_kubelet_args={'max-pods': ['110'], 'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80'], 'make-iptables-util-chains': ['false']}
 openshift_master_cluster_hostname=openshift.{{ hailstorm_dns_domain }}
 nuage_openshift_monitor_rest_server_port=9443
@@ -150,10 +150,10 @@ openshift_logging_es_nodeselector={"region":"infra"}
 # host group for nodes, includes region info
 [nodes]
 {% for master in groups["ocp-master-group"] %}
-{{ hostvars[master].hostname }} openshift_hostname={{ hostvars[master].hostname_short }} openshift_node_labels="{{ hostvars[master].openshift_node_labels }}"
+{{ hostvars[master].hostname }} openshift_hostname={{ hostvars[master].hostname_short }} openshift_node_labels="{{ hostvars[master].openshift_node_labels, 'install-monitor': 'true' }}"
 {% endfor %}
 {% for node in groups["ocp-node-group"] %}
-{{ hostvars[node].hostname }} openshift_hostname={{ hostvars[node].hostname_short }} openshift_node_labels="{{ hostvars[node].openshift_node_labels }}"
+{{ hostvars[node].hostname }} openshift_hostname={{ hostvars[node].hostname_short }} openshift_node_labels="{{ hostvars[node].openshift_node_labels, 'install-monitor': 'true' }}"
 {% endfor %}
 
 # Specify load balancer host
