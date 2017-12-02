@@ -22,6 +22,12 @@
     - "{{ satellite_activation_keys_and_host_collections }}"
   when: (item.1.activation_key + '-' + item.0) not in current_activation_keys.stdout
 
+- name: enable/disable auto-attach for activation_key
+  command: hammer activation-key update --organization "{{ organization }}" --name "{{ item.1.activation_key }}-{{ item.0 }}" --auto-attach {% if item.1.disable_auto_attach|default(false,true) %}false{% else %}true{% endif %}
+  with_nested:
+    - "{{ current_lifecycle_environments.stdout_lines }}"
+    - "{{ satellite_activation_keys_and_host_collections }}"
+
 ### ADD SUBSCRIPTIONS TO AK
 
 - name: get present subscriptions

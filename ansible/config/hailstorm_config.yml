@@ -635,6 +635,7 @@ satellite_activation_keys_and_host_collections:
     host_collection: "RHEL7"
     activation_key_subscription_regex: "{{ rhsso_subscription_pool_regex }}"
     override: "rhel-7-server-satellite-tools-{{ satellite_version }}-rpms"
+    disable_auto_attach: true
 
   - activation_key: AK-CV-RHOSP
     content_view: "CV-RHOSP"
