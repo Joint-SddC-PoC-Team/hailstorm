@@ -545,7 +545,20 @@ external_network_config:
       - from_port: 5986
         to_port: 5986
         proto: tcp
-
+    - expose_machine: vsd1
+      on_host_prefix: 10.32.105.81/32
+      via_network: services
+      ports:
+      - from_port: 7443
+        to_port: 7443
+        proto: tcp
+      - from_port: 8443
+        to_port: 8443
+        proto: tcp
+      - from_port: 9200
+        to_port: 9200
+        proto: tcp
+        
 nic_bonding:
 #   - name: <bonddevice>
 #     nics:

@@ -152,10 +152,10 @@ openshift_logging_es_nodeselector={"region":"infra"}
 # host group for nodes, includes region info
 [nodes]
 {% for master in groups["ocp-master-group"] %}
-{{ hostvars[master].hostname }} openshift_hostname={{ hostvars[master].hostname_short }} openshift_node_labels="{{ hostvars[master].openshift_node_labels, 'install-monitor': 'true' }}"
+{{ hostvars[master].hostname }} openshift_hostname={{ hostvars[master].hostname_short }} openshift_node_labels="{{ hostvars[master].openshift_node_labels|combine({'install-monitor': 'true'}) }}"
 {% endfor %}
 {% for node in groups["ocp-node-group"] %}
-{{ hostvars[node].hostname }} openshift_hostname={{ hostvars[node].hostname_short }} openshift_node_labels="{{ hostvars[node].openshift_node_labels, 'install-monitor': 'true' }}"
+{{ hostvars[node].hostname }} openshift_hostname={{ hostvars[node].hostname_short }} openshift_node_labels="{{ hostvars[node].openshift_node_labels }}"
 {% endfor %}
 
 # Specify load balancer host

@@ -122,7 +122,7 @@
       when: enable_nuage is not defined
 
     - name: run installer playbook for Nuage SDN integration
-      shell: git checkout tags/openshift-ansible-3.7.0-0.116.0 && ansible-playbook /root/openshift-ansible/playbooks/byo/config.yml 2>&1 >~/openshift_install.log
+      shell: cd openshift-ansible && git checkout tags/openshift-ansible-3.7.0-0.116.0 && ansible-playbook /root/openshift-ansible/playbooks/byo/config.yml 2>&1 >~/openshift_install.log
       async: 7200
       poll: 0
       tags: ['playbook']

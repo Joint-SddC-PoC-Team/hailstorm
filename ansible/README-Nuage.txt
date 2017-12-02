@@ -65,8 +65,8 @@ infrastructure to be fully functional:
 ∘ Platform Configuration/Infrastructure/Data Center Gateways/Gateways/{r1,r2}/WAN Services/vrf<num>002_mgmt_data/Add OpenStack_Org
 ∘ Platform Configuration/Infrastructure/Data Center Gateways/Gateways/{r1,r2}/Blue Hammer (wait)
 ∘ Shared Infrastructure/L3 domains/Networks/Domain for FIPs in 10.32.96.0/router (symbol)/wan service/add r1 and r2 with vrf<num>001_FIP
-∘ OpenStack_Org/L3 domains/Networks/router internal_demo_vms/router (symbol)/wan service/add r1 and r2 with vrf<num>002_mgmt_data
-∘ OpenStack_Org/L3 domains/Networks/router internal_demo_vms/router (symbol)/dhcp/add option 26 with mtu 1450
+∘ FOR ALL DOMAINS: OpenStack_Org/L3 domains/Networks/router <DOMAIN_NAME>/router (symbol)/wan service/add r1 and r2 with vrf<num>002_mgmt_data
+∘ FOR ALL DOMAINS: OpenStack_Org/L3 domains/Networks/router <DOMAIN_NAME>/router (symbol)/dhcp/add option 26 with mtu 1450
 
 
 Tear down
