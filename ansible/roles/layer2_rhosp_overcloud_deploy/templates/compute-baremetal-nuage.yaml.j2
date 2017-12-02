@@ -130,6 +130,9 @@ resources:
               addresses:
               - ip_netmask:
                   get_param: TenantIpSubnet
+              routes:
+                - default: true
+                  next_hop: {{ infrastructure_network_tenant.nuage_vsr_host_prefix |ipaddr('address') }}
             - type: vlan
               device: br-provisioning
               vlan_id:
@@ -146,7 +149,7 @@ resources:
                   get_param: ManagementIpSubnet
 {% if (override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend)) == 'ceph_hyperconverged' %}
             -
-              type: vlan 
+              type: vlan
               device: br-provisioning
               vlan_id:
                 get_param: StorageMgmtNetworkVlanID
@@ -161,11 +164,11 @@ resources:
               bonding_options: "mode=active-backup"
               addresses:
                  - ip_netmask: {get_param: ExternalIpSubnet}
-              routes:
-                -
-                  ip_netmask: 0.0.0.0/0
-                  default: true
-                  next_hop: {get_param: ExternalInterfaceDefaultRoute}
+            #  routes:
+            #    -
+            #      ip_netmask: 0.0.0.0/0
+            #      default: true
+            #      next_hop: {get_param: ExternalInterfaceDefaultRoute}
               members:
                - type: interface
                  name: eno1
@@ -183,7 +186,7 @@ resources:
                   primary: true
                 - type: interface
                   name: eno50
-              
+
 
 outputs:
   OS::stack_id:
