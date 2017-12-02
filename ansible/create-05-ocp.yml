@@ -45,7 +45,7 @@
   remote_user: root
   roles:
     - role: layerX_dns
-      tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'ocp-osp-lb', 'vm','dnat' ]
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'ocp-osp-lb', 'vm','dnat', 'dnsupdate' ]
       mode: update_floating_ip
       when: ocp_is_deployed_on == 'osp'
 

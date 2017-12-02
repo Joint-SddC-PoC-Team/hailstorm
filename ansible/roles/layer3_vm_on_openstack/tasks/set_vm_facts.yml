@@ -47,3 +47,16 @@
 
 - debug: var=ansible_host
 - debug: var=ansible_ssh_common_args
+
+- name: get subnet info
+  os_subnets_facts:
+    auth:  "{{ vars['os_auth_hailstorm_' + osp_tenant.replace('-','_')] }}"
+    validate_certs: False
+    name: "sub_{{ infrastructure_osp_tenant_internal_network.netname }}"
+  run_once: true
+  delegate_to: localhost
+
+- set_fact:
+    osp_subnet_id: "{{ openstack_subnets[0].id }}"
+# - debug:
+#     var: openstack_subnets

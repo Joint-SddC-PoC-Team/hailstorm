@@ -22,7 +22,8 @@ osm_default_node_selector="region=primary"
 {% if http_proxy is defined %}
 openshift_http_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
 openshift_https_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
-openshift_no_proxy=.{{ hailstorm_dns_domain }}
+{# it is important not to access the OSP metadata service (169.254.169.254) via proxy #}
+openshift_no_proxy=.{{ hailstorm_dns_domain }},169.254.169.254
 {% endif %}
 
 {% if cf_is_deployed_on == 'osp' %}
@@ -34,8 +35,9 @@ openshift_cloudprovider_openstack_password={{ root_password }}
 openshift_cloudprovider_openstack_tenant_name={{ osp_tenant }}
 openshift_cloudprovider_openstack_domain_name=hailstorm
 openshift_cloudprovider_openstack_region=regionOne
-# seems like we don't need this value for anything
-#openshift_cloudprovider_openstack_lb_subnet_id=
+{% if osp_subnet_id is defined %}
+openshift_cloudprovider_openstack_lb_subnet_id={{ osp_subnet_id }}
+{% endif %}
 {% endif %}
 
 # uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider

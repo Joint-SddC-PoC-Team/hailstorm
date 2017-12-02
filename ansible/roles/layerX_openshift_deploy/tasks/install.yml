@@ -37,6 +37,15 @@
 - name: create the hailstorm key on the OSE installer
   copy: content="{{ hailstorm_private_key.stdout }}" dest=/root/.ssh/{{ hailstorm_ssh_priv_key_file }} mode=0400
 
+- name: create ansible.cfg
+  copy:
+    content: |
+      [ssh_connection]
+      pipelining=True
+      retries=10
+      forks=20
+    dest: ~/ansible.cfg
+
 - name: create /etc/ansible/hosts for OVS multitenant SDN
   template: src=hosts.j2 dest=/etc/ansible/hosts
   register: ansible_hosts
@@ -44,7 +53,7 @@
 
 - name: create /etc/ansible/hosts for Nuage SDN
   template: src=hosts_nuagesdn.j2 dest=/etc/ansible/hosts
-  register: ansible_hosts
+  register: ansible_hosts_nuage
   when: enable_nuage is defined
 
 - name: Register Nuage SDN files repo IP
@@ -82,7 +91,7 @@
   when: enable_nuage is defined
 
 - name: clean images files from the installer host
-  file: 
+  file:
     state: absent
     path: "/root/ocp/dockerimages"
   when: enable_nuage is defined
@@ -117,13 +126,13 @@
       async: 7200
       poll: 0
       tags: ['playbook']
-      register: playbook
+      register: playbook2
       when: enable_nuage is defined
 
     - name: check on installer playbook completed
-      async_status: jid={{ playbook.ansible_job_id }}
+      async_status: jid={{ playbook.ansible_job_id|default(playbook2.ansible_job_id) }}
       register: job_result
       until: job_result.finished
       retries: 480
       delay: 15
-  when: ansible_hosts is defined
+  when: ansible_hosts|changed or ansible_hosts_nuage|changed
