@@ -21,7 +21,7 @@
   lineinfile:
     path: /etc/sysconfig/iptables
     line: '{{ item }}'
-    insertbefore: "log all ipv4"
+    insertbefore: "log all"
   notify: reload_iptables
   with_items:
     - '-A INPUT -p udp -m multiport --dports 4789 -m comment --comment "Accept VXLAN" -m state --state NEW -j ACCEPT'
