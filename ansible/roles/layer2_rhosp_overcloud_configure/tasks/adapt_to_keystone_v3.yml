@@ -104,19 +104,21 @@
         - internal
         - public
 
-    - name: grant admin domain user to default domain
+    - name: grant default domain admin user as admin to other domains
       shell: >
         . ~/{{ stack_name }}rc_v3 &&
-         openstack role add --domain default --user $(openstack user list --domain {{ item.keys()[0] }}|grep " admin "|awk '{print $2}') admin
-      with_items: "{{ osp_keystone_domains }}"
+         openstack role add --domain {{ item.keys()[0] }} --user $(openstack user list --domain default|awk '/ admin /{print $2}') admin
+      with_items:
+       - "{{ osp_keystone_domains }}"
 
-    - name: grant admin domain user to hailstorm domain
+    - name: grant hailstorm domain admin users (plural) as admin to other domains
       shell: >
         . ~/{{ stack_name }}rc_v3 &&
-         openstack role add --domain {{ item[0].keys()[0] }} --user $(openstack user list --domain {{ item[0].keys()[0] }}|grep " {{ item[1] }} "|awk '{print $2}') admin
+         openstack role add --domain {{ item[0].keys()[0] }} --user $(openstack user list --domain hailstorm|awk '/ {{ item[1] }} /{print $2}') admin
       with_nested:
         - "{{ osp_keystone_domains }}"
-        - ["admin","{{ osp_admin_user }}"]
+        - ["admin","{{ osp_hailstorm_domain_admin_user }}"]
+
 
   become: yes
   become_user: "{{ rhosp_stack_user }}"

@@ -37,7 +37,7 @@
         validate_certs: False
       with_nested:
         -  "{{ osp_projects }}"
-        -  "{{ osp_admin_user }}"
+        -  "{{ osp_hailstorm_domain_admin_user }}"
 
 
     - name: assign member users to projects
@@ -49,5 +49,5 @@
         validate_certs: False
       with_nested:
         -  "{{ osp_projects }}"
-        -  "{{ osp_member_user }}"
+        -  "{{ osp_hailstorm_domain_member_user }}"
   delegate_to: localhost

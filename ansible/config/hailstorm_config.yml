@@ -955,10 +955,10 @@ osp_projects:
             remote_ip_prefix: 0.0.0.0/0
 
 
-osp_admin_user:
+osp_hailstorm_domain_admin_user:
   - cfme-bind-user
   - admin
-osp_member_user:
+osp_hailstorm_domain_member_user:
   - consumer
   - developer
   - approver
