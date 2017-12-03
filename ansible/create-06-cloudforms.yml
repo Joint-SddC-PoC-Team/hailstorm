@@ -118,6 +118,9 @@
   roles:
   # RHEL after cloudforms config, to ensure the hostname is set before subscribing
     - { role: layer2_rhel, tags: [ 'layer3', 'cf', 'rhel', 'cf-rhel'], mode: create }
+    - role: layerX_proxy_client
+      tags: [ 'layer2', 'cf', 'proxy-client' ]
+      mode: create
     - { role: layer2_tdagent, tags: [ 'layer3', 'cf', 'tdagent', 'cf-tdagent'], mode: create, forward_to_rsyslog: true }
     # - role: layerX_syslog_client
     #   tags: [ 'layer2', 'rhosp', 'syslog',  'syslog-client']
