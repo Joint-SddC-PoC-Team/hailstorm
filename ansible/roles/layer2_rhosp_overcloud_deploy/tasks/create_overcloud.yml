@@ -19,7 +19,7 @@
       with_items:
         - cat /etc/ipa/ca.crt
         - openssl x509 -in /etc/ipa/ca.crt -outform PEM
-  when: stack.stdout == ""
+  when: stack.stdout == "" or rewrite_templates is defined
 
 - block:
     - name: Create bin directory
@@ -57,7 +57,7 @@
         . ~/stackrc ; rm ~/deploy_overcloud.log ;
         {{ lookup('template','deploy-overcloud.j2') }} 2>&1 >> ~/deploy_overcloud.log
       tags: ['deploy']
-      when: mode=="create"
+      when: mode=="create" and rewrite_templates is not defined
     #   async: 7200
     #   poll: 0
     #   register: deploy_overcloud
@@ -69,7 +69,7 @@
     #   retries: 480
     #   delay: 15
 
-  when: stack.stdout == ""
+  when: stack.stdout == "" or rewrite_templates is defined
   become: yes
   become_user: "{{ rhosp_stack_user }}"
 
