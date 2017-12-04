@@ -970,7 +970,7 @@ osp_host_aggregates:
      - overcloud-compute-0.{{ hailstorm_dns_domain }}
 
   - name: PROD
-    availability_zone: nova
+    availability_zone: production
     hosts:
      - overcloud-compute-1.{{ hailstorm_dns_domain }}
      - overcloud-compute-2.{{ hailstorm_dns_domain }}

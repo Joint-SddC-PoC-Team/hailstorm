@@ -44,7 +44,7 @@
         #config_drive: True
         #security_groups: "{% if vm_secgroups is defined and vm_secgroups %}{{  secgroup in vm_secgroups|default([])|join(',') }}{% else %}default-{{osp_tenant}}{% endif %}"
         security_groups: "{{ vm_secgroups|default(['default-' + osp_tenant]) }}"
-        availability_zone: "nova"
+        availability_zone: "{{ osp_availability_zone|default('production') }}"
         validate_certs: False
 
   delegate_to: localhost
