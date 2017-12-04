@@ -33,7 +33,7 @@ lifecycle_environments:
     osp_controlled_node_placement: false
     osp_glance_use_swift: false
     osp_in_baremetal: false
-    osp_force_config_drive: true
+    osp_force_config_drive: false
     #TLS with OSP10 or later
     osp_use_tls: true
     #CEPH with OSP10 or later
