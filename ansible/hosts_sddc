@@ -454,6 +454,8 @@ tower
 storage-console
 windows-group
 windows-baseimage-group
+mirror-target-group
+
 
 # to let it participate in the calculation of ansible_host
 # and the ssh proxy command used to communicate with all layer2/3 hosts
