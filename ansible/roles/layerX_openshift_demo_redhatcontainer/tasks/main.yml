@@ -1,0 +1,13 @@
+- block:
+    - include: create_redhatcontainer_project.yml
+  when: mode == "create"
+
+- block:
+    - name: login to OpenShift
+      shell: oc login --insecure-skip-tls-verify=true -u admin -p {{ root_password }} https://openshift.{{ hailstorm_dns_domain }}/ 
+    - name: remove redhat-msa project
+      shell: oc delete project {{ redhat_container_test_project }}
+  become: true
+  become_user: admin
+  become_method: su
+  when: mode == "destroy"
