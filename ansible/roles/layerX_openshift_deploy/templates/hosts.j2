@@ -21,14 +21,16 @@ osm_default_node_selector="region=primary"
 {% if http_proxy is defined %}
 openshift_http_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
 openshift_https_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
+{# explicitly set builddefaults - should not be necessary since it inherits from openshift_http(s)_proxy
 openshift_builddefaults_http_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
 openshift_builddefaults_https_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
 openshift_builddefaults_git_http_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
 openshift_builddefaults_git_https_proxy=https://{% if http_proxy.username|default('') != '' %}{{ http_proxy.username }}{% if http_proxy.password|default('') != '' %}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}:{{ http_proxy.port }}/
+#}
+
 {# it is important not to access the OSP metadata service (169.254.169.254) via proxy #}
 openshift_no_proxy=.{{ hailstorm_dns_domain }},169.254.169.254
-openshift_builddefaults_no_proxy=.{{ hailstorm_dns_domain }},169.254.169.254
-openshift_bu
+{% endif %}
 
 {% if cf_is_deployed_on == 'osp' %}
 #openstack cloudprovider
