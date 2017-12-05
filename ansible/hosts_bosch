@@ -431,6 +431,7 @@ dev-client-group
 tower
 ansible-jump-host
 storage-console
+mirror-target-group
 
 # All layer2 node groups that are installed with RHEL6
 [rhel6:children]
