@@ -83,7 +83,7 @@
   roles:
     - { role: layer2_ipa_certificate, tags: ['layer2', 'cf', 'cf-certificate', 'cf-ui'], mode: create, certcn: 'cloudforms.{{ hailstorm_dns_domain }}' }
     - { role: layer3_cloudforms_certificate, tags: ['layer2', 'cf', 'cf-certificate', 'cf-ui'], mode: create }
-#    - { role: layer3_cloudforms_saml_config, tags: ['layer2', 'cf', 'cf-saml', 'cf-ui'], mode: create, when: "cf_use_rhsso|default(false,true)" }
+    - { role: layer3_cloudforms_saml_config, tags: ['layer2', 'cf', 'cf-saml', 'cf-ui'], mode: create, when: "cf_use_rhsso|default(false,true)" }
 
 - hosts: cloudforms-wk-osp
   remote_user: root
