@@ -1079,10 +1079,10 @@ active_directory:
     user: Administrator
     password: "{{ root_password }}"
     users:
-      - username: TestUser30
+      - username: user30
         password: "{{ root_password }}"
-        first: User30First
-        last: User30Last
+        first: Vorname
+        last: Nachname
         desc: TestUser in AD2
         groups:
           - SDDC_TestGroup1AD2
@@ -1095,10 +1095,10 @@ active_directory:
     user: Administrator
     password: "{{ root_password }}"
     users:
-      - username: TestUser31
+      - username: user31
         password: "{{ root_password }}"
-        first: User31First
-        last: User31Last
+        first: Vorname
+        last: Nachname
         desc: TestUser in AD3
         groups:
           - SDDC_TestGroup1AD3
