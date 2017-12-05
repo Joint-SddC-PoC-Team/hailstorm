@@ -95,3 +95,15 @@
       mode: create
     - { role: layer2_efk_centos_opstools, tags: [ 'layer2', 'efk', 'efk-install'], mode: create, when: "current_lifecycle_env.openstack_version >= 10" }
     - { role: layerX_syslog_client, tags: [ 'layer2', 'efk', 'syslog',  'syslog-client'], mode: create }
+
+
+- hosts: mirror-target-group
+  remote_user: root
+  gather_facts: false
+  roles:
+   - { role: layer2_vms, tags: [ 'layer2', 'mirror-target', 'vm'], mode: create }
+   - role: layerX_dns
+     tags: [ 'layer2', 'mirror-target', 'dns', 'dnsupdate', 'dnat' ]
+     mode: update_services_network
+   - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer2', 'mirror-target', 'dns' ], mode: create, nameserver: "{{ hostvars['ipa'].vm_nics[0].ip }}" }
+   - { role: layer2_rhel, tags: [ 'layer2', 'mirror-target', 'rhel' ], mode: create }

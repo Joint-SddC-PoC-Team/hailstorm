@@ -52,6 +52,9 @@ infrastructure  ansible_host=10.116.127.155 activation_key="AK-CV-OS-RHEL7-SERVE
 [virt-who]
 infrastructure
 
+[mirror-target-group]
+mirror-target ansible_host=10.116.127.178 activation_key="AK-CV-OS-RHEL7-SERVER-{{ stage }}"  nic_attachments="[ {{ infrastructure_network_services }}, {{ infrastructure_network_tenant }} ]"
+
 #### END ADDITIONAL L2 VMS
 
 
