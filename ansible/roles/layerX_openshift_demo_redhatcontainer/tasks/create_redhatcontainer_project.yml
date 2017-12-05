@@ -18,7 +18,7 @@
       when: "redhat_container_test_project in projects.stdout_lines"
 
     - name: assign anyuid to default service account
-      shell: oc adm policy add-scc-to-user anyuid -z default -n {{ redhat_container_test_project }}"
+      shell: "oc adm policy add-scc-to-user anyuid -z default -n {{ redhat_container_test_project }}"
       changed_when: false
       tags: project
 
