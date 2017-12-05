@@ -58,9 +58,9 @@
        # set global proxy options in init file
 
        echo "export http_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/" > /etc/profile.d/proxy.sh
-       echo "export https_proxy=$http_proxy" >> /etc/profile.d/proxy.sh
-       echo "export ftp_proxy=$http_proxy" >> /etc/profile.d/proxy.sh
-       echo "export rsync_proxy=$http_proxy" >> /etc/profile.d/proxy.sh
+       echo "export https_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/" >> /etc/profile.d/proxy.sh
+       echo "export ftp_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/" >> /etc/profile.d/proxy.sh
+       echo "export rsync_proxy=https://{% if http_proxy.username|default(false,true) %}{{ http_proxy.username }}{% if http_proxy.password|default(false,true )%}:{{ http_proxy.password }}{% endif %}@{% endif %}{{ http_proxy.proxyname }}{% if http_proxy.port|default(false,true) %}:{{ http_proxy.port }}{% endif %}/" >> /etc/profile.d/proxy.sh
        echo "export no_proxy=localhost,127.0.0.1,localaddress,.localdomain.com,.{{ hailstorm_dns_domain }}" >> /etc/profile.d/proxy.sh
 
        chown root.root /etc/profile.d/proxy.sh
