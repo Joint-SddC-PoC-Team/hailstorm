@@ -7,3 +7,6 @@
   service:
     name: iptables
     state: restarted
+
+- name: sysctl
+  shell: sysctl -p
