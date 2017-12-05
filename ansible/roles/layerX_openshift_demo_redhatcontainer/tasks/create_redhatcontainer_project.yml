@@ -1,0 +1,53 @@
+- block:
+    - name: login to OpenShift
+      shell: "oc login --insecure-skip-tls-verify=true -u admin -p {{ root_password }} https://openshift.{{ hailstorm_dns_domain }}/"
+
+    - name: check existing projects
+      shell: "oc get projects | awk '{ print $1 }'"
+      register: projects
+      changed_when: false
+      tags: project
+
+    - name: Create Red Hat container project
+      shell: "oc new-project {{ redhat_container_test_project }} --description='Red Hat Container Test Demo'"
+      when: "redhat_container_test_project not in projects.stdout_lines"
+      tags: project
+
+    - name: Resetting Red Hat container project to empty state
+      shell: "oc delete all --all -n {{ redhat_container_test_project }}"
+      when: "redhat_container_test_project in projects.stdout_lines"
+
+    - name: assign anyuid to default service account
+      shell: oc adm policy add-scc-to-user anyuid -z default -n {{ redhat_container_test_project }}"
+      changed_when: false
+      tags: project
+
+    - name: Create OpenShift new-build based on RHEL7.4 base image
+      shell: "oc new-build -D 
+'FROM registry.access.redhat.com/rhel7.4:latest\nRUN yum install -y iputils net-tools\nCMD sleep infinity & wait' --name={{ app_name }} -n {{ redhat_container_test_project }} -l app={{ app_name }}"
+      register: command_result
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"
+
+    - name: Create OpenShift application from previously created images
+      shell: "oc new-app -n {{ redhat_container_test_project }} {{ app_name }} -l app={{ app_name }}"
+      register: command_result
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"
+
+    - name: get git pod id
+      shell: oc get pods -n {{ redhat_container_test_project }} | grep {{ app_name }} | awk '{ print $1 }'
+      register: gitPod
+      changed_when: false      
+
+    - name: Exec connectivity test
+      shell: oc exec {{ gitPod.stdout }} -- bash -c "ping -c 1 {{ test_target_IP }}"
+      register: command_result
+      failed_when: "'Unknown' in command_result.stderr and command_result.rc != 0"
+
+    - name: Dump connectivity results
+      debug: 'msg="command_result.stdout"'
+
+  become: true
+  become_user: admin
+  become_method: su
