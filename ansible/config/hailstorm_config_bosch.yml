@@ -1015,29 +1015,26 @@ active_directory:
     user: Administrator
     password: "{{ root_password }}"
     users:
-      - {username: UserTest1, first: Vorname1, last: LastName1, groups: [SDDC_TestGroup1AD1, SDDC_TestGroup2AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: UserTest2, first: Vorname2, last: LastName2, groups: [SDDC_TestGroup3AD1, SDDC_TestGroup2AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: UserTest2, first: Vorname2, last: LastName2, groups: [SDDC_TestGroup3AD1, SDDC_TestGroup2AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user1, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user2, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user3, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user4, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user5, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user6, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user7, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user8, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user9, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user10, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user11, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user12, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user13, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user14, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user15, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user16, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user17, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user18, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user19, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user20, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD1], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user1, first: Vorname, last: Nachname, groups: [SDDC_CFME_TenantAdministrator, SDDC_CFME_User, SDDC_CFME_UserSelfService,SDDC_OCP_admin, SDDC_OCP_self-provisioner], desc: sddc tenant user, password: "{{ password_for_all_test_users }}" }
+      - {username: user2, first: Vorname, last: Nachname, groups: [SDDC_CFME_TenantAdministrator, SDDC_CFME_User, SDDC_CFME_UserSelfService,SDDC_OCP_admin, SDDC_OCP_self-provisioner], desc: sddc tenant user, password: "{{ password_for_all_test_users }}" }
+      - {username: user3, first: Vorname, last: Nachname, groups: [SDDC_CFME_VmUser], desc: SDDC vm operator, password: "{{ password_for_all_test_users }}" }
+      - {username: user4, first: Vorname, last: Nachname, groups: [SDDC_CFME_TenantAdministrator, SDDC_CFME_User, SDDC_CFME_UserSelfService,SDDC_OCP_admin, SDDC_OCP_self-provisioner], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user5, first: Vorname, last: Nachname, groups: [SDDC_CFME_TenantAdministrator, SDDC_CFME_User, SDDC_CFME_UserSelfService,SDDC_OCP_admin, SDDC_OCP_self-provisioner], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user6, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user7, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user8, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user9, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user10, first: Vorname, last: Nachname, groups: [SDDC_CFME_Approver], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user11, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user12, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user13, first: Vorname, last: Nachname, groups: [SDDC_OCP_cluster-admin], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user14, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user15, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user16, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user17, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user18, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user19, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user20, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
 #      - {username: nuageadmin, first: Nuage, last: Administrator, groups: [Nuage_Everybody_NA, Nuage_Administrators_NA], desc: Nuage administrator, password: "{{ password_for_all_test_users }}" }
 #      - {username: nuageregular, first: Nuage, last: Regular, groups: [Nuage_Everybody_NA], desc: Nuage regular user, password: "{{ password_for_all_test_users }}" }
 #      - {username: nuagedesigner, first: Nuage, last: Designer, groups: [Nuage_Everybody_NA, Nuage_Network Designers_NA], desc: Nuage Designer, password: "{{ password_for_all_test_users }}" }
@@ -1067,7 +1064,7 @@ active_directory:
       - { name: SDDC_CFME_TenantQuotaAdministrator, desc: "Configures quota limits for the tenant, applying usage constraints for CPU, Memory, Storage, Maximum number of VMs, and Maximum number of Templates."}
       - { name: SDDC_CFME_User, desc: "User of the virtual infrastructure. Can view all virtual infrastructure items. Cannot perform actions on them."}
       - { name: SDDC_CFME_UserLimitedSelfService, desc: "Limited User of virtual machines. Can make provision requests. Can access some functions on the virtual machine that the user owns including changing power state."}
-      - { name: SDDC_CFME_User, desc: "Self Service	User of virtual machines. Can make provision requests. Can access some functions on the virtual machine that the user owns and that the user’s LDAP groups own including changing power state."}
+      - { name: SDDC_CFME_UserSelfService, desc: "Self Service	User of virtual machines. Can make provision requests. Can access some functions on the virtual machine that the user owns and that the user’s LDAP groups own including changing power state."}
       - { name: SDDC_CFME_VmUser, desc: "User of virtual machines. Can access all functions on the virtual machine including changing power state and viewing its console. Cannot assign policy, but can view policy simulation from virtual machine page."}
 #      - { name: Nuage_Administrators_NA, desc: Nuage Administrators }
 #      - { name: Nuage_Everybody_NA, desc: Nuage Users }
@@ -1079,13 +1076,7 @@ active_directory:
     user: Administrator
     password: "{{ root_password }}"
     users:
-      - username: user30
-        password: "{{ root_password }}"
-        first: Vorname
-        last: Nachname
-        desc: TestUser in AD2
-        groups:
-          - SDDC_TestGroup1AD2
+      - {username: user30, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD2], desc: SDDC TestUser in ADS14, password: "{{ password_for_all_test_users }}" }
     groups:
       - name: SDDC_TestGroup1AD2
         desc: A Group in 2nd Active Directory
@@ -1095,13 +1086,7 @@ active_directory:
     user: Administrator
     password: "{{ root_password }}"
     users:
-      - username: user31
-        password: "{{ root_password }}"
-        first: Vorname
-        last: Nachname
-        desc: TestUser in AD3
-        groups:
-          - SDDC_TestGroup1AD3
+      - {username: user31, first: Vorname, last: Nachname, groups: [SDDC_TestGroup1AD3], desc: SDDC TestUser in ADS15, password: "{{ password_for_all_test_users }}" }
     groups:
       - name: SDDC_TestGroup1AD3
         desc: A Group in 3nd Active Directory
