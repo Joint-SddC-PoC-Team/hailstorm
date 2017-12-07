@@ -1,5 +1,5 @@
 #!/bin/bash
-# ident: create-crushmap.sh, ver 0.2, 2017/12/07. (C)2017,Red Hat Inc.,mmuench@redhat.com
+# ident: create-crushmap.sh, ver 0.3, 2017/12/07. (C)2017,Red Hat Inc.,mmuench@redhat.com
 #
 # DESCRIPTION:
 #	reads a file with decompiled ceph crushmap and creates a new crushmap with 2 DCs and 2 storage classes
@@ -247,7 +247,6 @@ rule replicated_ruleset {
         min_size 1
         max_size 10
         step take slow
-        step choose firstn 2 type datacenter
         step chooseleaf firstn 0 type host
         step emit
 }' >>$OUTFILE
