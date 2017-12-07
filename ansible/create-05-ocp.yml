@@ -184,6 +184,12 @@
     mode: create
     when: cf_is_deployed_on == 'osp'
 
+- hosts: ocp-master-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layerX_splunk_client, tags: ['layer2', 'ocp', 'splunk-client'], mode: create }
+ 
 
 # - hosts: infrastructure
 #   remote_user: root

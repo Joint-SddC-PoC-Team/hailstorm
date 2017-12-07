@@ -23,26 +23,38 @@
 # service splunk restart
 #
 # exit
-
+- name: Check if /opt/splunkforwarder/ exists
+  register: sp_dir
+  stat:
+    path: /opt/splunkforwarder/
 
 - block:
     # - name: copy over the splunk installation
     #   copy: src=binary/{{ current_lifecycle_env.splunk_agent_rpm }} dest=/tmp
 
     - name: install splunk with yum
-      yum:
-        name: "{{ item }}"
-        state: present
+      command: yum install -y {{ item }}
+      #yum:
+      #  name: "{{ item }}"
+      #  state: present
+      ignore_errors: True
       with_items:
         - sysstat
         - "{{ splunk_agent_rpm_url }}"
 
     - name: splunk license
       command: /opt/splunkforwarder/bin/splunk start --accept-license creates=/opt/splunkforwarder/etc/users/splunk-system-user
+      become_user: splunk
+      become: True
       register: splunk_license
 
+    - name: change permissions
+      command: chown -R splunk /opt/splunkforwarder/
+
     - name: connect to splunk server
-      command: /opt/splunkforwarder/bin/splunk -c "splunk set deploy-poll {{ splunk_agent_server }}:{{ splunk_agent_port|default('8089') }} -auth {{ splunk_agent_user|default('admin') }}:{{ splunk_agent_password|default('changeme') }}"
+      command: /opt/splunkforwarder/bin/splunk set deploy-poll {{ splunk_agent_server }}:{{ splunk_agent_port|default('8089') }} -auth {{ splunk_agent_user|default('admin') }}:{{ splunk_agent_password|default('changeme') }}
+      become_user: splunk
+      become: True
       when: splunk_license|changed
 
     - name: setup to start at boot
@@ -50,11 +62,15 @@
       when: splunk_license|changed
 
     - name: add monitor for /var/log
-      command: /opt/splunkforwarder/bin/splunk add monitor /var/log
+      command: /opt/splunkforwarder/bin/splunk add monitor /var/log -auth {{ splunk_agent_user|default('admin') }}:{{ splunk_agent_password|default('changeme') }}
+      become_user: splunk
+      become: True
       when: splunk_license|changed
 
     - name: change splunk admin password
-      shell: /opt/splunkforwarder/bin/splunk -c "splunk edit user {{ splunk_agent_user|default('admin') }} -password `date +%s | sha256sum | base64 | head -c 32` -auth {{ splunk_agent_user|default('admin') }}:{{ splunk_agent_password|default('changeme') }}"
+      shell: /opt/splunkforwarder/bin/splunk edit user {{ splunk_agent_user|default('admin') }} -password `date +%s | sha256sum | base64 | head -c 32` -auth {{ splunk_agent_user|default('admin') }}:{{ splunk_agent_password|default('changeme') }}
+      become_user: splunk
+      become: True
       when: splunk_license|changed
 
     - name: restart splunk service
@@ -64,4 +80,4 @@
     # - name: connect to splunk server
     #   command: /opt/splunkforwarder/bin/splunk add forward-server {{ splunk_agent_server }}:{{ splunk_agent_port|default('8089') }} -auth {{ splunk_agent_user }}:{{ splunk_agent_password }}
 
-  when: splunk_agent_server|default(false, true) and splunk_agent_rpm_url|default(false, true)
+  when: splunk_agent_server|default(false, true) and splunk_agent_rpm_url|default(false, true) and not ( sp_dir.stat.isdir is defined and sp_dir.stat.isdir)

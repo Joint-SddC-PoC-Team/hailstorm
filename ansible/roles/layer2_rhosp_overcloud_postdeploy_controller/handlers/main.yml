@@ -10,3 +10,8 @@
 
 - name: sysctl
   shell: sysctl -p
+
+- name: restart_keystone
+  service:
+    name: httpd
+    state: restarted
