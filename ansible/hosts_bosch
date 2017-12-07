@@ -314,6 +314,20 @@ ocp-l2-or-rhv-lb-group
 [ocp-installer-group]
 ocp-master1
 
+
+# SECOND OPENSHIFT INSTANCE ON OVERCLOUD2
+
+[ocp2-master-group]
+ocp2-master openshift_node_labels="{'region': 'master', 'zone': 'default', 'logging-infra-fluentd': 'true', 'openshift_schedulable': 'false', 'sddc_region': 'europe', 'sddc_zone' : 'production'}" activation_key="AK-CV-RHOCP-INFRA-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7" osp_availability_zone="nova" additional_dns="openshift2"
+
+[ocp2-node-group]
+ocp2-infranode  jump_host=ocp2-master openshift_node_labels="{'region': 'infra', 'zone': 'default', 'logging-infra-fluentd': 'true', 'sddc_region': 'europe', 'sddc_zone' : 'production'}" activation_key="AK-CV-RHOCP-INFRA-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7" osp_availability_zone="nova" additional_dns="*.apps2"
+ocp2-node1      jump_host=ocp2-master openshift_node_labels="{'region': 'primary', 'zone': 'east', 'logging-infra-fluentd': 'true', 'sddc_region': 'europe', 'sddc_zone' : 'production'}"  activation_key="AK-CV-RHOCP-APPNODE-{{ stage }}" osp_tenant="{{ ocp_tenant }}" osp_flavor="m1.large" osp_image="RHEL7" osp_availability_zone="nova"
+
+[ocp2-installer-group]
+ocp2-master
+
+
 #### END OPENSHIFT
 
 

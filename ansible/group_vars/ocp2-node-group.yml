@@ -1,0 +1,66 @@
+---
+repos: "{{ ose3_repos|select|list }}"
+packages: "wget,git,net-tools,bind-utils,iptables-services,bridge-utils,bash-completion,atomic-openshift-utils{% if current_lifecycle_env.openshift_version >= 3.4 %},atomic-openshift-excluder,atomic-openshift-docker-excluder{% endif %}"
+
+mem: "{{ layer2_ose3node_mem }}"
+vcpu: "{{ layer2_ose3node_cpu }}"
+
+disk:
+  path: "{{ inventory_hostname_short }}.qcow2"
+  size: 60
+  format: qcow2
+  # partition_table:
+  #   lvmpv: 59500
+  #   swap: 2048
+  #   home: 2048
+  #   root: 10000
+
+  physvols:
+    boot: 500
+    rhel: 59500
+  logvols:
+    - name: swap
+      fstype: swap
+      mountpoint: swap
+      size: 2048
+    - name: root
+      fstype: "{{ fstype }}"
+      mountpoint: /
+      size: 5120
+    - name: home
+      fstype: "{{ fstype }}"
+      mountpoint: /home
+      size: 2048
+    - name: var
+      fstype: "{{ fstype }}"
+      mountpoint: /var
+      size: 40720
+
+extra_disk_files: "{% if current_lifecycle_env.ocp_use_cns %}{{ cns_disk_files}}{% else %}[]{% endif %}"
+
+cns_disk_files:
+  - path: "{{ inventory_hostname_short }}-extra-1.qcow2"
+    size: 60
+    format: qcow2
+    dev: /dev/vdb
+  - path: "{{ inventory_hostname_short }}-extra-2.qcow2"
+    size: 60
+    format: qcow2
+    dev: /dev/vdc
+  - path: "{{ inventory_hostname_short }}-extra-3.qcow2"
+    size: 60
+    format: qcow2
+    dev: /dev/vdd
+  - path: "{{ inventory_hostname_short }}-extra-4.qcow2"
+    size: 60
+    format: qcow2
+    dev: /dev/vde
+
+
+vm_secgroups:
+  - "appnode-{{ ocp_tenant }}"
+
+vm_additional_disks:
+  - 53687091200
+
+pool_regex: "{{ osp_appnode_subscription_pool_regex }}"

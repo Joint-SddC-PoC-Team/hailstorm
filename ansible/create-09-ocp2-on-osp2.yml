@@ -1,0 +1,85 @@
+---
+# --- FOR OPENSHIFT ON LAYER2 ("BARE METAL") ---
+- hosts: ocp2-master-group,ocp2-node-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'vm','dnat', 'ocp-prep' ]
+      mode: create
+    - role: layerX_dns
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'ocp-osp-lb', 'vm','dnat', 'dnsupdate' ]
+      mode: update_floating_ip
+    - role: layer3_vm_on_openstack_etc_hosts_internal_ips
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'vm', 'ocp-vm', 'etc-hosts' ]
+      mode: create
+      group: "{{ groups['ocp2-master-group'] + groups['ocp2-node-group'] }}"
+    - role: layerX_syslog_client
+      tags: [ 'layer2', 'ocp', 'syslog',  'syslog-client']
+      mode: create
+    - role: layerX_splunk_client
+      tags: [ 'layer2', 'ocp', 'splunk',  'splunk-client']
+      mode: create
+
+# register wildcard hosts with floating IPs in IPA
+- hosts: ipa
+  remote_user: root
+  gather_facts: false
+  roles:
+   - role: layer2_ipa_add_host_to_wildcard_ca_acl
+     tags: [ 'layer3', 'ocp-osp', 'vm', 'dns', 'ocp-vm']
+     mode: create
+     group: "{{ groups['ocp2-master-group'] + groups['ocp2-node-group'] }}"
+
+# --- FOR OPENSHIFT ON EITHER LAYER2 OR OSP ---
+- hosts: ocp2-master-group,ocp2-node-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer3', 'ocp', 'dns', 'ocp-prep' ], mode: create, nameserver: "{{ (hostvars['ipa']|selectattr('netname','match', infrastructure_network_services.netname)|first).ip }}" }
+    - { role: layer2_rhel, tags: [ 'layer3', 'ocp', 'rhel', 'ocp-prep'  ], mode: create }
+    - { role: layerX_ipa_client, tags: [ 'layer3', 'ocp',  'ipa-client', 'ocp-prep' ], mode: create }
+    - { role: layerX_distribute_pubkey, tags: [ 'layer3', 'ocp', 'ocp-installprep' , 'ocp-prep' ], mode: create, pubkeyhost: "{{ groups['ocp-installer-group']|first }}" }
+    - role: layerX_proxy_client
+      tags: [ 'layer2', 'ocp', 'ocp-prep', 'proxy-client' ]
+      mode: create
+
+- hosts: ocp2-master-group,ocp2-node-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layerX_openshift_osp_node, tags: [ 'layer3', 'ocp', 'ocp-node', 'ocp-prep' ], mode: create }
+
+
+# reread OSP VM facts, in case we skipped with ocp-vm/ocp-prep
+# reread rhsso vm facts, in case it is running on osp
+- hosts: ocp2-master-group,ocp2-node-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3', 'ocp', 'ocp-osp' ]
+      mode: readfacts
+
+- hosts: ocp2-master-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-roles'], mode: create, certcn: 'openshift.{{ hailstorm_dns_domain }}', factprefix: openshift }
+    - { role: layerX_openshift_deploy, tags: [ 'layer3', 'ocp', 'ocp-install', 'ocp-metrics', 'ocp-roles' ], mode: create }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-logging-certificate'], mode: create, certcn: 'kibana.{{ ocp_apps_dns_domain }}' }
+    - { role: layerX_openshift_route_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-logging-certificate'], mode: create, route: "logging-kibana", namespace: "logging" }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-metrics-certificate'], mode: create, certcn: 'hawkular-metrics.{{ ocp_apps_dns_domain }}' }
+    - { role: layerX_openshift_route_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-metrics-certificate'], mode: create, route: "hawkular-metrics", namespace: "openshift-infra" }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-router-certificate'], mode: create, certcn: '{{ ocp_apps_dns_domain }}', wildcard: true, factprefix: wildcard }
+    - { role: layerX_openshift_router_wildcardcertificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-router-certificate'], mode: create }
+#    - { role: layerX_openshift_devops_tools, tags: [layer3, 'ocp', 'ocp-devops'], mode: create }
+
+### convenience - add redirect to https if user access http endpoint (on l2 lb or on OSP master)
+- hosts: ocp2-master-group
+  remote_user: root
+  gather_facts: false
+  roles:
+   - role: layerX_openshift_redirect_to_https
+     tags: [ 'layer3', 'ocp', 'ocp-install','ocp-lb' ]
+     mode: create
