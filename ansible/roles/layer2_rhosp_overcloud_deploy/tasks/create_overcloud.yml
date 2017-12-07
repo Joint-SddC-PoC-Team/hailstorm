@@ -30,6 +30,7 @@
         - deploy-overcloud
         - scale-down
 #        - virsh-names
+        - create-overcloud2-plan
 
     - name: Create templates directory
       file: path=~/templates state=directory
