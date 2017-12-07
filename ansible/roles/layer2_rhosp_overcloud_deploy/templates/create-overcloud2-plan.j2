@@ -1,0 +1,11 @@
+openstack overcloud plan create --templates /usr/share/openstack-tripleo-heat-templates overcloud2
+
+openstack overcloud parameters set overcloud2 --templates  ~/templates/network-isolation.yaml
+{% if current_lifecycle_env.osp_use_tls|default(false) %}openstack overcloud parameters set overcloud2 --templates /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml
+{% endif %}
+{% if (override_osp_storage_backend|default(current_lifecycle_env.osp_storage_backend)) == 'ceph_hyperconverged' %}openstack overcloud parameters set overcloud2 --templates /usr/share/openstack-tripleo-heat-templates/environments/hyperconverged-ceph.yaml
+openstack overcloud parameters set overcloud2 --templates /usr/share/openstack-tripleo-heat-templates/environments/ceph-radosgw.yaml
+
+{% for template in templates|select|list %}{% if 'environment.yaml' in template %}openstack overcloud parameters set overcloud2 --templates  ~/templates/{{ template }}{% if not loop.last %}{% endif %}
+
+{% endif %}{% endfor %}

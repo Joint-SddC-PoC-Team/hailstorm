@@ -134,10 +134,12 @@ resources:
                 - default: true
                   next_hop: {{ infrastructure_network_tenant.nuage_vsr_host_prefix |ipaddr('address') }}
                 # routes for satellite, ipa, efk, vsd1-3, es1-3, vsc1-4 infrastructure via VSR
-{% for vm in ['satellite','ipa','efk','infrastructure','vsd1','vsd2','vsd3','c1','c2','c3','c4','elastic1','elastic2','elastic3'] %}
+{% for vm in ['satellite','ipa','efk','infrastructure','vsd1','vsd2','vsd3','c1','c2','c3','c4','elastic1','elastic2','elastic3','openstack'] %}
                 - ip_netmask: {{ (hostvars[vm].vm_nics|selectattr('netname','match',infrastructure_network_services.netname)|first).ip }}/32
                   next_hop: {{ infrastructure_network_tenant.nuage_vsr_host_prefix |ipaddr('address') }}
 {% endfor %}
+                - ip_netmask: {{ infrastructure_address_ntp_server }}/32
+                  next_hop: {{ infrastructure_network_tenant.nuage_vsr_host_prefix |ipaddr('address') }}
             - type: vlan
               device: br-provisioning
               vlan_id:
