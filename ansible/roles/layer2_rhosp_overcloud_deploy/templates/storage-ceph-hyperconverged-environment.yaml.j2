@@ -30,6 +30,8 @@ parameter_defaults:
     ceph::profile::params::osd_recovery_max_active: 3
     ceph::profile::params::osd_max_backfills: 1
     ceph::profile::params::osd_recovery_op_priority: 2
+    # Disable CRUSH map update on start
+    ceph::osd_crush_update_on_start: false
 #  OsdComputeExtraConfig:
     ceph::profile::params::osd_journal_size: 5120
     ceph::profile::params::osds:
