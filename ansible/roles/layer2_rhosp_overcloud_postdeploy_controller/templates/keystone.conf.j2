@@ -1,0 +1,6 @@
+[ldap]
+{% for config in item[item.keys()[0]].keys() %}
+{{ config }} = {{ item[item.keys()[0]][config] }}
+{% endfor %}
+[identity]
+driver = keystone.identity.backends.ldap.Identity

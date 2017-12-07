@@ -1,0 +1,4 @@
+- name: configure keystone domain file in the controllers
+  template: src=keystone.conf.j2 dest=/etc/keystone/domains/keystone.{{ item.keys()[0] }}.conf
+  notify: restart_keystone
+  with_items: "{{ osp_keystone_domains }}"

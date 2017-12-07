@@ -7,4 +7,6 @@
     - include: add_nuage_vrs.yml
       when: enable_nuage is defined
     - include: add_lbaas_ui.yml
+    - include: create_keystone_domain_files.yml
+      tags: configure-keystone
   when: mode=="create"
