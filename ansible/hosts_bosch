@@ -475,6 +475,8 @@ ocp-rhv-vm-group
 sddc
 overcloud-controller-group
 overcloud-compute-group
+overcloud2-controller-group
+overcloud2-compute-group
 
 [accessible_via_floating_ip:children]
 ansible-jump-host
