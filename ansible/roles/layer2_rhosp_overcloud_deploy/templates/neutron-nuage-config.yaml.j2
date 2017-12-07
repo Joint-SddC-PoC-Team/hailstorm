@@ -13,7 +13,7 @@ parameter_defaults:
   NeutronNuageNetPartitionName: 'OpenStack_Org'
   NuageBridgeMTU: '{{ osp_mtu - 50 }}'
   # for the next use VIP for VSD
-  NeutronNuageVSDIp: '{{ hostvars['vsd1'].vm_nics[0].ip }}:8443'
+  NeutronNuageVSDIp: '{{ hostvars['infrastructure'].vm_nics[0].ip }}:8443'
   NeutronNuageVSDUsername: 'csproot'
   NeutronNuageVSDPassword: 'csproot'
   NeutronNuageVSDOrganization: 'csp'
