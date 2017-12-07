@@ -1,0 +1,42 @@
+mem: 262144
+vcpu: 48
+disk:
+  size: 278
+
+osd_disks_config: "{% if current_lifecycle_env.osp_in_baremetal %}{{ osd_disks_config_baremetal }}{%else %}{{ osd_disks_config_virtual }}{% endif %}"
+
+osd_disks_config_virtual:
+   - {"device": "/dev/vdb" }
+   - {"device": "/dev/vdc" }
+   - {"device": "/dev/vdd" }
+   - {"device": "/dev/vde" }
+
+osd_disks_config_baremetal:
+   - {"device": "/dev/sdb", "journal": "/dev/sdf" }
+   - {"device": "/dev/sdc", "journal": "/dev/sdf" }
+   - {"device": "/dev/sdd", "journal": "/dev/sdf" }
+   - {"device": "/dev/sde", "journal": "/dev/sdf" }
+   - {"device": "/dev/sdg", "journal": "/dev/sdk" }
+   - {"device": "/dev/sdh", "journal": "/dev/sdk" }
+   - {"device": "/dev/sdi", "journal": "/dev/sdk" }
+   - {"device": "/dev/sdj", "journal": "/dev/sdk" }
+
+pm_user: "changeme"
+pm_password: "changeme"
+pm_type: "pxe_ipmitool"
+pm_port: 623
+pm_priv_level: USER
+
+
+nic_attachments:
+  - "{{ infrastructure_network_provisioning }}"
+  - "{{ infrastructure_network_storage }}"
+  - "{{ infrastructure_network_storage_mgmt }}"
+  - "{{ infrastructure_network_internal_api }}"
+  - "{{ infrastructure_network_tenant }}"
+  - "{{ infrastructure_network_admin }}"
+  - "{{ infrastructure_network_services }}"
+#default_route_via: "{{ infrastructure_network_services }}"
+#name_service_via: "{{ infrastructure_network_services }}"
+default_route_via: "{{ infrastructure_network_provisioning }}"
+name_service_via: "{{ infrastructure_network_provisioning }}"
