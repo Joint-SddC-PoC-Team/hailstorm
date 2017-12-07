@@ -30,7 +30,7 @@ openshift_builddefaults_git_https_proxy=https://{% if http_proxy.username|defaul
 #}
 
 {# it is important not to access the OSP metadata service (169.254.169.254) via proxy #}
-openshift_no_proxy=.{{ hailstorm_dns_domain }},169.254.169.254
+openshift_no_proxy=.{{ hailstorm_dns_domain }},169.254.169.254,openstack.{{ hailstorm_dns_domain }}
 {% endif %}
 
 {% if cf_is_deployed_on == 'osp' %}
