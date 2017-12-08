@@ -54,6 +54,10 @@
   remote_user: root
   gather_facts: false
   roles:
+    - role: layer2_rhosp_undercloud_configure_nuage
+      tags: ['layer2', 'nuage', 'undercloud2-config-nuage']
+      mode: create
+      when: enable_nuage is defined
     - role: layer2_ipa_certificate
       tags: ['layer2', 'rhosp', 'overcloud2', 'overcloud2-cert']
       mode: create
@@ -165,4 +169,3 @@
       tags: [ 'layer2', 'rhosp', 'splunk',  'splunk-client']
       mode: create
     - { role: layerX_splunk_client, tags: ['layer2', 'rhosp', 'splunk-client'], mode: create }
-
