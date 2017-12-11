@@ -28,7 +28,7 @@
       tags: project
 
     - name: Create OpenShift new-build based on RHEL7.4 base image
-      shell: "oc new-build -D 'FROM registry.access.redhat.com/rhel7.4:latest\nUSER root\nRUN yum install -y iputils net-tools httpd\nEXPOSE 80\nCMD exec /usr/sbin/apachectl -DFOREGROUND' --name={{ app_name }} -n {{ redhat_container_test_project }} -l app={{ app_name }}"
+      shell: "oc new-build --dockerfile $'FROM registry.access.redhat.com/rhel7.4:latest\nUSER root\nRUN yum install -y iputils net-tools httpd\nEXPOSE 80\nCMD exec /usr/sbin/apachectl -DFOREGROUND' --name={{ app_name }} -n {{ redhat_container_test_project }} -l app={{ app_name }}"
       register: command_result
       failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
       changed_when: "'exists' not in command_result.stderr"
@@ -39,6 +39,12 @@
       failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
       changed_when: "'exists' not in command_result.stderr"
 
+    - name: Expose the DC 
+      shell: "oc expose dc {{ app_name }} --port=80 -n {{ redhat_container_test_project }}"
+      register: command_result
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"    
+    
     - name: Expose the service 
       shell: "oc expose svc {{ app_name }} -n {{ redhat_container_test_project }}"
       register: command_result
