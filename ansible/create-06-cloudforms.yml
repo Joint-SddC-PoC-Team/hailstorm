@@ -110,7 +110,7 @@
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer3_cloudforms_rhev_provider, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-osp' ], mode: create }
+    - { role: layer3_cloudforms_rhev_provider, tags: [ 'layer3', 'cf', 'cf-provider', 'cf-provider-rhv' ], mode: create }
 
 - hosts: cloudforms-group
   remote_user: root
