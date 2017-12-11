@@ -7,6 +7,7 @@
     - role: layer3_vm_on_openstack
       tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'vm','dnat', 'ocp-prep' ]
       mode: create
+      openstack_vip: openstack2
     - role: layerX_dns
       tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'ocp-osp-lb', 'vm','dnat', 'dnsupdate' ]
       mode: update_floating_ip
@@ -60,18 +61,19 @@
     - role: layer3_vm_on_openstack
       tags: [ 'layer3', 'ocp', 'ocp-osp' ]
       mode: readfacts
+      openstack_vip: openstack2
 
 - hosts: ocp2-master-group
   remote_user: root
   gather_facts: false
   roles:
-    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-roles'], mode: create, certcn: 'openshift.{{ hailstorm_dns_domain }}', factprefix: openshift }
-    - { role: layerX_openshift_deploy, tags: [ 'layer3', 'ocp', 'ocp-install', 'ocp-metrics', 'ocp-roles' ], mode: create }
-    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-logging-certificate'], mode: create, certcn: 'kibana.{{ ocp_apps_dns_domain }}' }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-roles'], mode: create, certcn: 'openshift2.{{ hailstorm_dns_domain }}', factprefix: openshift }
+    - { role: layerX_openshift_deploy, tags: [ 'layer3', 'ocp', 'ocp-install', 'ocp-metrics', 'ocp-roles' ], mode: create,  openstack_vip: openstack2 }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-logging-certificate'], mode: create, certcn: 'kibana.{{ ocp2_apps_dns_domain }}' }
     - { role: layerX_openshift_route_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-logging-certificate'], mode: create, route: "logging-kibana", namespace: "logging" }
-    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-metrics-certificate'], mode: create, certcn: 'hawkular-metrics.{{ ocp_apps_dns_domain }}' }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-metrics-certificate'], mode: create, certcn: 'hawkular-metrics.{{ ocp2_apps_dns_domain }}' }
     - { role: layerX_openshift_route_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-metrics-certificate'], mode: create, route: "hawkular-metrics", namespace: "openshift-infra" }
-    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-router-certificate'], mode: create, certcn: '{{ ocp_apps_dns_domain }}', wildcard: true, factprefix: wildcard }
+    - { role: layer2_ipa_certificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-router-certificate'], mode: create, certcn: '{{ ocp2_apps_dns_domain }}', wildcard: true, factprefix: wildcard }
     - { role: layerX_openshift_router_wildcardcertificate, tags: ['layer3', 'ocp', 'ocp-install', 'ocp-router-certificate'], mode: create }
 #    - { role: layerX_openshift_devops_tools, tags: [layer3, 'ocp', 'ocp-devops'], mode: create }
 

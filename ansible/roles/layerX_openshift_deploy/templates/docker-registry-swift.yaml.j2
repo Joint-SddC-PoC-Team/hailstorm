@@ -11,7 +11,7 @@ storage:
   swift:
     username: admin
     password: {{ root_password }}
-    authurl: https://openstack.{{ hailstorm_dns_domain }}:13000/v3
+    authurl: https://{{ hostvars[openstack_vip|default('openstack')].hostname }}:13000/v3
     tenant: {{ osp_tenant }}
     domain: hailstorm
     insecureskipverify: true

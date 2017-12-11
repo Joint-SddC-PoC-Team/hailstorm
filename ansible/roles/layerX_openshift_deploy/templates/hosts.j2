@@ -29,13 +29,13 @@ openshift_builddefaults_git_https_proxy=https://{% if http_proxy.username|defaul
 #}
 
 {# it is important not to access the OSP metadata service (169.254.169.254) via proxy #}
-openshift_no_proxy=.{{ hailstorm_dns_domain }},169.254.169.254,openstack.{{ openstack_dns_domain }}
+openshift_no_proxy=.{{ hailstorm_dns_domain }},169.254.169.254,{{ hostvars[openstack_vip|default('openstack')].hostname }}
 {% endif %}
 
 {% if cf_is_deployed_on == 'osp' %}
 #openstack cloudprovider
 openshift_cloudprovider_kind=openstack
-openshift_cloudprovider_openstack_auth_url=https://openstack.{{ hailstorm_dns_domain }}:13000/v3
+openshift_cloudprovider_openstack_auth_url=https://{{ hostvars[openstack_vip|default('openstack')].hostname }}:13000/v3
 openshift_cloudprovider_openstack_username=admin
 openshift_cloudprovider_openstack_password={{ root_password }}
 openshift_cloudprovider_openstack_tenant_name={{ osp_tenant }}

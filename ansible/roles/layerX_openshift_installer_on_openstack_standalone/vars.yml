@@ -1,7 +1,7 @@
 ---
 ### OpenStack related data
 # Auth details
-AUTH_URL: https://openstack.{{ hailstorm_dns_domain }}:13000/v3
+AUTH_URL: https://{{ hostvars[openstack_vip|default('openstack')].hostname }}:13000/v3
 AUTH_USERNAME: admin
 AUTH_PASSWORD: redhat01
 ADMIN_PROJECT_NAME: admin

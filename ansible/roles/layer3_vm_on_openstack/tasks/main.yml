@@ -8,7 +8,7 @@
 
 
 - name: check if openstack is reachable
-  shell: curl -k {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://{{ hostvars['openstack'].vm_nics[0].ip }}/ || true
+  shell: curl -k {% if current_lifecycle_env.osp_use_tls %}https{% else %}http{% endif %}://{{ hostvars[openstack_vip|default('openstack')].vm_nics[0].ip }}/ || true
   register: openstack_response
   changed_when: false
   delegate_to: "{{ infrastructure_delegate_host_used_to_test_if_layer2_host_is_available }}"
@@ -17,7 +17,7 @@
 - block:
     - set_fact:
         os_auth_hailstorm:
-          auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
+          auth_url: "https://{{ hostvars[openstack_vip|default('openstack')].hostname }}:13000/v3/"
           domain_name: hailstorm
           user_domain_name: hailstorm
           project_domain_name: hailstorm
@@ -25,7 +25,7 @@
           password: "{{ root_password }}"
     - set_fact:
         os_auth_hailstorm_{{ item.name|replace("-","_") }}:
-          auth_url: "https://openstack.{{ hailstorm_dns_domain }}:13000/v3/"
+          auth_url: "https://{{ hostvars[openstack_vip|default('openstack')].hostname }}:13000/v3/"
           project_name: "{{ item.name }}"
           tenant_name: "{{ item.name }}"
           domain_name: hailstorm
