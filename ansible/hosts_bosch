@@ -498,6 +498,8 @@ lookbusy-osp-group
 ocp-osp-vm-group
 cf-osp-vm-group
 rh-sso-osp-vm-group
+ocp2-master-group
+ocp2-node-group
 
 [accessible_via_services_network:children]
 nuage
