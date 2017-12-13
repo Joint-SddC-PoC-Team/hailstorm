@@ -60,6 +60,19 @@
 - name: Move appliance to Zone
   command: "/var/www/miq/vmdb/bin/rails runner 'MiqServer.my_server.set_config(:server => {:zone => \"{{ cf_zone }}\"})'"
 
+- block:
+    - name: Set HTTP_Proxy settings for download OCP OpenSCAP definitions from Internet
+      command: /var/www/miq/vmdb/bin/rails runner 'ExtManagementSystem.find_by_name("openshift.{{ hailstorm_dns_domain }}").custom_attributes.create(:section => "cluster_settings", :name => 'http_proxy', :value => "http://cloudforms:{{ (proxy_users|selectattr('name','match','cloudforms')|first).password }}@{{hostvars['proxy'].vm_nics[0].ip}}:3128")'
+
+    - name: Set HTTPS_Proxy settings for download OCP OpenSCAP definitions from Internet
+      command: /var/www/miq/vmdb/bin/rails runner 'ExtManagementSystem.find_by_name("openshift.{{ hailstorm_dns_domain }}").custom_attributes.create(:section => "cluster_settings", :name => 'https_proxy', :value => "https://cloudforms:{{ (proxy_users|selectattr('name','match','cloudforms')|first).password }}@{{hostvars['proxy'].vm_nics[0].ip}}:3128")'
+
+    - name: Set NO_Proxy settings for download OCP OpenSCAP definitions from Internet
+      command: /var/www/miq/vmdb/bin/rails runner 'ExtManagementSystem.find_by_name("openshift.{{ hailstorm_dns_domain }}").custom_attributes.create(:section => "cluster_settings", :name => 'no_proxy', :value => "")'
+
+  when: cf_type=="wk-ocp"
+
+
 - name: perform appliance IPA integration
   shell: >
     LC_CTYPE= appliance_console_cli
@@ -73,3 +86,6 @@
 - name: set internal admin password
   shell: cd /var/www/miq/vmdb && rails r "User.find_by_userid('admin').update_attributes(:password => '{{ root_password }}')"
   #https://access.redhat.com/solutions/801103
+  #
+
+
