@@ -1029,7 +1029,7 @@ active_directory:
       - {username: user12, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
       - {username: user13, first: Vorname, last: Nachname, groups: [SDDC_OCP_cluster-admin], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
       - {username: user14, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
-      - {username: user15, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
+      - {username: user15, first: Vorname, last: Nachname, groups: [SDDC_CFME_icd21], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
       - {username: user16, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
       - {username: user17, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
       - {username: user18, first: Vorname, last: Nachname, groups: [SDDC_CFME_UserSelfService], desc: SDDC TestUser, password: "{{ password_for_all_test_users }}" }
@@ -1065,9 +1065,12 @@ active_directory:
       - { name: SDDC_CFME_User, desc: "User of the virtual infrastructure. Can view all virtual infrastructure items. Cannot perform actions on them."}
       - { name: SDDC_CFME_UserLimitedSelfService, desc: "Limited User of virtual machines. Can make provision requests. Can access some functions on the virtual machine that the user owns including changing power state."}
       - { name: SDDC_CFME_UserSelfService, desc: "Self Service	User of virtual machines. Can make provision requests. Can access some functions on the virtual machine that the user owns and that the user’s LDAP groups own including changing power state."}
+      - { name: SDDC_CFME_icd21, desc: "Used for UseCase ICD21 to add/revoke rights to CFME"}
       - { name: SDDC_CFME_VmUser, desc: "User of virtual machines. Can access all functions on the virtual machine including changing power state and viewing its console. Cannot assign policy, but can view policy simulation from virtual machine page."}
       - { name: SDDC_OSP_Member, desc: "OpenStack Member/user"}
       - { name: SDDC_OSP_Admin, desc: "OpenStack Admin"}
+
+
 #      - { name: Nuage_Administrators_NA, desc: Nuage Administrators }
 #      - { name: Nuage_Everybody_NA, desc: Nuage Users }
 #      - { name: Nuage_Network Designers_NA, desc: Nuage Network Designers }
