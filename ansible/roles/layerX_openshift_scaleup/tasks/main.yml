@@ -1,0 +1,6 @@
+- block:
+    - include: prereqs.yml
+      tags: ["ose3-prereqs"]
+    - include: install.yml
+      tags: ["ose3-ansible"]
+  when: mode=="create"

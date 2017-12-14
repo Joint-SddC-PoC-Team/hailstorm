@@ -156,6 +156,12 @@ openshift_logging_es_nodeselector={"region":"infra"}
 {{ hostvars[master].hostname }}
 {% endfor %}
 
+# Specify load balancer host
+[lb]
+{% for lb in groups["ocp-l2-or-rhv-lb-group"] %}
+{{ hostvars[lb].hostname }}
+{% endfor %}
+
 # host group for nodes, includes region info
 [nodes]
 {% for master in groups["ocp-master-group"] %}
@@ -165,8 +171,7 @@ openshift_logging_es_nodeselector={"region":"infra"}
 {{ hostvars[node].hostname }} openshift_hostname={{ hostvars[node].hostname_short }} openshift_node_labels="{{ hostvars[node].openshift_node_labels }}"
 {% endfor %}
 
-# Specify load balancer host
-[lb]
-{% for lb in groups["ocp-l2-or-rhv-lb-group"] %}
-{{ hostvars[lb].hostname }}
+[new_nodes]
+{% for node in groups["ocp-node-scaleup-group"] %}
+{{ hostvars[node].hostname }}
 {% endfor %}
