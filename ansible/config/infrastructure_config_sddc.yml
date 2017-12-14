@@ -24,7 +24,7 @@ disable_registration_against_satellite: "{% if infrastructure_network_master is 
 satellite_version:    "{% if infrastructure_network_master is defined %}6.2{% else %}{{ node_satellite_version }}{% endif %}"
 stage:                "{% if infrastructure_network_master is defined %}DEV{% else %}{{ node_stage }}{% endif %}"
 ocp_apps_dns_domain: "apps.{{ hailstorm_dns_domain }}"
-ocp_apps_dns_domain: "apps2.{{ hailstorm_dns_domain }}"
+ocp2_apps_dns_domain: "apps2.{{ hailstorm_dns_domain }}"
 ocp_tenant: "infra-openshift"
 rhsso_tenant: "infra-rh-sso"
 cf_tenant: "infra-cloudforms"
