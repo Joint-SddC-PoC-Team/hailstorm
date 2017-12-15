@@ -1,0 +1,14 @@
+
+- name: run scaleup playbook 
+  shell: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-node/scaleup.yml 2>&1 >~/openshift_scaleup.log
+  async: 7200
+  poll: 0
+  tags: ['playbook']
+  register: playbook
+
+- name: check on installer playbook completed
+  async_status: jid={{ playbook.ansible_job_id|default(playbook2.ansible_job_id) }}
+  register: job_result
+  until: job_result.finished
+  retries: 480
+  delay: 15

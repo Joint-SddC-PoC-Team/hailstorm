@@ -1,0 +1,101 @@
+---
+# instantiate VMs
+- hosts: ocp-node-scaleup-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'vm','dnat', 'ocp-prep' ]
+      mode: create
+      when: ocp_is_deployed_on == 'osp'
+
+- hosts: ocp-node-scaleup-group
+  gather_facts: false
+  remote_user: root
+  roles:
+    - role: layerX_dns
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'ocp-vm', 'ocp-osp-lb', 'vm','dnat', 'dnsupdate' ]
+      mode: update_floating_ip
+      when: ocp_is_deployed_on == 'osp'
+
+- hosts: rh-sso-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer2', 'ocp', 'ocp-l2', 'vm', 'ocp-vm']
+      mode: readfacts
+      when: rhsso_is_deployed_on == 'osp'
+
+# write VM+LBaaS tenant IPs to /etc/hosts
+- hosts: ocp-node-scaleup-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_openstack_etc_hosts_internal_ips
+      tags: [ 'layer3', 'ocp', 'ocp-osp', 'vm', 'ocp-vm', 'etc-hosts' ]
+      mode: create
+      group: "{{ groups['ocp-node-scaleup-group'] }}"
+      when: ocp_is_deployed_on == 'osp'
+    # - role: layerX_etc_hosts
+    #   tags: [ 'layer3', 'ocp', 'ocp-osp', 'etc-hosts' ]
+    #   mode: create
+    #   hosts:
+    #     - satellite
+    #     - ipa
+    #     - openstack
+    #     - rh-sso
+    #   when: ocp_is_deployed_on == 'osp'
+    - role: layerX_syslog_client
+      tags: [ 'layer2', 'ocp', 'syslog',  'syslog-client']
+      mode: create
+    - role: layerX_splunk_client
+      tags: [ 'layer2', 'ocp', 'splunk',  'splunk-client']
+      mode: create
+
+# # write floatign IPs to DNAT DNS
+# - hosts: infrastructure
+#   remote_user: root
+#   gather_facts: false
+#   roles:
+#    - role: layer2_dnat_dns
+#      tags: [ 'layer3', 'ocp-osp', 'dnat' , 'ocp-vm']
+#      mode: floating_ip
+#      group: "{{ groups['ocp-osp-lbaas-group'] }}"
+#      when: ocp_is_deployed_on == 'osp'
+
+# --- FOR OPENSHIFT ON EITHER LAYER2 OR OSP ---
+- hosts: ocp-node-scaleup-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layer2_rhel_reconfigure_dns, tags: [ 'layer3', 'ocp', 'dns', 'ocp-prep' ], mode: create, nameserver: "{{ (hostvars['ipa']|selectattr('netname','match', infrastructure_network_services.netname)|first).ip }}" }
+    - { role: layer2_rhel, tags: [ 'layer3', 'ocp', 'rhel', 'ocp-prep'  ], mode: create }
+    - { role: layerX_ipa_client, tags: [ 'layer3', 'ocp',  'ipa-client', 'ocp-prep' ], mode: create }
+    - { role: layerX_distribute_pubkey, tags: [ 'layer3', 'ocp', 'ocp-installprep' , 'ocp-prep' ], mode: create, pubkeyhost: "{{ groups['ocp-installer-group']|first }}" }
+    - role: layerX_proxy_client
+      tags: [ 'layer2', 'ocp', 'ocp-prep', 'proxy-client' ]
+      mode: create
+
+- hosts: ocp-node-scaleup-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layerX_openshift_osp_node, tags: [ 'layer3', 'ocp', 'ocp-node', 'ocp-prep' ], mode: create }
+
+
+# reread OSP VM facts, in case we skipped with ocp-vm/ocp-prep
+# reread rhsso vm facts, in case it is running on osp
+- hosts: ocp-node-scaleup-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - role: layer3_vm_on_openstack
+      tags: [ 'layer3', 'ocp', 'ocp-osp' ]
+      mode: readfacts
+
+- hosts: ocp-installer-group
+  remote_user: root
+  gather_facts: false
+  roles:
+    - { role: layerX_openshift_scaleup, tags: [ 'layer3', 'ocp', 'ocp-scaleup' ], mode: create }
