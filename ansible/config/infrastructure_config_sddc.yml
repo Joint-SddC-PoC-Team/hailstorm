@@ -14,7 +14,7 @@ infrastructure_delegate_kickstart_nfs_server: "{{ infrastructure_network_master|
 infrastructure_address_ssh_jump_host: "{{ infrastructure_network_master|default(layer1_ansible_host) }}"
 # Use dediciated ntp server if role ntp was defined to one infrastucture server
 #infrastructure_server_with_ntp_role: "{% for host in groups['infrastructure-group'] %}{% if 'ntp' in hostvars[host].roles %}{{ hostvars[host].vm_nics[0].ip }}{% endif %}{% endfor %}"
-infrastructure_address_ntp_server: "{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','ipa')|first).on_host_prefix|ipaddr('address') }}"
+infrastructure_address_ntp_server: "{% if osp_tenant is defined %}{{ (external_network_config.services_network_dnat.mapping|selectattr('expose_machine','match','ipa')|first).on_host_prefix|ipaddr('address') }}{% else %}{{ infrastructure_network_admin.default_gw_host_prefix|ipaddr('address') }}{% endif %}"
 
 infrastructure_address_default_dns: "{{ infrastructure_network_services.default_gw_host_prefix | ipaddr('address') }}"
 infrastructure_address_nfs_server: "{{ infrastructure_network_storage.default_gw_host_prefix | ipaddr('address') }}"
