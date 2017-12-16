@@ -1,0 +1,100 @@
+---
+- hosts: localhost
+
+#
+# Configure to match your environment
+#
+  vars:
+    nuage_auth:
+      api_username: csproot
+      api_password: csproot
+      api_enterprise: csp
+      api_url: https://10.116.127.156:8443
+      api_version: v5_0
+    enterprise_name: OpenStack2_Org
+    shared_enterprise: "Shared Infrastructure"
+
+  tasks:
+  - name: Finding Enterprise
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Enterprise
+      command: find
+      properties:
+        name: "{{ enterprise_name }}"
+    register: nuage_enterprise
+
+  - name: Fetching all Domains
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Domain
+      parent_id: "{{ nuage_enterprise.id }}"
+      parent_type: Enterprise
+      command: find
+    register: nuage_domains
+    ignore_errors: true
+
+#  - debug:
+#      var: nuage_domains
+
+  - name: Fetching all vminterfaces
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: VMInterface
+      command: find
+      parent_id: "{{ item.ID }}"
+      parent_type: Domain
+    with_items: "{{ nuage_domains.entities }}"
+    ignore_errors: yes
+    when: nuage_domains.entities is defined
+    register: nuage_vminterfaces
+
+  - include_tasks: delete_vminterfaces.yml nuage_vminterfaces_results="{{result_item}}"
+    with_items: "{{ nuage_vminterfaces.results }}"
+    loop_control:
+      loop_var: result_item
+    when: nuage_vminterfaces.results is defined
+
+  - name: Fetching all vports
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: VPort
+      command: find
+      parent_id: "{{ item.ID }}"
+      parent_type: Domain
+    with_items: "{{ nuage_domains.entities }}"
+    ignore_errors: yes
+    when: nuage_domains.entities is defined
+    register: nuage_vports
+
+#  - debug:
+#      var: nuage_vports.results[0]
+
+  - include_tasks: delete_vports.yml nuage_vports_results="{{result_item}}"
+    with_items: "{{ nuage_vports.results }}"
+    loop_control:
+      loop_var: result_item
+    when: nuage_vports.results is defined
+
+  - name: Deleting all found Domains
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Domain
+      state: absent
+      id: "{{ item.ID }}"
+    with_items: "{{ nuage_domains.entities }}"
+    when: nuage_domains.entities is defined
+
+  - name: Delete Enterprise
+    delegate_to: localhost
+    nuage_vspk:
+      auth: "{{ nuage_auth }}"
+      type: Enterprise
+      id: "{{ nuage_enterprise.id }}"
+      state: absent
+    ignore_errors: true

@@ -40,7 +40,7 @@
       tags: ['nuage-phase-4']
 
     - name: Phase V) configure VSRs
-      shell: "sshpass -p {{ nuage.vsr_pw }} ssh -o StrictHostKeyChecking=no {{ nuage.vsr_user }}@{{ hostvars[item].vm_nics[0].ip }} < ~/vsr/{{ item }}_w{% if infrastructure_network_guests.physical_underlay == false %}o{% endif %}_physical_underlay.cfg > ~/vsr/{{ item }}_w{% if infrastructure_network_guests.physical_underlay == false %}o{% endif %}_physical_underlay.cfg.log"
+      shell: "sshpass -p {{ nuage.vsr_pw }} ssh -o StrictHostKeyChecking=no {{ nuage.vsr_user }}@{{ hostvars[item].vm_nics[0].ip }} < ~/vsr/{{ item }}_w{% if infrastructure_network_guests.physical_underlay == false %}o{% endif %}_physical_underlay_{{ layer1_ansible_host }}.cfg > ~/vsr/{{ item }}_w{% if infrastructure_network_guests.physical_underlay == false %}o{% endif %}_physical_underlay.cfg.log"
       with_items:
         - r1
         - r2

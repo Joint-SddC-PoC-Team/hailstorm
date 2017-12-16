@@ -76,6 +76,11 @@
     src: "../../../binary/{{ nuage.metro_bins }}"
     dest: "~{{ nuage.user }}"
     use_ssh_args: yes
+- name: add configs from nuage directory
+  synchronize:
+    src: "../../../nuage"
+    dest: "~{{ nuage.user }}"
+    use_ssh_args: yes
 - name: move the bins to ~
   shell: rsync -aviPHAXS ~{{ nuage.user }}/{{ nuage.metro_bins }}/* ~{{ nuage.user }}/ && rm -Rf ~{{ nuage.user }}/{{ nuage.metro_bins }}
 - name: correct ownership
@@ -127,7 +132,7 @@
         - ipaddr
         - pexpect
         - vspk
-        - pyvmomi 
+        - pyvmomi
 
     - name: Upgrade pip modules
       pip:
