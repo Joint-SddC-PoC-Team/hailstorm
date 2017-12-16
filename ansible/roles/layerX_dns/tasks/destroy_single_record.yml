@@ -2,7 +2,7 @@
 - block:
     - shell: echo {{ hostvars['ipa'].ipa_admin_password }} | kinit admin && ipa dnsrecord-del {{ hailstorm_dns_domain }} {{ item }} --a-rec={{ ip }}
       register: iparecord
-      failed_when: iparecord.rc != 0 and 'DNS resource record not found' not in iparecord.stderr
+      failed_when: iparecord.rc != 0 and 'DNS resource record not found' not in iparecord.stderr and 'A record does not contain' not in iparecord.stderr
   delegate_to: ipa
 
 ### DNAT DNS
