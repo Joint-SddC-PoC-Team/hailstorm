@@ -968,6 +968,7 @@ osp_host_aggregates:
     availability_zone: development
     hosts:
      - overcloud-compute-0.{{ hailstorm_dns_domain }}
+     - overcloud-compute-5.{{ hailstorm_dns_domain }}
 
   - name: PROD
     availability_zone: production
@@ -975,6 +976,8 @@ osp_host_aggregates:
      - overcloud-compute-1.{{ hailstorm_dns_domain }}
      - overcloud-compute-2.{{ hailstorm_dns_domain }}
      - overcloud-compute-3.{{ hailstorm_dns_domain }}
+     - overcloud-compute-4.{{ hailstorm_dns_domain }}
+     - overcloud-compute-6.{{ hailstorm_dns_domain }}
 
 osp_mtu: 1500
 
