@@ -16,11 +16,11 @@
 - name: link key and cert
   file: state=link src=/etc/httpd/saml2/{{ item.src }} dest=/etc/httpd/saml2/{{ item.dest }}
   with_items:
-    - src: "https_cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.key"
+    - src: "https_cloudforms.{{ hailstorm_dns_domain|regex_replace('\\d|\\-','_') }}.key"
       dest: miqsp-key.key
-    - src: "https_cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.cert"
+    - src: "https_cloudforms.{{ hailstorm_dns_domain|regex_replace('\\d|\\-','_') }}.cert"
       dest: miqsp-cert.cert
-    - src: "https_cloudforms.{{ hailstorm_dns_domain|replace('-','_') }}.xml"
+    - src: "https_cloudforms.{{ hailstorm_dns_domain|regex_replace('\\d|\\-','_') }}.xml"
       dest: miqsp-metadata.xml
 
 - set_fact:
