@@ -3,7 +3,10 @@
   register: storageclasses
   changed_when: false
 
-- name: create Cinder Storage Class
-  shell: "oc create -f - <<EOF
-         {{ lookup('template','cinder_storageclass.yaml.j2') }}"
+- block:
+    - name: create storageclass file
+      template: src=cinder_storageclass.yaml.j2 dest=~/cinder_storageclass.yaml
+
+    - name: create Cinder Storage Class
+      shell: oc create -f ~/cinder_storageclass.yaml
   when: "'cinder' not in storageclasses.stdout_lines and cf_is_deployed_on == 'osp'"
