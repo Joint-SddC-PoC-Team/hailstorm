@@ -15,6 +15,7 @@
       tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'dnat' ]
       mode: create
       when: cf_is_deployed_on == 'osp'
+      osp_config_drive: true
     # - role: layerX_etc_hosts
     #   tags: [ 'layer3', 'cf', 'vm', 'cf-vm', 'etc-hosts' ]
     #   mode: create
