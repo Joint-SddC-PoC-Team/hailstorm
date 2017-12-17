@@ -100,11 +100,11 @@
 
     # need to cut off last character since this is a dot that is not returned from AD
     - name: create reverse lookup zone
-      win_shell: Add-DnsServerPrimaryZone -NetworkId {{ temp_host_prefix|ipaddr('network') }}/{{ temp_host_prefix|ipaddr('prefix') }} -ReplicationScope Domain
+      win_shell: Add-DnsServerPrimaryZone -Name {{ temp_reverse_zone_name[:-1] }} -ReplicationScope Domain
       when: temp_reverse_zone_name[:-1] not in ad_existing_zones.stdout_lines
 
     - name: query PTR record in AD DNS
-      win_shell: Get-DnsServerResourceRecord -ZoneName {{ temp_reverse_zone_name  }} -Name {{ temp_ptr_record }} -RRType PTR | %{$_.RecordData.PtrDomainName}
+      win_shell: Get-DnsServerResourceRecord -ZoneName {{ temp_reverse_zone_name[:-1]  }} -Name {{ temp_ptr_record }} -RRType PTR | %{$_.RecordData.PtrDomainName}
       failed_when: false
       changed_when: false
       register: temp_existing_ptr_record
