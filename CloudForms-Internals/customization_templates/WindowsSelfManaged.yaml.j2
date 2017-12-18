@@ -9,6 +9,7 @@
        ssh_key = evm[:sshkey]
     %>#ps1_sysnative
     net user Administrator <%=ssh_key%>
+    net user Administrator /active:yes
 
     C:
     mkdir C:\temp

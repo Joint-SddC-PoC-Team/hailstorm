@@ -9,9 +9,11 @@
        ssh_key = evm[:sshkey]
        script_username = evm[:scriptusername]
     %>#ps1_sysnative
+    net user <%=script_username%> /ADD
     net user <%=script_username%> <%=ssh_key%> /ADD
     net localgroup "Remote Desktop Users" <%=script_username%> /ADD
-    net user Administrator {{ root_password }}
+    net user Administrator /active:yes
+    net user Administrator 0pen_5ource
 
     C:
     mkdir C:\temp
